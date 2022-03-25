@@ -1,40 +1,91 @@
-<script setup>
-import { ref } from 'vue'
-
-defineProps({
-  msg: String
-})
-
-const count = ref(0)
-</script>
-
 <template>
-  <h1>{{ msg }}</h1>
+  <v-container>
+    <v-table>
+      <thead>
+      <tr>
+        <th class="text-left">
+          Name
+        </th>
+        <th class="text-left">
+          Calories
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr
+          v-for="item in desserts"
+          :key="item.name"
+      >
+        <td>{{ item.name }}</td>
+        <td>{{ item.calories }}</td>
+      </tr>
+      </tbody>
+    </v-table>
+    <div class="text-center">
+      <v-pagination
+          v-model="page"
+          :length="4"
+          prev-icon="mdi-menu-left"
+          next-icon="mdi-menu-right"
+      ></v-pagination>
+    </div>
+  </v-container>
 
-  <p>
-    Recommended IDE setup:
-    <a href="https://code.visualstudio.com/" target="_blank">VSCode</a>
-    +
-    <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
-  </p>
-
-  <p>
-    <a href="https://vitejs.dev/guide/features.html" target="_blank">
-      Vite Documentation
-    </a>
-    |
-    <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Documentation</a>
-  </p>
-
-  <button type="button" @click="count++">count is: {{ count }}</button>
-  <p>
-    Edit
-    <code>components/HelloWorld.vue</code> to test hot module replacement.
-  </p>
 </template>
 
-<style scoped>
-a {
-  color: #42b983;
+<script>
+export default {
+  name: "vtable.vue",
+  data () {
+    return {
+      desserts: [
+        {
+          name: 'Frozen Yogurt',
+          calories: 159,
+        },
+        {
+          name: 'Ice cream sandwich',
+          calories: 237,
+        },
+        {
+          name: 'Eclair',
+          calories: 262,
+        },
+        {
+          name: 'Cupcake',
+          calories: 305,
+        },
+        {
+          name: 'Gingerbread',
+          calories: 356,
+        },
+        {
+          name: 'Jelly bean',
+          calories: 375,
+        },
+        {
+          name: 'Lollipop',
+          calories: 392,
+        },
+        {
+          name: 'Honeycomb',
+          calories: 408,
+        },
+        {
+          name: 'Donut',
+          calories: 452,
+        },
+        {
+          name: 'KitKat',
+          calories: 518,
+        },
+      ],
+      page: 1,
+    }
+  },
 }
+</script>
+
+<style scoped>
+
 </style>
