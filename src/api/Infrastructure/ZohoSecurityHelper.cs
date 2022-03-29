@@ -32,7 +32,8 @@ public static class ZohoSecurityHelper {
             var response = clientToken.PostAsync($"{tokenHost}", content).GetAwaiter().GetResult();
             var resContent = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
-            return JsonConvert.DeserializeObject<AccessTokenResponse>(resContent).AccessToken;
+            // return JsonConvert.DeserializeObject<AccessTokenResponse>(resContent).AccessToken;
+            return "";
         }
     }
 }

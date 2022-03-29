@@ -7,9 +7,9 @@ public static class HttpClientConfig {
     public static void Setup(WebApplicationBuilder? builder) {
         var zohoSprintApiHost = builder.Configuration.GetValue<string>("Zoho:ApiHost");
 
-        builder.Services.AddHttpClient((httpClient, services) =>
+        builder.Services.AddHttpClient("", (services, httpClient) =>
         {
-            var accessToken =  ZohoServiceClient.GetAccessToken(serviceProvider, configuration);
+            var accessToken =  ZohoSecurityHelper.GetAccessToken(services, builder.Configuration);
 
             httpClient.BaseAddress = new Uri(zohoSprintApiHost);
 
