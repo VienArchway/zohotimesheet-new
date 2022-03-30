@@ -9,7 +9,7 @@ import { ref, reactive } from "vue";
 import ExampleProp from "./ExampleProp.vue"
 
 const state = reactive({
-  message: 'hieu-san, han-san',
+  message: 'testing',
   customMessage: '',
 })
 

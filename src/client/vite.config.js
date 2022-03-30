@@ -4,13 +4,11 @@ import vuetify from '@vuetify/vite-plugin'
 
 const path = require('path')
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
     vuetify({
-      autoImport: true,
+      autoImport: true, // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
     }),
   ],
   define: { 'process.env': {} },
@@ -19,22 +17,14 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
-  /* remove the need to specify .vue files https://vitejs.dev/config/#resolve-extensions
-  resolve: {
-    extensions: [
-      '.js',
-      '.json',
-      '.jsx',
-      '.mjs',
-      '.ts',
-      '.tsx',
-      '.vue',
-    ]
-  },
-  */
   server: {
     proxy: {
-      '/api': 'http://localhost:5000' // config api
+      '/api': 'http://localhost:5000', // config server api
+      '/zohoauth': {
+        target: 'https://accounts.zoho.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/zohoauth/, ''),
+      },
     }
   }
 })

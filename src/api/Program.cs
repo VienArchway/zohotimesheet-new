@@ -1,6 +1,11 @@
-var builder = WebApplication.CreateBuilder(args);
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 
+var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
+var configuration = builder.Configuration;
 
 builder.Services.AddControllers();
 builder.Services.AddSpaStaticFiles(config => { config.RootPath = "dist"; });
@@ -8,6 +13,25 @@ builder.Services.AddSpaStaticFiles(config => { config.RootPath = "dist"; });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// add jwt
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidIssuer = configuration["Jwt:Issuer"],
+            ValidAudience = configuration["Jwt:Audience"],
+            IssuerSigningKey = new X509SecurityKey(new X509Certificate2(configuration["Jwt:Client_Id"])),
+        };
+    });
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .Build();
+});
 
 var app = builder.Build();
 
@@ -22,12 +46,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSpaStaticFiles();
 app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseEndpoints(endpoints => { endpoints.MapDefaultControllerRoute(); });
-
-
-app.UseSpaStaticFiles();
 
 // Register middleware spa client
 app.UseSpa(spa =>

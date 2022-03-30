@@ -1,13 +1,7 @@
 <template>
-  <v-app>
-    <v-main>
-      <ShowMessage />
-      <HelloWorld/>
-    </v-main>
-  </v-app>
+  <router-view></router-view>
 </template>
 
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import ShowMessage from './components/ShowMessage.vue'
+// https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 </script>

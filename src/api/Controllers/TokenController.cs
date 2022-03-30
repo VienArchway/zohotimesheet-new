@@ -6,7 +6,7 @@ namespace api.Controllers;
 [Authorize]
 [Route("/api/v1/[controller]")]
 [ApiController]
-public class MessageController : ControllerBase
+public class TokenController : ControllerBase
 {
     public IActionResult Get(string? msg)
     {
