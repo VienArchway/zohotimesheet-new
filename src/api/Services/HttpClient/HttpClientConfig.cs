@@ -15,8 +15,6 @@ public static class HttpClientConfig {
 
             httpClient.DefaultRequestHeaders.Add("User-Agent", "Archway");
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken);
-
-            // httpClient.Timeout = TimeSpan.FromMinutes(3);
         });
     }
 }
