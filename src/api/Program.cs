@@ -1,4 +1,5 @@
 using System.Security.Cryptography.X509Certificates;
+using api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -14,24 +15,9 @@ builder.Services.AddSpaStaticFiles(config => { config.RootPath = "dist"; });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// add jwt
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidIssuer = configuration["Jwt:Issuer"],
-            ValidAudience = configuration["Jwt:Audience"],
-            IssuerSigningKey = new X509SecurityKey(new X509Certificate2(configuration["Jwt:Client_Id"])),
-        };
-    });
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .Build();
-});
+// add custom scheme authentication
+builder.Services.AddAuthentication(ZohoSetting.DefaultSchemeName)
+    .AddScheme<ZohoSetting, ZohoAuthHandle>(ZohoSetting.DefaultSchemeName, options => {});
 
 var app = builder.Build();
 
