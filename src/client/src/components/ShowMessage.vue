@@ -5,36 +5,30 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { onMounted, ref, reactive } from "vue";
 import ExampleProp from "./ExampleProp.vue"
+import MessageAPI from '../api/resources/Message.js'
+
+onMounted(async () => {
+  await getDefaultMessage()
+  await getMessageWithParam()
+})
 
 const state = reactive({
   message: 'testing',
-  customMessage: '',
+  customMessage: 'custom text',
 })
 
 const messageWithParameter = ref('')
 const messageWithoutParameter = ref('')
 
 // call api get message with msg parameter
-fetch('/api/v1/message?msg=' + state.message, {
-  headers: {
-    'Zoho-Verify-Token': localStorage.getItem('access-token'),
-    'Zoho-Client-Id': '1000.1KQGLWBUATFDBEE1S19FVN59D339GN' // client-id
-  }
-})
-    .then(res => res.text())
-    .then(t => messageWithParameter.value = t)
-// .then(t => state.message = t) // using reactive
+const getMessageWithParam = async () => {
+  messageWithParameter.value = await MessageAPI.getMessageWithParam(state.customMessage)
+}
 
 // call api get message without msg parameter
-fetch('/api/v1/message', {
-  headers: {
-    'Zoho-Verify-Token': localStorage.getItem('access-token'),
-    'Zoho-Client-Id': '1000.1KQGLWBUATFDBEE1S19FVN59D339GN' // client-id
-  }
-})
-    .then(res => res.text())
-    .then(t => messageWithoutParameter.value = t)
-
+const getDefaultMessage = async () => {
+  messageWithoutParameter.value = await MessageAPI.getDefaultMessage()
+}
 </script>
