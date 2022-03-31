@@ -2,6 +2,7 @@ using api;
 using api.Application;
 using api.Infrastructure;
 using api.Services;
+using api.Services.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -15,8 +16,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // add custom scheme authentication
-builder.Services.AddAuthentication(ZohoSetting.DefaultSchemeName)
-    .AddScheme<ZohoSetting, ZohoAuthHandle>(ZohoSetting.DefaultSchemeName, options => {});
+builder.Services.AddAuthentication(ZohoAuthenticationSchema.DefaultSchemeName)
+    .AddScheme<ZohoAuthenticationSchema, ZohoAuthenticationHandler>(ZohoAuthenticationSchema.DefaultSchemeName, options => {});
 
 // register dependency injections
 ServiceConfig.ConfigureService(builder);

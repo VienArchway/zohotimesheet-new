@@ -1,19 +1,22 @@
-using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using api.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
-namespace api;
+namespace api.Services.Security;
 
-public class ZohoAuthHandle : AuthenticationHandler<ZohoSetting>
+public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticationSchema>
 {
     private readonly IConfiguration _config;
+
+    private readonly ITeamClient teamClient;
     
-    public ZohoAuthHandle(IOptionsMonitor<ZohoSetting> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IConfiguration config)
+    public ZohoAuthenticationHandler(ITeamClient teamClient, IOptionsMonitor<ZohoAuthenticationSchema> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IConfiguration config)
         : base(options, logger, encoder, clock)
     {
         _config = config;
+        this.teamClient = teamClient;
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -44,19 +47,17 @@ public class ZohoAuthHandle : AuthenticationHandler<ZohoSetting>
         }
         
         // TODO: check expired
+        var fetchTeam = this.teamClient.SearchAsync().GetAwaiter().GetResult();
         
-        const string teamPath = "/teams/";
-        var fetchTeam = ZohoHttpClient.RunAsync(accessToken, teamPath, _config).GetAwaiter().GetResult();
-        
-        if (!fetchTeam.Equals("success"))
+        if (!fetchTeam.Any())
         {
             return Task.FromResult(AuthenticateResult.Fail($"Wrong access token: {Options.TokenHeaderName}"));
         }
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, fetchTeam),
-            new Claim(ClaimTypes.Name, fetchTeam),
+            new Claim(ClaimTypes.NameIdentifier, "NameIdentifier"),
+            new Claim(ClaimTypes.Name, "Name"),
         };
 
         var id = new ClaimsIdentity(claims, Scheme.Name);

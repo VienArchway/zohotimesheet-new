@@ -8,6 +8,7 @@ namespace api.Infrastructure
         public static void ConfigureService(IServiceCollection services)
         {
             services.AddScoped<IProjectClient, ProjectClient>();
+            services.AddScoped<ITeamClient, TeamClient>();
         }
     }
 }

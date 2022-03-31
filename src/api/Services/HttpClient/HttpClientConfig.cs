@@ -14,7 +14,7 @@ public static class HttpClientConfig {
             // Get accessToken from Request header to reduce number of access tokens.
             // If we generate many token at the same time, Zoho will return error "Given token is invalid".
             // If request does not include Access Token in header, we will generate new one for that request.
-            var accessToken = httpContext.HttpContext?.Request?.Headers["AccessToken"];
+            var accessToken = httpContext.HttpContext?.Request?.Headers["Zoho-Verify-Token"];
 
             // var accessToken =  ZohoSecurityHelper.GetAccessToken(services, builder.Configuration);
 

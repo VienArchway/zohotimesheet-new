@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authentication;
 
-namespace api;
+namespace api.Services.Security;
 
-public class ZohoSetting : AuthenticationSchemeOptions
+public class ZohoAuthenticationSchema : AuthenticationSchemeOptions
 {
     public const string DefaultSchemeName = "zoho";
     public string TokenHeaderName { get; set; } = "Zoho-Verify-Token";
