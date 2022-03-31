@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 using api.Models;
 using api.Infrastructure.Interfaces;
 
-namespace ZHTimeSheet.Infrastructure.Clients
+namespace api.Infrastructure.Clients
 {
     public class ProjectClient : ZohoServiceClient, IProjectClient
     {

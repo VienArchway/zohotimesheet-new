@@ -1,8 +1,7 @@
-using System.Security.Cryptography.X509Certificates;
 using api;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
+using api.Application;
+using api.Infrastructure;
+using api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -18,6 +17,11 @@ builder.Services.AddSwaggerGen();
 // add custom scheme authentication
 builder.Services.AddAuthentication(ZohoSetting.DefaultSchemeName)
     .AddScheme<ZohoSetting, ZohoAuthHandle>(ZohoSetting.DefaultSchemeName, options => {});
+
+// register dependency injections
+ServiceConfig.ConfigureService(builder);
+ApplicationConfig.ConfigureService(builder.Services);
+InfrastructureConfig.ConfigureService(builder.Services);
 
 var app = builder.Build();
 
