@@ -9,6 +9,7 @@ namespace api.Infrastructure
         {
             services.AddScoped<IProjectClient, ProjectClient>();
             services.AddScoped<ITeamClient, TeamClient>();
+            services.AddScoped<ITokenClient, TokenClient>();
         }
     }
 }
