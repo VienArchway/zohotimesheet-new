@@ -18,18 +18,18 @@ public class TokenController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(string), 200)]
+    [ProducesResponseType(typeof(Token), 200)]
     public async Task<IActionResult> GetAccessToken(string code)
     {
         var result = await service.GetAccessTokenAsync(code).ConfigureAwait(false);
         return Ok(result);
     }
 
-    [HttpGet]
-    [ProducesResponseType(typeof(string), 200)]
-    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync(string refreshToken)
-    {
-        var result = await service.GetAccessTokenFromRefreshTokenAsync(refreshToken).ConfigureAwait(false);
-        return Ok(result);
-    }
+    // [HttpGet("/refresh-access-token")]
+    // [ProducesResponseType(typeof(Token), 200)]
+    // public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync(string refreshToken)
+    // {
+    //     var result = await service.GetAccessTokenFromRefreshTokenAsync(refreshToken).ConfigureAwait(false);
+    //     return Ok(result);
+    // }
 }
