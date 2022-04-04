@@ -32,4 +32,12 @@ public class TokenController : ControllerBase
     //     var result = await service.GetAccessTokenFromRefreshTokenAsync(refreshToken).ConfigureAwait(false);
     //     return Ok(result);
     // }
+
+    // [HttpGet]
+    // [ProducesResponseType(typeof(Token), 200)]
+    // public async Task<IActionResult> RevokeRefreshTokenAsync(string token)
+    // {
+    //     await service.RevokeRefreshTokenAsync(token).ConfigureAwait(false);
+    //     return Ok();
+    // }
 }

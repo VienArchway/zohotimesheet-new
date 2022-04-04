@@ -22,5 +22,10 @@ namespace api.Application
         {
             return client.GetAccessTokenFromRefreshTokenAsync(refreshToken);
         }
+
+        public async Task RevokeRefreshTokenAsync(string token)
+        {
+            await client.RevokeRefreshTokenAsync(token);
+        }
     }
 }

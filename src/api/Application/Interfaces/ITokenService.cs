@@ -6,5 +6,7 @@ namespace api.Application.Interfaces
     {
         Task<Token> GetAccessTokenAsync(string code);
         Task<Token> GetAccessTokenFromRefreshTokenAsync(string refreshToken);
+
+        Task RevokeRefreshTokenAsync(string accessToken);
     }
 }

@@ -78,5 +78,32 @@ namespace api.Infrastructure.Clients
                 return token;
             }
         }
+
+        public async Task RevokeRefreshTokenAsync(string token)
+        {
+            var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
+
+            using (var clientToken = new HttpClient())
+            {
+                var parameter = new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("token", token)
+                };
+                var content = new FormUrlEncodedContent(parameter);
+                clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+                clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+                clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+                var response = await clientToken.PostAsync($"{tokenHost}/revoke", content);
+                
+                var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var srcJObj = JsonConvert.DeserializeObject<JObject>(resContent);
+                var status = srcJObj.GetValue("status")?.ToObject<string>();
+
+                if (status == null || !status.Equals("success"))
+                {
+                    throw new InvalidOperationException(resContent);
+                }
+            }
+        }
     }
 }

@@ -8,5 +8,6 @@ namespace api.Infrastructure.Interfaces
     {
         Task<Token> GetAccessTokenAsync(string code);
         Task<Token> GetAccessTokenFromRefreshTokenAsync(string refreshToken);
+        Task RevokeRefreshTokenAsync(string token);
     }
 }
