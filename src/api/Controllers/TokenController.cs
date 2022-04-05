@@ -25,7 +25,7 @@ public class TokenController : ControllerBase
         var result = await service.GetAccessTokenAsync(code).ConfigureAwait(false);
         return Ok(result);
     }
-
+    
     [HttpGet("refresh-access-token")]
     [ProducesResponseType(typeof(Token), 200)]
     public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync([FromQuery]string refreshToken)
@@ -34,11 +34,11 @@ public class TokenController : ControllerBase
         return Ok(result);
     }
 
-    // [HttpGet]
-    // [ProducesResponseType(typeof(Token), 200)]
-    // public async Task<IActionResult> RevokeRefreshTokenAsync(string token)
-    // {
-    //     await service.RevokeRefreshTokenAsync(token).ConfigureAwait(false);
-    //     return Ok();
-    // }
+    [HttpGet("revoke")]
+    [ProducesResponseType(typeof(Token), 200)]
+    public async Task<IActionResult> RevokeRefreshTokenAsync([FromQuery]string token)
+    {
+        await service.RevokeRefreshTokenAsync(token).ConfigureAwait(false);
+        return Ok();
+    }
 }
