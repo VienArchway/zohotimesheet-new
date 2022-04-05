@@ -8,6 +8,7 @@ namespace api.Application
         {
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IItemService, ItemService>();
         }
     }
 }

@@ -70,5 +70,52 @@ namespace api.Infrastructure.Clients
 
             return result;
         }
+        protected IEnumerable<User> ConvertUserDisplay(JToken items)
+        {
+            var result = new List<User>();
+
+            if (items != null)
+            {
+                #pragma warning disable S3217 // Either change the type to iterate on a generic collection of type
+                foreach (JProperty item in items)
+                {
+                    var newJObjFormat = new JObject();
+                    newJObjFormat.Add("id", item.Name);
+                    newJObjFormat.Add("displayName", item.Value.ToObject<string>());
+
+                    var resultItem = newJObjFormat.ToObject<User>();
+                    result.Add(resultItem);
+                }
+                #pragma warning restore S3217
+            }
+
+            return result;
+        }
+
+        protected FormUrlEncodedContent SetAndEncodeParameter<T>(T parameter)
+        {
+            var type = parameter.GetType();
+            var properties = type.GetProperties().Where(prop => prop.GetCustomAttribute(typeof(JsonPropertyAttribute)) != null);
+            var urlParameter = new List<KeyValuePair<string, string>>();
+
+            foreach (var property in properties)
+            {
+                var value = property.GetValue(parameter);
+                var jsonAttr = property.GetCustomAttribute<JsonPropertyAttribute>();
+                if (value != null)
+                {
+                    var stringValue = value.ToString();
+                    if (property.PropertyType.Equals(typeof(DateTime?)) ||
+                        property.PropertyType.Equals(typeof(DateTime))) {
+                        var date = (DateTime) value;
+                        stringValue = date.ToString("yyyy-MM-dd'T'HH:mm:ssZ");
+                    }
+                    var keyValue = new KeyValuePair<string, string>(jsonAttr.PropertyName, stringValue);
+                    urlParameter.Add(keyValue);
+                }
+            }
+
+            return new FormUrlEncodedContent(urlParameter);
+        }
     }
 }
