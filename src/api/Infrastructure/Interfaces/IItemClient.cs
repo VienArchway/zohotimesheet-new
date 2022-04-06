@@ -4,9 +4,9 @@ using api.Models;
 
 namespace api.Infrastructure.Interfaces
 {
-    public interface IItemClient
+    public interface ITaskItemClient
     {
-        Task<IEnumerable<Item>> SearchAsync(
+        Task<IEnumerable<TaskItem>> SearchAsync(
             DateTime? startDateFrom,
             DateTime? startDateTo,
             IEnumerable<int> sprintTypeIds,
@@ -14,19 +14,19 @@ namespace api.Infrastructure.Interfaces
             int statusId,
             IEnumerable<string> assignees);
 
-        Task<IEnumerable<Item>> SearchByProjectIdAsync(
+        Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(
             string projectId, 
-            IEnumerable<string> itemIds, 
-            IEnumerable<string> itemNos);
+            IEnumerable<string> TaskItemIds, 
+            IEnumerable<string> TaskItemNos);
 
-        Task UpdateStatusAsync(UpdateItemStatusParameter parameter);
+        Task UpdateStatusAsync(UpdateTaskItemStatusParameter parameter);
 
-        Task<Item> CreateAsync(ItemSaveParameter parameter);
+        Task<TaskItem> CreateAsync(TaskItemSaveParameter parameter);
 
-        Task<Item> CreateSubItemAsync(ItemSaveParameter parameter);
+        Task<TaskItem> CreateSubTaskItemAsync(TaskItemSaveParameter parameter);
 
-        Task UpdateAsync(ItemSaveParameter parameter);
+        Task UpdateAsync(TaskItemSaveParameter parameter);
 
-        Task DeleteAsync(DeleteItemParameter parameter);
+        Task DeleteAsync(DeleteTaskItemParameter parameter);
     }
 }

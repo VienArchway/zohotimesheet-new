@@ -36,24 +36,24 @@ namespace api.Infrastructure.Clients
             this.configuration = configuration;
         }
 
-        protected IEnumerable<T> ConvertJsonResponseToClass<T>(JToken? properties, JToken? items)
+        protected IEnumerable<T> ConvertJsonResponseToClass<T>(JToken? properties, JToken? TaskItems)
         {
             var result = new List<T>();
 
-            if (items != null)
+            if (TaskItems != null)
             {
                 #pragma warning disable S3217 // Either change the type to iterate on a generic collection of type
-                foreach (JProperty item in items)
+                foreach (JProperty TaskItem in TaskItems)
                 {
-                    var isNumber = long.TryParse(item.Name, out var temp);
+                    var isNumber = long.TryParse(TaskItem.Name, out var temp);
                     if (!isNumber)
                     {
                         continue;
                     }
 
                     var newJObjFormat = new JObject();
-                    var values = item.Value;
-                    newJObjFormat.Add("id", item.Name);
+                    var values = TaskItem.Value;
+                    newJObjFormat.Add("id", TaskItem.Name);
 
                     foreach (JProperty property in properties)
                     {
@@ -62,29 +62,29 @@ namespace api.Infrastructure.Clients
                         newJObjFormat.Add(property.Name, propertyVal);
                     }
 
-                    var resultItem = newJObjFormat.ToObject<T>();
-                    result.Add(resultItem);
+                    var resultTaskItem = newJObjFormat.ToObject<T>();
+                    result.Add(resultTaskItem);
                 }
                 #pragma warning restore S3217
             }
 
             return result;
         }
-        protected IEnumerable<User> ConvertUserDisplay(JToken items)
+        protected IEnumerable<User> ConvertUserDisplay(JToken TaskItems)
         {
             var result = new List<User>();
 
-            if (items != null)
+            if (TaskItems != null)
             {
                 #pragma warning disable S3217 // Either change the type to iterate on a generic collection of type
-                foreach (JProperty item in items)
+                foreach (JProperty TaskItem in TaskItems)
                 {
                     var newJObjFormat = new JObject();
-                    newJObjFormat.Add("id", item.Name);
-                    newJObjFormat.Add("displayName", item.Value.ToObject<string>());
+                    newJObjFormat.Add("id", TaskItem.Name);
+                    newJObjFormat.Add("displayName", TaskItem.Value.ToObject<string>());
 
-                    var resultItem = newJObjFormat.ToObject<User>();
-                    result.Add(resultItem);
+                    var resultTaskItem = newJObjFormat.ToObject<User>();
+                    result.Add(resultTaskItem);
                 }
                 #pragma warning restore S3217
             }

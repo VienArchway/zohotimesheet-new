@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 
 namespace api.Models
 {
-    public class ItemSaveParameter
+    public class TaskItemSaveParameter
     {
-        public string ItemId { get; set; }
+        public string TaskItemId { get; set; }
 
         public string ProjId { get; set; }
 
@@ -15,8 +15,8 @@ namespace api.Models
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
-        [JsonProperty(PropertyName = "projitemtypeid", NullValueHandling=NullValueHandling.Ignore)]
-        public long? ProjitemTypeId { get; set; }
+        [JsonProperty(PropertyName = "projItemTypeid", NullValueHandling=NullValueHandling.Ignore)]
+        public long? ProjItemTypeId { get; set; }
 
         [JsonProperty(PropertyName = "projpriorityid", NullValueHandling=NullValueHandling.Ignore)]
         public long? ProjPriorityId { get; set; }

@@ -24,4 +24,19 @@ public class ProjectController : ControllerBase
         var result = await service.SearchAsync().ConfigureAwait(false);
         return Ok(result);
     }
+
+    [HttpGet("priority/{projectId}")]
+    [ProducesResponseType(typeof(IEnumerable<ProjectPriority>), 200)]
+    public async Task<IActionResult> GetProjectPriorityAsync(string projectId)
+    {
+        var result = await service.GetProjectPriorityAsync(projectId).ConfigureAwait(false);
+        return Ok(result);
+    }
+    [HttpGet("TaskItem-type/{projectId}")]
+    [ProducesResponseType(typeof(IEnumerable<ProjectItemType>), 200)]
+    public async Task<IActionResult> GetProjectItemTypeAsync(string projectId)
+    {
+        var result = await service.GetProjectItemTypeAsync(projectId).ConfigureAwait(false);
+        return Ok(result);
+    }
 }

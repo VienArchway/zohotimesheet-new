@@ -3,11 +3,11 @@ using Newtonsoft.Json;
 
 namespace api.Models
 {
-    public class ItemSearchParameter
+    public class TaskItemSearchParameter
     {
-        public IEnumerable<string>? itemIds { get; set; }
+        public IEnumerable<string>? TaskItemIds { get; set; }
 
-        public IEnumerable<string>? itemNos { get; set; }
+        public IEnumerable<string>? TaskItemNos { get; set; }
 
         public DateTime? StartDateFrom { get; set; }
 

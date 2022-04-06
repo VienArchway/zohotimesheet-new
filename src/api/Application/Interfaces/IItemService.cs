@@ -2,20 +2,20 @@ using api.Models;
 
 namespace api.Application.Interfaces
 {
-    public interface IItemService
+    public interface ITaskItemService
     {
-        Task<IEnumerable<Item>> SearchAsync(ItemSearchParameter parameter);
+        Task<IEnumerable<TaskItem>> SearchAsync(TaskItemSearchParameter parameter);
 
-        Task<IEnumerable<Item>> SearchByProjectIdAsync(string projectId, ItemSearchParameter parameter);
+        Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(string projectId, TaskItemSearchParameter parameter);
 
-        Task UpdateStatusAsync(UpdateItemStatusParameter parameter);
+        Task UpdateStatusAsync(UpdateTaskItemStatusParameter parameter);
 
-        Task<Item> CreateAsync(ItemSaveParameter parameter);
+        Task<TaskItem> CreateAsync(TaskItemSaveParameter parameter);
 
-        Task<Item> CreateSubItemAsync(ItemSaveParameter parameter);
+        Task<TaskItem> CreateSubTaskItemAsync(TaskItemSaveParameter parameter);
 
-        Task UpdateAsync(ItemSaveParameter parameter);
+        Task UpdateAsync(TaskItemSaveParameter parameter);
 
-        Task DeleteAsync(DeleteItemParameter parameter);
+        Task DeleteAsync(DeleteTaskItemParameter parameter);
     }
 }

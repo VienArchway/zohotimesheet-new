@@ -12,16 +12,16 @@ namespace api.Models
         [JsonProperty(PropertyName = "projItemTypeId", NullValueHandling=NullValueHandling.Ignore)]
         public string ProjItemTypeId { get; set; }
 
-        [JsonProperty(PropertyName = "itemTypeImage", NullValueHandling=NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "ItemTypeImage", NullValueHandling=NullValueHandling.Ignore)]
         public string ItemTypeImage { get; set; }
 
         [JsonProperty(PropertyName = "baseType", NullValueHandling=NullValueHandling.Ignore)]
         public int BaseType { get; set; }
 
-        [JsonProperty(PropertyName = "itemTypeId", NullValueHandling=NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "ItemTypeId", NullValueHandling=NullValueHandling.Ignore)]
         public string ItemTypeId { get; set; }
 
-        [JsonProperty(PropertyName = "itemTypeName", NullValueHandling=NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "ItemTypeName", NullValueHandling=NullValueHandling.Ignore)]
         public string ItemTypeName { get; set; }
     }
 }

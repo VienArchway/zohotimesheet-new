@@ -7,14 +7,14 @@ using System.Web;
 
 namespace api.Infrastructure.Clients
 {
-    public class ItemClient : ZohoServiceClient, IItemClient
+    public class TaskItemClient : ZohoServiceClient, ITaskItemClient
     {
-        public ItemClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider)
+        public TaskItemClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider)
             : base(client, configuration, svcProvider)
         {
         }
 
-        public async Task<IEnumerable<Item>> SearchAsync(
+        public async Task<IEnumerable<TaskItem>> SearchAsync(
             DateTime? startDateFrom,
             DateTime? startDateTo,
             IEnumerable<int> sprintTypeIds,
@@ -22,7 +22,7 @@ namespace api.Infrastructure.Clients
             int statusId,
             IEnumerable<string> assignees)
         {
-            var result = new List<Item>();
+            var result = new List<TaskItem>();
             var index = 1;
             var hasNext = true;
             var range = 100;
@@ -54,7 +54,7 @@ namespace api.Infrastructure.Clients
                     filter.Add("completedon", JArray.FromObject(completedOn));
                 }
 
-                var url = $"team/{teamId}/globalview/?action=itemdetails&view={view}&viewoption={statusId}&index={index}&range={range}&needsubitem=true";
+                var url = $"team/{teamId}/globalview/?action=TaskItemdetails&view={view}&viewoption={statusId}&index={index}&range={range}&needsubTaskItem=true";
 
                 var filterEncode = HttpUtility.UrlEncode(JsonConvert.SerializeObject(filter));
                 if (!string.IsNullOrEmpty(filterEncode))
@@ -75,43 +75,43 @@ namespace api.Infrastructure.Clients
                 if (hasData)
                 {
                     hasNext = srcJObj.GetValue("next").ToObject<bool>();
-                    var itemProperties = srcJObj.GetValue("item_prop");
-                    var items = srcJObj.GetValue("itemJObj");
+                    var TaskItemProperties = srcJObj.GetValue("TaskItem_prop");
+                    var TaskItems = srcJObj.GetValue("TaskItemJObj");
                     var projItemTypeProperties = srcJObj.GetValue("projItemType_prop");
                     var projItemTypes = srcJObj.GetValue("projItemTypeJObj");
                     var projStatusProperties = srcJObj.SelectToken("projStatus.status_Prop");
                     var projStatuses = srcJObj.SelectToken("projStatus").Children().Last().Last();
-                    var userItems = srcJObj.GetValue("userDisplayName");
-                    var users = ConvertUserDisplay(userItems);
+                    var userTaskItems = srcJObj.GetValue("userDisplayName");
+                    var users = ConvertUserDisplay(userTaskItems);
 
-                    var resultItems = ConvertJsonResponseToClass<Item>(itemProperties, items);
+                    var resultTaskItems = ConvertJsonResponseToClass<TaskItem>(TaskItemProperties, TaskItems);
                     var resultProjItemTypes = ConvertJsonResponseToClass<ProjectItemType>(projItemTypeProperties, projItemTypes);
                     var resultprojStatuses = ConvertJsonResponseToClass<ProjectStatus>(projStatusProperties, projStatuses);
 
-                    foreach (var resultItem in resultItems)
+                    foreach (var resultTaskItem in resultTaskItems)
                     {
-                        resultItem.Users = users;
-                        resultItem.ProjItemName = resultProjItemTypes.FirstOrDefault(item => item.ProjItemTypeId.Equals(resultItem.ProjItemTypeId)).ItemTypeName;
+                        resultTaskItem.Users = users;
+                        resultTaskItem.ProjTaskItemName = resultProjItemTypes.FirstOrDefault(TaskItem => TaskItem.ProjItemTypeId.Equals(resultTaskItem.ProjItemTypeId)).ItemTypeName;
 
-                        var status = resultprojStatuses.FirstOrDefault(item => item.StatusId.Equals(resultItem.StatusId));
-                        resultItem.StatusName = status != null ? status.Name : null;
+                        var status = resultprojStatuses.FirstOrDefault(TaskItem => TaskItem.StatusId.Equals(resultTaskItem.StatusId));
+                        resultTaskItem.StatusName = status != null ? status.Name : null;
 
-                        if (resultItem.IsParent)
+                        if (resultTaskItem.IsParent)
                         {
-                            var urlSubItems = $"team/{teamId}/projects/{resultItem.ProjId}/sprints/{resultItem.SprintId}/item/{resultItem.ItemId}/subitem/?action=level";
-                            var resSubItems = await client.GetAsync(urlSubItems).ConfigureAwait(false);
+                            var urlSubTaskItems = $"team/{teamId}/projects/{resultTaskItem.ProjId}/sprints/{resultTaskItem.SprintId}/TaskItem/{resultTaskItem.TaskItemId}/subTaskItem/?action=level";
+                            var resSubTaskItems = await client.GetAsync(urlSubTaskItems).ConfigureAwait(false);
 
-                            if (resSubItems.StatusCode == HttpStatusCode.OK)
+                            if (resSubTaskItems.StatusCode == HttpStatusCode.OK)
                             {
-                                var resContentSubItems = await resSubItems.Content.ReadAsStringAsync().ConfigureAwait(false);
-                                var srcJObjSubItems = JsonConvert.DeserializeObject<JObject>(resContentSubItems);
-                                var subIds = srcJObjSubItems.GetValue("itemIds").ToObject<List<string>>();
-                                resultItem.SubItemIds = subIds;
+                                var resContentSubTaskItems = await resSubTaskItems.Content.ReadAsStringAsync().ConfigureAwait(false);
+                                var srcJObjSubTaskItems = JsonConvert.DeserializeObject<JObject>(resContentSubTaskItems);
+                                var subIds = srcJObjSubTaskItems.GetValue("TaskItemIds").ToObject<List<string>>();
+                                resultTaskItem.SubTaskItemIds = subIds;
                             }
                         }
                     }
 
-                    result.AddRange(resultItems);
+                    result.AddRange(resultTaskItems);
                     index += range;
                 }
                 else
@@ -123,21 +123,21 @@ namespace api.Infrastructure.Clients
             return result;
         }
 
-        public async Task<IEnumerable<Item>> SearchByProjectIdAsync(string projectId, IEnumerable<string> itemIds, IEnumerable<string> itemNos)
+        public async Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(string projectId, IEnumerable<string> TaskItemIds, IEnumerable<string> TaskItemNos)
         {
-            var result = new List<Item>();
+            var result = new List<TaskItem>();
             var filter = new JObject();
-            var url = $"team/{teamId}/projects/{projectId}/item/?action=multipledetails";
-            if (itemIds != null && itemIds.Any())
+            var url = $"team/{teamId}/projects/{projectId}/TaskItem/?action=multipledetails";
+            if (TaskItemIds != null && TaskItemIds.Any())
             {
-                var itemidarr = HttpUtility.UrlEncode(JsonConvert.SerializeObject(itemIds));
-                url += $"&itemidarr={itemidarr}";
+                var TaskItemidarr = HttpUtility.UrlEncode(JsonConvert.SerializeObject(TaskItemIds));
+                url += $"&TaskItemidarr={TaskItemidarr}";
             }
 
-            if (itemNos != null && itemNos.Any())
+            if (TaskItemNos != null && TaskItemNos.Any())
             {
-                var itemnoarr = HttpUtility.UrlEncode(JsonConvert.SerializeObject(itemNos));
-                url += $"&itemidarr={itemnoarr}";
+                var TaskItemnoarr = HttpUtility.UrlEncode(JsonConvert.SerializeObject(TaskItemNos));
+                url += $"&TaskItemidarr={TaskItemnoarr}";
             }
 
             var response = await client.GetAsync(url).ConfigureAwait(false);
@@ -150,42 +150,42 @@ namespace api.Infrastructure.Clients
 
             var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
 
-            var itemProperties = srcJObj.GetValue("item_prop");
-            var items = srcJObj.GetValue("itemJObj");
-            var userItems = srcJObj.GetValue("userDisplayName");
-            var users = ConvertUserDisplay(userItems);
+            var TaskItemProperties = srcJObj.GetValue("TaskItem_prop");
+            var TaskItems = srcJObj.GetValue("TaskItemJObj");
+            var userTaskItems = srcJObj.GetValue("userDisplayName");
+            var users = ConvertUserDisplay(userTaskItems);
 
-            var resultItems = ConvertJsonResponseToClass<Item>(itemProperties, items);
+            var resultTaskItems = ConvertJsonResponseToClass<TaskItem>(TaskItemProperties, TaskItems);
 
-            foreach (var resultItem in resultItems)
+            foreach (var resultTaskItem in resultTaskItems)
             {
-                resultItem.Users = users;
+                resultTaskItem.Users = users;
 
-                if (resultItem.IsParent)
+                if (resultTaskItem.IsParent)
                 {
-                    var urlSubItems = $"team/{teamId}/projects/{resultItem.ProjId}/sprints/{resultItem.SprintId}/item/{resultItem.ItemId}/subitem/?action=level";
-                    var resSubItems = await client.GetAsync(urlSubItems).ConfigureAwait(false);
+                    var urlSubTaskItems = $"team/{teamId}/projects/{resultTaskItem.ProjId}/sprints/{resultTaskItem.SprintId}/TaskItem/{resultTaskItem.TaskItemId}/subTaskItem/?action=level";
+                    var resSubTaskItems = await client.GetAsync(urlSubTaskItems).ConfigureAwait(false);
 
-                    if (resSubItems.StatusCode == HttpStatusCode.OK)
+                    if (resSubTaskItems.StatusCode == HttpStatusCode.OK)
                     {
-                        var resContentSubItems = await resSubItems.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        var srcJObjSubItems = JsonConvert.DeserializeObject<JObject>(resContentSubItems);
-                        var subIds = srcJObjSubItems.GetValue("itemIds").ToObject<List<string>>();
-                        resultItem.SubItemIds = subIds;
+                        var resContentSubTaskItems = await resSubTaskItems.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        var srcJObjSubTaskItems = JsonConvert.DeserializeObject<JObject>(resContentSubTaskItems);
+                        var subIds = srcJObjSubTaskItems.GetValue("TaskItemIds").ToObject<List<string>>();
+                        resultTaskItem.SubTaskItemIds = subIds;
                     }
                 }
 
-                result.AddRange(resultItems);
+                result.AddRange(resultTaskItems);
             }
 
-            result = result.OrderBy(item => item.ItemId).ToList();
+            result = result.OrderBy(TaskItem => TaskItem.TaskItemId).ToList();
 
             return result;
         }
 
-        public async Task UpdateStatusAsync(UpdateItemStatusParameter parameter)
+        public async Task UpdateStatusAsync(UpdateTaskItemStatusParameter parameter)
         {
-            var url = $"/zsapi/team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/{parameter.ItemId}/";
+            var url = $"/zsapi/team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/TaskItem/{parameter.TaskItemId}/";
             var content = SetAndEncodeParameter(parameter);
 
             var response = await client.PostAsync(url, content).ConfigureAwait(false);
@@ -200,43 +200,43 @@ namespace api.Infrastructure.Clients
             }
         }
 
-        public async Task<Item> CreateAsync(ItemSaveParameter parameter)
+        public async Task<TaskItem> CreateAsync(TaskItemSaveParameter parameter)
         {
-            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/";
+            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/TaskItem/";
             var formContent = SetAndEncodeParameter(parameter);
 
-            var response = await SendItem(url, formContent).ConfigureAwait(false);
-            var result = GetItemFromResponse(response);
+            var response = await SendTaskItem(url, formContent).ConfigureAwait(false);
+            var result = GetTaskItemFromResponse(response);
             return result.FirstOrDefault();
         }
 
-        public async Task<Item> CreateSubItemAsync(ItemSaveParameter parameter)
+        public async Task<TaskItem> CreateSubTaskItemAsync(TaskItemSaveParameter parameter)
         {
-            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/{parameter.ItemId}/subitem/";
+            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/TaskItem/{parameter.TaskItemId}/subTaskItem/";
             var formContent = SetAndEncodeParameter(parameter);
 
-            var response = await SendItem(url, formContent).ConfigureAwait(false);
-            var result = GetItemFromResponse(response);
+            var response = await SendTaskItem(url, formContent).ConfigureAwait(false);
+            var result = GetTaskItemFromResponse(response);
             return result.FirstOrDefault();
         }
 
-        public async Task UpdateAsync(ItemSaveParameter parameter)
+        public async Task UpdateAsync(TaskItemSaveParameter parameter)
         {
-            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/{parameter.ItemId}/";
+            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/TaskItem/{parameter.TaskItemId}/";
             var formContent = SetAndEncodeParameter(parameter);
 
-            await SendItem(url, formContent).ConfigureAwait(false);
+            await SendTaskItem(url, formContent).ConfigureAwait(false);
         }
 
-        public async Task DeleteAsync(DeleteItemParameter parameter)
+        public async Task DeleteAsync(DeleteTaskItemParameter parameter)
         {
-            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/{parameter.ItemId}/";
+            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/TaskItem/{parameter.TaskItemId}/";
             var formContent = SetAndEncodeParameter(parameter);
 
-            await SendItem(url, formContent).ConfigureAwait(false);
+            await SendTaskItem(url, formContent).ConfigureAwait(false);
         }
 
-        private async Task<JObject> SendItem(string url, FormUrlEncodedContent formContent)
+        private async Task<JObject> SendTaskItem(string url, FormUrlEncodedContent formContent)
         {
             client.DefaultRequestHeaders.Add("x-za-reqsize", new string[] { "large" });
             var response = await client.PostAsync(url, formContent).ConfigureAwait(false);
@@ -253,15 +253,15 @@ namespace api.Infrastructure.Clients
             return srcJObj;
         }
 
-        private IEnumerable<Item> GetItemFromResponse(JObject srcJObj, Project proj = null)
+        private IEnumerable<TaskItem> GetTaskItemFromResponse(JObject srcJObj, Project proj = null)
         {
-            var itemProperties = srcJObj.GetValue("item_prop");
-            var items = srcJObj.GetValue("itemJObj");
-            var userItems = srcJObj.GetValue("userDisplayName");
-            var users = ConvertUserDisplay(userItems);
+            var TaskItemProperties = srcJObj.GetValue("TaskItem_prop");
+            var TaskItems = srcJObj.GetValue("TaskItemJObj");
+            var userTaskItems = srcJObj.GetValue("userDisplayName");
+            var users = ConvertUserDisplay(userTaskItems);
 
-            var resultItems = ConvertJsonResponseToClass<Item>(itemProperties, items);
-            return resultItems;
+            var resultTaskItems = ConvertJsonResponseToClass<TaskItem>(TaskItemProperties, TaskItems);
+            return resultTaskItems;
         }
     }
 }

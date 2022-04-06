@@ -4,16 +4,16 @@ using api.Models;
 
 namespace api.Application
 {
-    public class ItemService : IItemService
+    public class TaskItemService : ITaskItemService
     {
-        private readonly IItemClient client;
+        private readonly ITaskItemClient client;
 
-        public ItemService(IItemClient client)
+        public TaskItemService(ITaskItemClient client)
         {
             this.client = client;
         }
 
-        public Task<IEnumerable<Item>> SearchAsync(ItemSearchParameter parameter)
+        public Task<IEnumerable<TaskItem>> SearchAsync(TaskItemSearchParameter parameter)
         {
             return client.SearchAsync(
                 parameter.StartDateFrom,
@@ -24,35 +24,35 @@ namespace api.Application
                 parameter.Assignees);
         }
 
-        public Task<IEnumerable<Item>> SearchByProjectIdAsync(string projectId, ItemSearchParameter parameter)
+        public Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(string projectId, TaskItemSearchParameter parameter)
         {
             return client.SearchByProjectIdAsync(
                 projectId,
-                parameter.itemIds,
-                parameter.itemNos);
+                parameter.TaskItemIds,
+                parameter.TaskItemNos);
         }
 
-        public Task UpdateStatusAsync(UpdateItemStatusParameter parameter)
+        public Task UpdateStatusAsync(UpdateTaskItemStatusParameter parameter)
         {
             return client.UpdateStatusAsync(parameter);
         }
 
-        public Task<Item> CreateAsync(ItemSaveParameter parameter)
+        public Task<TaskItem> CreateAsync(TaskItemSaveParameter parameter)
         {
             return client.CreateAsync(parameter);
         }
 
-        public Task<Item> CreateSubItemAsync(ItemSaveParameter parameter)
+        public Task<TaskItem> CreateSubTaskItemAsync(TaskItemSaveParameter parameter)
         {
-            return client.CreateSubItemAsync(parameter);
+            return client.CreateSubTaskItemAsync(parameter);
         }
 
-        public Task UpdateAsync(ItemSaveParameter parameter)
+        public Task UpdateAsync(TaskItemSaveParameter parameter)
         {
             return client.UpdateAsync(parameter);
         }
 
-        public Task DeleteAsync(DeleteItemParameter parameter)
+        public Task DeleteAsync(DeleteTaskItemParameter parameter)
         {
             return client.DeleteAsync(parameter);
         }

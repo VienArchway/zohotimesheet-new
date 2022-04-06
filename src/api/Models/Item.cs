@@ -3,10 +3,10 @@ using Newtonsoft.Json;
 
 namespace api.Models
 {
-    public class Item
+    public class TaskItem
     {
         [JsonProperty(PropertyName = "id")]
-        public string ItemId { get; set; }
+        public string TaskItemId { get; set; }
 
         [JsonProperty(PropertyName = "projId")]
         public string ProjId { get; set; }
@@ -17,8 +17,8 @@ namespace api.Models
         [JsonProperty(PropertyName = "endDate")]
         public string EndDate { get; set; }
 
-        [JsonProperty(PropertyName = "itemNo")]
-        public string ItemNo { get; set; }
+        [JsonProperty(PropertyName = "TaskItemNo")]
+        public string TaskItemNo { get; set; }
 
         [JsonProperty(PropertyName = "ownerId")]
         public List<string> OwnerId { get; set; }
@@ -31,8 +31,8 @@ namespace api.Models
         [JsonProperty(PropertyName = "duration")]
         public string Duration { get; set; }
 
-        [JsonProperty(PropertyName = "itemName")]
-        public string ItemName { get; set; }
+        [JsonProperty(PropertyName = "TaskItemName")]
+        public string TaskItemName { get; set; }
 
         [JsonProperty(PropertyName = "sprintType")]
         public int SprintType { get; set; }
@@ -75,7 +75,7 @@ namespace api.Models
         [JsonProperty(PropertyName = "projItemTypeId")]
         public string ProjItemTypeId { get; set; }
 
-        public string ProjItemName { get; set; }
+        public string ProjTaskItemName { get; set; }
 
         [JsonProperty(PropertyName = "projectId")]
         public string ProjectId { get; set; }
@@ -86,6 +86,6 @@ namespace api.Models
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
 
-        public IEnumerable<string> SubItemIds { get; set; }
+        public IEnumerable<string> SubTaskItemIds { get; set; }
     }
 }

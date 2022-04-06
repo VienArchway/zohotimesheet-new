@@ -17,5 +17,15 @@ namespace api.Application
         {
             return client.SearchAsync();
         }
+
+        public Task<IEnumerable<ProjectPriority>> GetProjectPriorityAsync(string id)
+        {
+            return client.GetProjectPriorityAsync(id);
+        }
+
+        public Task<IEnumerable<ProjectItemType>> GetProjectItemTypeAsync(string id)
+        {
+            return client.GetProjectItemTypeAsync(id);
+        }
     }
 }
