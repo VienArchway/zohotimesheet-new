@@ -32,7 +32,7 @@ public class ProjectController : ControllerBase
         var result = await service.GetProjectPriorityAsync(projectId).ConfigureAwait(false);
         return Ok(result);
     }
-    [HttpGet("TaskItem-type/{projectId}")]
+    [HttpGet("item-type/{projectId}")]
     [ProducesResponseType(typeof(IEnumerable<ProjectItemType>), 200)]
     public async Task<IActionResult> GetProjectItemTypeAsync(string projectId)
     {

@@ -4,11 +4,11 @@ using api.Models;
 
 namespace api.Application
 {
-    public class TokenService :  ITokenService
+    public class ZohoTokenService :  IZohoTokenService
     {
-        private readonly ITokenClient client;
+        private readonly IZohoTokenClient client;
 
-        public TokenService(ITokenClient client)
+        public ZohoTokenService(IZohoTokenClient client)
         {
             this.client = client;
         }

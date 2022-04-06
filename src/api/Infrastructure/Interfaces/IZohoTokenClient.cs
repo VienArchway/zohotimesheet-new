@@ -4,7 +4,7 @@ using api.Models;
 
 namespace api.Infrastructure.Interfaces
 {
-    public interface ITokenClient
+    public interface IZohoTokenClient
     {
         Task<Token> GetAccessTokenAsync(string code);
         Task<Token> GetAccessTokenFromRefreshTokenAsync(string refreshToken);

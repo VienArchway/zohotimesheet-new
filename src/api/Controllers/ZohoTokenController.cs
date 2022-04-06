@@ -9,11 +9,11 @@ namespace api.Controllers;
 [Route("/api/v1/[controller]")]
 [ApiController]
 
-public class TokenController : ControllerBase
+public class ZohoTokenController : ControllerBase
 {
-    private readonly ITokenService service;
+    private readonly IZohoTokenService service;
 
-    public TokenController(ITokenService service)
+    public ZohoTokenController(IZohoTokenService service)
     {
         this.service = service;
     }

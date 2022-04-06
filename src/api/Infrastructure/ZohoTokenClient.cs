@@ -12,9 +12,9 @@ using System.Net.Http.Headers;
 
 namespace api.Infrastructure.Clients
 {
-    public class TokenClient: ZohoServiceClient, ITokenClient
+    public class ZohoTokenClient: ZohoServiceClient, IZohoTokenClient
     {
-        public TokenClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider)
+        public ZohoTokenClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider)
             : base(client, configuration, svcProvider)
         {
         }
