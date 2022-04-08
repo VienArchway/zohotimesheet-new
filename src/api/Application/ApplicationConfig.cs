@@ -12,7 +12,7 @@ namespace api.Application
             services.AddScoped<ILogWorkService, LogWorkService>();
             services.AddScoped<ITaskItemService, TaskItemService>();
             services.AddScoped<IZohoTokenService, ZohoTokenService>();
-            // services.AddScoped<IZohoWebHookService, ZohoWebHookService>();
+            services.AddScoped<IWebHookService, WebHookService>();
             // services.AddScoped<ISlackService, SlackService>();
             // services.AddScoped<IWebHookService, WebHookService>();
             // services.AddScoped<IAdlsService, AdlsService>();

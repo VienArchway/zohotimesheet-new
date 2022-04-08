@@ -15,6 +15,7 @@ namespace api.Infrastructure
             services.AddScoped<ISprintClient, SprintClient>();
             services.AddScoped<IUserClient, UserClient>();
             services.AddScoped<ILogWorkClient, LogWorkClient>();
+            services.AddScoped<IWebHookClient, WebHookClient>();
         }
     }
 }
