@@ -1,5 +1,8 @@
 using api.Infrastructure.Interfaces;
 using api.Infrastructure.Clients;
+using Microsoft.Rest;
+using Microsoft.Identity.Client;
+using Microsoft.PowerBI.Api;
 
 namespace api.Infrastructure
 {
