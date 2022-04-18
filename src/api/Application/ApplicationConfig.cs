@@ -13,12 +13,12 @@ namespace api.Application
             services.AddScoped<ITaskItemService, TaskItemService>();
             services.AddScoped<IZohoTokenService, ZohoTokenService>();
             services.AddScoped<IWebHookService, WebHookService>();
-            // services.AddScoped<ISlackService, SlackService>();
+            services.AddScoped<ISlackService, SlackService>();
             // services.AddScoped<IWebHookService, WebHookService>();
-            // services.AddScoped<IAdlsService, AdlsService>();
+            services.AddScoped<IAdlsService, AdlsService>();
 
-            // services.AddHostedService<QueuedHostedService>();
-            // services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+            services.AddHostedService<QueuedHostedService>();
+            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
             // services.AddSingleton<ZohoHostedService>();
             // services.AddSingleton<IHostedService, ZohoHostedService>(serviceProvider => serviceProvider.GetService<ZohoHostedService>());
