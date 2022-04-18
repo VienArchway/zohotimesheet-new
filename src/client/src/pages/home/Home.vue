@@ -1,35 +1,29 @@
 <template>
-  <a ref="redirectLogin" :href="zohoAuthUrl" />
-  <v-container v-if="isLogin">
-    <h1>Homepage</h1>
-    <div>
-      <router-link to="/about">About</router-link>
-    </div>
-    <ShowMessageComp />
-    <HelloWorld />
-  </v-container>
+  <AppLogin :is-login="isLogin">
+    <AppContainer>
+      <h1>Homepage</h1>
+      <div>
+        <router-link to="/about">About</router-link>
+      </div>
+      <AsyncShowMessage />
+    </AppContainer>
+  </AppLogin>
 </template>
 
 <script setup>
-import { defineAsyncComponent, onMounted, ref } from 'vue'
-import HelloWorld from '@/components/HelloWorld.vue'
-const ShowMessageComp = defineAsyncComponent(() => import('@/components/ShowMessage.vue'))
+import AppLogin from '@/components/app/AppLogin.vue'
+import AppContainer from '@/components/app/AppContainer.vue'
+import AppLoading from '@/components/app/AppLoading.vue'
+import { defineAsyncComponent } from 'vue'
+import { useLogin } from '@/lib/auth/login.js'
 
-const zohoAuthUrl = import.meta.env.VITE_ZOHO_REDIRECT_LOGIN
-const redirectLogin = ref(null)
-const isLogin = ref(false)
-
-onMounted(() => {
-  console.log('access-token', localStorage.getItem('access-token'))
-  console.log('refresh-token', localStorage.getItem('refresh-token'))
-  if (!localStorage.getItem('access-token')) {
-    window.location.href = redirectLogin.value.href
-  } else {
-    isLogin.value = true
-  }
+const AsyncShowMessage = defineAsyncComponent({
+  loader: () => import('@/components/ShowMessage.vue'),
+  loadingComponent: AppLoading,
+  delay: 200
 })
+const { isLogin } = useLogin()
 </script>
 
 <style scoped>
-
 </style>

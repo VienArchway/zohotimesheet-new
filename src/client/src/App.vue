@@ -1,7 +1,16 @@
 <template>
-  <router-view></router-view>
+<!--  <RouterView v-slot="{ Component }">-->
+<!--    <Suspense timeout="0">-->
+<!--      <template #default>-->
+<!--        <component :is="Component" />-->
+<!--      </template>-->
+<!--      <template #fallback>-->
+<!--        <AppLoading />-->
+<!--      </template>-->
+<!--    </Suspense>-->
+<!--  </RouterView>-->
+  <RouterView />
 </template>
 
 <script setup>
-// https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 </script>

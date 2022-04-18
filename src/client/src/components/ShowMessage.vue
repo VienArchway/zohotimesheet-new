@@ -9,9 +9,9 @@ import { onMounted, ref, reactive } from "vue";
 import ExampleProp from "./ExampleProp.vue"
 import MessageAPI from '../api/resources/Message.js'
 
-onMounted(async () => {
-  await getDefaultMessage()
-  await getMessageWithParam()
+onMounted(() => {
+  getDefaultMessage()
+  getMessageWithParam()
 })
 
 const state = reactive({

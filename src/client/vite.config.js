@@ -12,6 +12,7 @@ export default defineConfig({
     }),
   ],
   define: { 'process.env': {} },
+  envPrefix: 'FE_',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

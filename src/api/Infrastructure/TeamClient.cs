@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using api.Models;
 using api.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
 
 namespace api.Infrastructure.Clients
 {
@@ -23,9 +25,14 @@ namespace api.Infrastructure.Clients
             var response = await client.GetAsync("teams/").ConfigureAwait(false);
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
+            
             var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<Team>();
+            }
             var portals = srcJObj?.SelectToken("portals") as JArray;
-            return portals.ToObject<List<Team>>();
+            return portals?.ToObject<List<Team>>() ?? new List<Team>();
         }
     }
 }
