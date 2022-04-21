@@ -1,28 +1,17 @@
 import { createRouter } from 'vue-router'
-import Homepage from './home/Home.vue'
-import About from './about/About.vue'
-import AuthCallback from './auth/Callback.vue'
+import routes from '~pages'
 
+const errorPage =  {
+    name: 'error',
+    path: '/:pathMatch(.*)*',
+    component: () => import('@/components/app/AppErrorPage.vue'),
+    props: true
+}
 
-const routes = [
-    {
-        path: '/',
-        component: Homepage
-    },
-
-    {
-        path: '/about/',
-        component: About
-    },
-
-    {
-        path: '/auth/callback',
-        component: AuthCallback
-    }
-]
+routes.push(errorPage)
 
 export default function (history) {
-    return createRouter({
+    return  createRouter({
         history,
         routes
     })

@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from '@vuetify/vite-plugin'
+import VueI18n from '@intlify/vite-plugin-vue-i18n'
+import Pages from 'vite-plugin-pages'
 
 const path = require('path')
 
@@ -9,6 +11,16 @@ export default defineConfig({
     vue(),
     vuetify({
       autoImport: true, // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
+    }),
+    VueI18n({
+      runtimeOnly: true,
+      compositionOnly: true,
+      include: [path.resolve(__dirname, 'i18n/**')],
+    }),
+    Pages({
+      dirs: [
+        { dir: 'src/pages', baseRoute: '' },
+      ],
     }),
   ],
   define: { 'process.env': {} },

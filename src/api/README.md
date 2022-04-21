@@ -21,3 +21,9 @@ https://www.zoho.com/accounts/protocol/oauth-setup.html
 - Get access token and refresh token from code
 - Generate access token from refresh token
 
+
+## C# Coding Conventions
+
+https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions
+
+https://www.dofactory.com/csharp-coding-standards

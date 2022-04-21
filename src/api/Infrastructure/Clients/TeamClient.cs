@@ -1,15 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+using api.Infrastructure.Interfaces;
+using api.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using api.Models;
-using api.Infrastructure.Interfaces;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Options;
 
 namespace api.Infrastructure.Clients
 {

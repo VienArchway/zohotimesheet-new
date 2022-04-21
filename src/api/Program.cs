@@ -16,8 +16,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // add custom scheme authentication
-// builder.Services.AddAuthentication(ZohoAuthenticationSchema.DefaultSchemeName)
-//     .AddScheme<ZohoAuthenticationSchema, ZohoAuthenticationHandler>(ZohoAuthenticationSchema.DefaultSchemeName, options => {});
+builder.Services.AddAuthentication(ZohoAuthenticationSchema.DefaultSchemeName)
+    .AddScheme<ZohoAuthenticationSchema, ZohoAuthenticationHandler>(ZohoAuthenticationSchema.DefaultSchemeName, options => {});
 
 // register dependency injections
 ServiceConfig.ConfigureService(builder);
@@ -40,8 +40,8 @@ if (app.Environment.IsDevelopment())
 app.UseSpaStaticFiles();
 app.UseRouting();
 
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseEndpoints(endpoints => { endpoints.MapDefaultControllerRoute(); });
 

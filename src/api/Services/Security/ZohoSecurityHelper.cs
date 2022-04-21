@@ -1,9 +1,8 @@
 using System.Net.Http.Headers;
+using api.Models;
 
-namespace api.Service.Security
+namespace api.Services.Security
 {
-    public record TeamClient(object Portals, string Status);
-
     public static class ZohoSecurityHelper
     {
         public static string GetAccessToken(IServiceProvider serviceProvider, IConfiguration configuration)
@@ -11,7 +10,7 @@ namespace api.Service.Security
             var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>();
             var userRefreshToken = httpContext?.HttpContext?.User?.Claims.FirstOrDefault(x => x.Type == "ZohoRefreshToken")?.Value;
 
-            return GetAccessTokenFromRefreshToken(configuration, userRefreshToken);
+            return GetAccessTokenFromRefreshToken(configuration, userRefreshToken!);
         }
 
         private static string GetAccessTokenFromRefreshToken(IConfiguration configuration, string refreshToken)
@@ -21,7 +20,7 @@ namespace api.Service.Security
             var clientSecret = configuration.GetValue<string>("Zoho:ClientSecret");
             var redirectUri = configuration.GetValue<string>("Zoho:Redirect_uri");
 
-            using (var clientToken = new HttpClient())
+            using (var clientToken = new System.Net.Http.HttpClient())
             {
                 var parameter = new List<KeyValuePair<string, string>>
                 {
@@ -44,9 +43,9 @@ namespace api.Service.Security
         }
 
 
-        public static async Task<string> GetTea(string apiKey, string path, IConfiguration config)
+        public static async Task<string?> GetTea(string apiKey, string path, IConfiguration config)
         {
-            using (var httpClient = new HttpClient())
+            using (var httpClient = new System.Net.Http.HttpClient())
             {
                 if (httpClient.BaseAddress == null)
                 {
@@ -60,8 +59,8 @@ namespace api.Service.Security
 
                 var response = await httpClient.GetAsync(httpClient.BaseAddress + path);
                 var teamClient = await response.Content.ReadFromJsonAsync<TeamClient>();
-                Console.WriteLine(teamClient.Portals);
-                return teamClient.Status;
+                Console.WriteLine(teamClient?.Portals);
+                return teamClient?.Status;
             }
         }
     }

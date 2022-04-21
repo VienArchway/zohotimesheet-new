@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers;
 
-[AllowAnonymous]
+[Authorize]
 [Route("/api/v1/[controller]")]
 [ApiController]
 public class MessageController : ControllerBase

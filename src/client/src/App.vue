@@ -1,15 +1,11 @@
 <template>
-<!--  <RouterView v-slot="{ Component }">-->
-<!--    <Suspense timeout="0">-->
-<!--      <template #default>-->
-<!--        <component :is="Component" />-->
-<!--      </template>-->
-<!--      <template #fallback>-->
-<!--        <AppLoading />-->
-<!--      </template>-->
-<!--    </Suspense>-->
-<!--  </RouterView>-->
-  <RouterView />
+  <RouterView v-slot="{ Component }">
+    <Suspense timeout="0">
+      <div>
+        <component :is="Component" />
+      </div>
+    </Suspense>
+  </RouterView>
 </template>
 
 <script setup>

@@ -1,5 +1,3 @@
-using api.Infrastructure.Interfaces;
-using api.Infrastructure.Clients;
 using api.Services.HttpClient;
 using Microsoft.Rest;
 using Microsoft.PowerBI.Api;
