@@ -1,17 +1,14 @@
+<script setup>
+import AppLogin from '@/components/app/AppLogin.vue'
+import AppContainer from '@/components/app/AppContainer.vue'
+</script>
+
 <template>
-  <p>About</p>
-  <router-link to="/">Back to home</router-link>
+  <AppLogin>
+    <AppContainer>
+      <p>About</p>
+      <router-link to="/">Back to home</router-link>
+    </AppContainer>
+  </AppLogin>
 </template>
 
-<script setup>
-</script>
-
-<script>
-export default {
-  name: "About"
-}
-</script>
-
-<style scoped>
-
-</style>

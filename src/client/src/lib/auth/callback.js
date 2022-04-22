@@ -1,11 +1,9 @@
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import ZOHO_SETTINGS from '@/lib/zoho.js'
 
 export function useHandleCallBack() {
     const route = useRoute()
-    const router = useRouter()
-
     const code = ref(null)
 
     const handleRedirectFromCallBack = async () => {
@@ -34,7 +32,7 @@ export function useHandleCallBack() {
             localStorage.setItem('refresh-token', data?.refresh_token)
             localStorage.setItem('expired', data?.expires_in)
 
-            router.push({path: '/'})
+            window.location.href = '/'
         } else {
             console.error('Can not get code')
         }

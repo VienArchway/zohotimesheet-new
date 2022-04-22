@@ -1,21 +1,3 @@
-<i18n>
-{
-  "en": {
-    "test-message": "test message"
-  },
-  "ja": {
-    "test-message": "メジェしょい"
-  }
-}
-</i18n>
-
-<template>
-  <ExampleProp :message="state.message" />
-  <p>with msg: {{ messageWithParameter }}</p>
-  <p>default: {{ messageWithoutParameter }}</p>
-  {{ t('test-message') }}
-</template>
-
 <script setup>
 import { useI18n } from 'vue-i18n'
 import { onMounted, ref, reactive } from "vue";
@@ -47,3 +29,21 @@ const getDefaultMessage = async () => {
   messageWithoutParameter.value = await getDefaultMessageApi()
 }
 </script>
+
+<template>
+  <ExampleProp :message="state.message" />
+  <p>with msg: {{ messageWithParameter }}</p>
+  <p>default: {{ messageWithoutParameter }}</p>
+  {{ t('test-message') }}
+</template>
+
+<i18n>
+{
+  "en": {
+    "test-message": "test message"
+  },
+  "ja": {
+    "test-message": "メジェしょい"
+  }
+}
+</i18n>

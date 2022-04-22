@@ -34,3 +34,5 @@ FE_ZOHO_TOKEN_PATH=oauth/v2/token
 FE_ZOHO_LOGIN_URL=https://accounts.zoho.com/oauth/v2/auth
 FE_ZOHO_LOGIN_SCOPE=ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ
 ```
+
+### Pages

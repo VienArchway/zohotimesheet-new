@@ -1,14 +1,15 @@
-<template>
-  <div v-if="isLogin">
-    <slot />
-  </div>
-</template>
+<script setup>
+import useAuthStore from '@/store/auth.js'
+import { onMounted } from 'vue'
 
-<script>
-export default {
-  name: "AppLogin",
-  props: {
-    isLogin: Boolean
-  }
-}
+const auth = useAuthStore()
+
+onMounted(() => {
+  if (!auth.getAuthentication) auth.login()
+})
+
 </script>
+
+<template>
+  <slot v-if="auth.isAuthenticated" />
+</template>
