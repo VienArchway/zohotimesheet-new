@@ -2,5 +2,8 @@
   "hello": "こんにちは",
   "button": {
     "back": "戻る"
+  },
+  "pages": {
+    "not-found": "見つかりません"
   }
 }

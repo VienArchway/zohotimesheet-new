@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import vuetify from '@vuetify/vite-plugin'
 import VueI18n from '@intlify/vite-plugin-vue-i18n'
 import Pages from 'vite-plugin-pages'
+import Layouts from 'vite-plugin-vue-layouts'
 
 const path = require('path')
 
@@ -22,6 +23,9 @@ export default defineConfig({
         { dir: 'src/pages', baseRoute: '' },
       ],
     }),
+    Layouts({
+      defaultLayout: 'default'
+    }),
   ],
   define: { 'process.env': {} },
   envPrefix: 'FE_',
@@ -39,5 +43,12 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/zohoauth/, ''),
       },
     }
-  }
+  },
+  test: {
+    include: ['test/**/*.test.js'],
+    // environment: 'jsdom',
+    deps: {
+      inline: ['@vue', '@vueuse', 'vue-demi'],
+    },
+  },
 })

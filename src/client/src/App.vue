@@ -1,7 +1,7 @@
 <template>
   <RouterView v-slot="{ Component }">
     <Suspense timeout="0">
-      <div class="app-component">
+      <div class="zoho">
         <component :is="Component" />
       </div>
     </Suspense>

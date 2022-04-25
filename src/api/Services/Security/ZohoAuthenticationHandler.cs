@@ -60,6 +60,8 @@ public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticatio
         {
             return Task.FromResult(AuthenticateResult.Fail($"Wrong access token: {Options.TokenHeaderName}"));
         }
+        
+        // TODO: save refresh_token to somewhere
 
         var claims = new[]
         {

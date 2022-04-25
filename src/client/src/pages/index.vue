@@ -1,6 +1,4 @@
 <script setup>
-import AppLogin from '@/components/app/AppLogin.vue'
-import AppContainer from '@/components/app/AppContainer.vue'
 import AppLoading from '@/components/app/AppLoading.vue'
 import { defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -15,14 +13,15 @@ const AsyncShowMessage = defineAsyncComponent({
 </script>
 
 <template>
-  <AppLogin>
-    <AppContainer>
-      <h1>Zoho index page</h1>
-      {{ t('hello') }}
-      <div>
-        <router-link to="/about">About</router-link>
-      </div>
-      <AsyncShowMessage />
-    </AppContainer>
-  </AppLogin>
+  <h1>Zoho index page</h1>
+  {{ t('hello') }}
+  <div>
+    <router-link to="/about">About</router-link>
+  </div>
+  <AsyncShowMessage />
 </template>
+
+<route lang="yaml">
+meta:
+  layout: auth
+</route>

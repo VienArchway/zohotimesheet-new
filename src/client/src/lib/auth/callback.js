@@ -29,7 +29,7 @@ export function useHandleCallBack() {
             }
 
             localStorage.setItem('access-token', data?.access_token)
-            localStorage.setItem('refresh-token', data?.refresh_token)
+            // localStorage.setItem('refresh-token', data?.refresh_token)
             localStorage.setItem('expired', data?.expires_in)
 
             window.location.href = '/'
