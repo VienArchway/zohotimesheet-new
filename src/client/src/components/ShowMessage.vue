@@ -1,10 +1,10 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
+// import { useI18n } from 'vue-i18n'
 import { onMounted, ref, reactive } from "vue";
 import ExampleProp from "./ExampleProp.vue"
 import { getDefaultMessageApi, getMessageWithParamApi } from '@/api/resources/Message.js'
 
-const { t } = useI18n()
+// const { t } = useI18n()
 
 onMounted(() => {
   getDefaultMessage()
@@ -34,16 +34,14 @@ const getDefaultMessage = async () => {
   <ExampleProp :message="state.message" />
   <p>with msg: {{ messageWithParameter }}</p>
   <p>default: {{ messageWithoutParameter }}</p>
-  {{ t('test-message') }}
 </template>
 
-<i18n>
-{
-  "en": {
-    "test-message": "test message"
-  },
-  "ja": {
-    "test-message": "メジェしょい"
-  }
+<script>
+export default {
+  name: "ShowMessageApi"
 }
-</i18n>
+</script>
+
+<style scoped>
+
+</style>

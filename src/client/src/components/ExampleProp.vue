@@ -6,7 +6,7 @@ const props = defineProps({
 <template>
   <div>
     <h1>Message here</h1>
-    <span>{{ props.message }}</span>
+    <span data-testid="prop-msg">{{ props.message }}</span>
   </div>
 </template>
 
