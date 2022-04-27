@@ -7,6 +7,7 @@ import vuetify from '@/plugins/vuetify/vuetify'
 import { loadFonts } from '@/plugins/vuetify/webfontloader'
 import useAuthStore from '@/store/auth.js'
 import ZOHO_SETTINGS from '@/lib/zoho.js'
+import { worker } from '@/mocks/browser.js'
 
 loadFonts()
 
@@ -16,4 +17,19 @@ app
     .use(i18n)
     .use(router)
     .use(vuetify)
+
+if (import.meta.env.MODE === "e2e") {
+    localStorage.setItem('access-token', 'test login')
+    const auth = useAuthStore()
+    auth.isAuthenticated = true
+    if (auth.getAuthentication) {
+        console.log('run e2e')
+        worker.start()
+    }
+    
+    if (window.Cypress) {
+        window.appReady = true
+    }
+}
+
 app.mount('#app')

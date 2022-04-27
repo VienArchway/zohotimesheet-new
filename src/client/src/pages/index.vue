@@ -16,7 +16,7 @@ const AsyncShowMessage = defineAsyncComponent({
   <h1>Zoho index page</h1>
   {{ t('hello') }}
   <div>
-    <router-link to="/about">About</router-link>
+    <router-link data-cy="link-about" to="/about">About</router-link>
   </div>
   <AsyncShowMessage />
 </template>

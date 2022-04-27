@@ -1,4 +1,4 @@
 <template>
   <p>About</p>
-  <router-link to="/">Back to home</router-link>
+  <router-link data-cy="link-index" to="/">Back to home</router-link>
 </template>

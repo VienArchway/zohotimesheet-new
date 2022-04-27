@@ -11,7 +11,7 @@ https://vuejs.org/guide/scaling-up/testing.html
 ```js
 test: {
     globals: true, // instead import { describe, expect, it, test,... }
-    environment: 'happy-dom',
+    environment: 'jsdom',
   },
 ```
 
@@ -26,3 +26,9 @@ test: {
 - https://testing-library.com/docs/dom-testing-library/api-events
 - https://vitest.dev/api/
 - https://mswjs.io/docs/getting-started/mocks/rest-api
+
+
+## References
+
+- https://kentcdodds.com/blog/stop-mocking-fetch
+- https://mswjs.io/docs/recipes

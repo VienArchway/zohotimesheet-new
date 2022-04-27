@@ -6,8 +6,10 @@
     "serve": "vite preview",
     "build": "vite build",
     "dev": "vite",
+    "dev:e2e": "vite --mode=e2e",
     "preview": "vite preview",
     "test": "vitest",
+    "test:e2e": "cypress open",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
@@ -23,9 +25,12 @@
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^4.0.0",
+    "@testing-library/cypress": "^8.0.2",
     "@testing-library/vue": "^6.4.2",
     "@vue/test-utils": "^2.0.0-rc.21",
     "@vuetify/vite-plugin": "^1.0.0-alpha.0",
+    "c8": "^7.11.2",
+    "cypress": "^9.6.0",
     "happy-dom": "latest",
     "jsdom": "latest",
     "msw": "latest",
@@ -38,5 +43,8 @@
     "vue-cli-plugin-vuetify": "~2.4.8",
     "vuetify-loader": "^2.0.0-alpha.0",
     "whatwg-fetch": "^3.6.2"
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }
