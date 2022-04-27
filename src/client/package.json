@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "@vitejs/plugin-vue": "^2.3.1",
     "pinia": "^2.0.12",
     "roboto-fontface": "*",
     "vue": "^3.2.33",
@@ -23,7 +24,6 @@
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^4.0.0",
     "@testing-library/vue": "^6.4.2",
-    "@vitejs/plugin-vue": "^2.3.1",
     "@vue/test-utils": "^2.0.0-rc.21",
     "@vuetify/vite-plugin": "^1.0.0-alpha.0",
     "happy-dom": "latest",
@@ -36,6 +36,7 @@
     "vite-plugin-vue-layouts": "^0.6.0",
     "vitest": "latest",
     "vue-cli-plugin-vuetify": "~2.4.8",
-    "vuetify-loader": "^2.0.0-alpha.0"
+    "vuetify-loader": "^2.0.0-alpha.0",
+    "whatwg-fetch": "^3.6.2"
   }
 }

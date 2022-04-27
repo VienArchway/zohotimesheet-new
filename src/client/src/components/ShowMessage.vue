@@ -31,9 +31,10 @@ const getDefaultMessage = async () => {
 </script>
 
 <template>
+  <h2>Show message component</h2>
   <ExampleProp :message="state.message" />
-  <p>with msg: {{ messageWithParameter }}</p>
-  <p>default: {{ messageWithoutParameter }}</p>
+  <p data-testid="custom-ms">with msg: {{ messageWithParameter }}</p>
+  <p data-testid="default-ms">default: {{ messageWithoutParameter }}</p>
 </template>
 
 <script>
