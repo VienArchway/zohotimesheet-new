@@ -4,7 +4,7 @@ context('Index page', () => {
     beforeEach(() => {
         cy.login()
         cy.visit('/')
-        cy.window().should('have.property', 'appReady', true)
+        // cy.window().should('have.property', 'appReady', true)
     })
 
     it('index infor', () => {

@@ -8,6 +8,7 @@
   "exclude": [
     "node_modules",
     "dist",
+    "coverage",
     "cypress",
     "__snapshots__"
   ]
