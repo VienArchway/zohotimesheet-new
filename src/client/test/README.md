@@ -2,9 +2,14 @@
 
 https://vuejs.org/guide/scaling-up/testing.html
 
+This folder will cover `unit test` and `component test`
+```
 - unit test
 - component test
-- e2e test
+```
+
+
+- e2e test -> [here](../cypress/README.md)
 
 ## Setup
 

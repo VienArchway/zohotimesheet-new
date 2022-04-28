@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "ESNext",
+    "target": "ES6",
     "sourceMap": true
   },
+  "include": ["src/**/*"],
   "exclude": [
     "node_modules",
     "dist",
-    "cypress"
+    "cypress",
+    "__snapshots__"
   ]
 }
