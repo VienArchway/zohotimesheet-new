@@ -23,8 +23,8 @@ namespace api.Infrastructure.Clients
         public async Task<IEnumerable<LogWork>> SearchAsync(
             DateTime? startDate,
             DateTime? endDate,
-            Project project,
-            Sprint sprint,
+            IEnumerable<string> projectIds,
+            IEnumerable<string> sprintTypes,
             IEnumerable<string> ownerIds,
             int delayTimeoutBySeconds = 0)
         {
@@ -46,9 +46,19 @@ namespace api.Infrastructure.Clients
                 if (delayTask.Status == TaskStatus.RanToCompletion)
                 {
                     var filter = new JObject();
+                    if (projectIds != null && projectIds.Any())
+                    {
+                        filter.Add("projectIds", JArray.FromObject(projectIds));
+                    }
+
                     if (ownerIds != null && ownerIds.Any())
                     {
                         filter.Add("logowner", JArray.FromObject(ownerIds));
+                    }
+
+                    if (sprintTypes != null && sprintTypes.Any())
+                    {
+                        filter.Add("sprinttype", JArray.FromObject(sprintTypes));
                     }
 
                     if (startDate.HasValue && endDate.HasValue)
@@ -58,14 +68,15 @@ namespace api.Infrastructure.Clients
                             endDate = DateTime.Now.Date;
                         }
 
-                        filter.Add("logdate_startdate", startDate.Value.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
-                        filter.Add("logdate_enddate", endDate.Value.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
-                        filter.Add("logdate", JArray.FromObject(new string[] { "5" }));
+                        filter.Add("logdate", JArray.FromObject(new string[] { "custom" }));
+                        filter.Add("logdate_fromdate", startDate.Value.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
+                        filter.Add("logdate_todate", endDate.Value.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
                     }
 
                     var filterEncode = HttpUtility.UrlEncode(JsonConvert.SerializeObject(filter));
 
-                    var url = $"team/{teamId}/projects/{project.ProjId}/sprints/{sprint.SprintId}/timesheet/?action=logitems&index={index}&range={range}&listviewtype=1";
+                    var url = $"team/{teamId}/timesheet/?action=orglogs&viewtype=0&index={index}&range={range}&logtype=0";
+
 
                     if (!string.IsNullOrEmpty(filterEncode))
                     {
@@ -82,15 +93,14 @@ namespace api.Infrastructure.Clients
                     else
                     {
                         var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
+                        var properties = srcJObj?.GetValue("log_prop");
+                        var logworkItems = srcJObj?.GetValue("logJObj");
+                        var resultTaskItems = ConvertJsonResponseToClass<LogWork>(properties, logworkItems);
+
+                        totalResult.AddRange(resultTaskItems);
+
                         hasData = srcJObj.GetValue("hasData").ToObject<bool>();
-
-                        if (hasData)
-                        {
-                            var resultItems = GetLogWorkFromResponse(srcJObj, project);
-
-                            totalResult.AddRange(resultItems);
-                            index += range;
-                        }
+                        index += range;
                     }
                 }
             }
@@ -224,6 +234,24 @@ namespace api.Infrastructure.Clients
                 {
                     logwork.ProjName = proj.ProjName;
                 }
+            }
+
+            return resultItems;
+        }
+
+        private IEnumerable<LogWork> GetLogWorkFromResponse(JObject srcJObj)
+        {
+            var properties = srcJObj.GetValue("log_prop");
+            var items = srcJObj.GetValue("logJObj");
+            var userItems = srcJObj.GetValue("userDisplayName");
+            var resultItems = ConvertJsonResponseToClass<LogWork>(properties, items);
+            var users = ConvertUserDisplay(userItems);
+
+            foreach (var logwork in resultItems)
+            {
+                logwork.LogDate = !string.IsNullOrEmpty(logwork.LogDate) ? logwork.LogDate.Split(" ")[0] : null;
+                logwork.LogTime = logwork.LogTime == null ? 0 : (logwork.LogTime / 3600000);
+                logwork.OwnerName = users.FirstOrDefault(x => x.UserId.Equals(logwork.Owner)).DisplayName;
             }
 
             return resultItems;

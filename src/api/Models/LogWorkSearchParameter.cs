@@ -11,5 +11,9 @@ namespace api.Models
         public IEnumerable<string>? OwnerIds { get; set; }
 
         public int? SprintTypeId { get; set; }
+
+        public IEnumerable<string>? ProjectIds { get; set; }
+
+        public IEnumerable<string>? SprintTypes { get; set; }
     }
 }

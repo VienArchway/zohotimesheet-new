@@ -9,8 +9,8 @@ namespace api.Infrastructure.Interfaces
         Task<IEnumerable<LogWork>> SearchAsync(
             DateTime? startDate,
             DateTime? endDate,
-            Project project,
-            Sprint sprint,
+            IEnumerable<string> projectIds,
+            IEnumerable<string> sprintTypes,
             IEnumerable<string> ownerIds,
             int delayTimeoutBySeconds = 0);
 

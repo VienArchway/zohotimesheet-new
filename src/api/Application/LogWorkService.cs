@@ -28,34 +28,7 @@ namespace api.Application
 
         public async Task<IEnumerable<LogWork>> SearchAsync(LogWorkSearchParameter parameter)
         {
-            var result = new List<LogWork>();
-            var projects = (parameter.Projects != null && parameter.Projects.Any()) ? parameter.Projects :
-                    await projectClient.SearchAsync().ConfigureAwait(false);
-
-            foreach (var project in projects)
-            {
-                var sprints = project.Sprints;
-                if (sprints == null || !sprints.Any())
-                {
-                    sprints = await sprintClient.SearchAsync(project.ProjId, parameter.SprintTypeId).ConfigureAwait(false);
-                }
-
-                if (parameter.SprintTypeId == null || parameter.SprintTypeId == 0)
-                {
-                    var backlog = await backlogClient.SearchAsync(project.ProjId).ConfigureAwait(false);
-                    if (backlog != null)
-                    {
-                        sprints = sprints.Append(new Sprint() { SprintId = backlog.BacklogId, SprintName = "BackLog" });
-                    }
-                }
-
-                var delaySeconds = sprints.Count() > 10 ? 3 : 0;
-
-                foreach (var sprint in sprints)
-                {
-                    result.AddRange(await client.SearchAsync(parameter.StartDate, parameter.EndDate, project, sprint, parameter.OwnerIds, delaySeconds).ConfigureAwait(false));
-                }
-            }
+            var result = await client.SearchAsync(parameter.StartDate, parameter.EndDate, parameter.ProjectIds, parameter.SprintTypes, parameter.OwnerIds).ConfigureAwait(false);
 
             return result;
         }
