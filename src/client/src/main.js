@@ -6,7 +6,6 @@ import i18n from '@/lib/i18n.js'
 import vuetify from '@/plugins/vuetify/vuetify'
 import { loadFonts } from '@/plugins/vuetify/webfontloader'
 import useAuthStore from '@/store/auth.js'
-import ZOHO_SETTINGS from '@/lib/zoho.js'
 import { worker } from '@/mocks/browser.js'
 
 loadFonts()

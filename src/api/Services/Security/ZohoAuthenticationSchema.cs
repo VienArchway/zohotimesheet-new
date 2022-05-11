@@ -6,5 +6,7 @@ public class ZohoAuthenticationSchema : AuthenticationSchemeOptions
 {
     public const string DefaultSchemeName = "zoho";
     public string TokenHeaderName { get; set; } = "Zoho-Verify-Token";
-    public string ClientIdHeaderName { get; } = "Zoho-Client-Id";
+    public string RefreshTokenHeaderName { get; set; } = "Zoho-Refresh-Token";
+    
+    public string IsRedirectUri { get; set; } = "Is-Redirect-Uri"; 
 }

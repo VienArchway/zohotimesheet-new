@@ -20,7 +20,15 @@ const props = defineProps({
       
       <router-view />
 
-      <v-btn @click="router.back()">{{ t('button.back') }}</v-btn>
+      <v-btn @click="router.back()">
+        {{ t('button.back') }}
+      </v-btn>
+      <v-btn
+        v-if="props.errorStatus === '401'"
+        @click="router.push('/auth/callback')"
+      >
+        {{ t('button.try-again') }}
+      </v-btn>
     </AppContainer>
   </main>
 </template>

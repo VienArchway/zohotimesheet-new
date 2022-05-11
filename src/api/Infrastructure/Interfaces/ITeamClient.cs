@@ -4,6 +4,6 @@ namespace api.Infrastructure.Interfaces
 {
     public interface ITeamClient
     {
-        Task<IEnumerable<Team>> SearchAsync();
+        Task<string?> SearchAsync();
     }
 }

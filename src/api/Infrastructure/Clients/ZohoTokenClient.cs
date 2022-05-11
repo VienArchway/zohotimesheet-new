@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using api.Models;
@@ -26,27 +20,25 @@ namespace api.Infrastructure.Clients
             var clientSecret = configuration.GetValue<string>("Zoho:ClientSecret");
             var redirectUri = configuration.GetValue<string>("Zoho:Redirect_uri");
 
-            using (var clientToken = new HttpClient())
+            using var clientToken = new HttpClient();
+            var parameter = new List<KeyValuePair<string, string>>
             {
-                var parameter = new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("code", code),
-                    new KeyValuePair<string, string>("client_id", clientId),
-                    new KeyValuePair<string, string>("client_secret", clientSecret),
-                    new KeyValuePair<string, string>("redirect_uri", redirectUri),
-                    new KeyValuePair<string, string>("grant_type", "authorization_code")
-                };
-                var content = new FormUrlEncodedContent(parameter);
-                clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-                clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-                clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-                var response = await clientToken.PostAsync($"{tokenHost}", content);
-                var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                new("code", code),
+                new("client_id", clientId),
+                new("client_secret", clientSecret),
+                new("redirect_uri", redirectUri),
+                new("grant_type", "authorization_code")
+            };
+            var content = new FormUrlEncodedContent(parameter);
+            clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+            var response = await clientToken.PostAsync($"{tokenHost}", content);
+            var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                var token = JsonConvert.DeserializeObject<Token>(resContent);
-                // return JsonConvert.DeserializeObject<AccessTokenResponse>(resContent).AccessToken;
-                return token;
-            }
+            var token = JsonConvert.DeserializeObject<Token>(resContent);
+            // return JsonConvert.DeserializeObject<AccessTokenResponse>(resContent).AccessToken;
+            return token ?? throw new InvalidOperationException();
         }
 
         public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string refreshToken)
@@ -54,55 +46,49 @@ namespace api.Infrastructure.Clients
             var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
             var clientId = configuration.GetValue<string>("Zoho:ClientId");
             var clientSecret = configuration.GetValue<string>("Zoho:ClientSecret");
-            var redirectUri = configuration.GetValue<string>("Zoho:Redirect_uri");
 
-            using (var clientToken = new HttpClient())
+            using var clientToken = new HttpClient();
+            var parameter = new List<KeyValuePair<string, string>>
             {
-                var parameter = new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("refresh_token", refreshToken),
-                    new KeyValuePair<string, string>("client_id", clientId),
-                    new KeyValuePair<string, string>("client_secret", clientSecret),
-                    new KeyValuePair<string, string>("redirect_uri", redirectUri),
-                    new KeyValuePair<string, string>("grant_type", "refresh_token")
-                };
-                var content = new FormUrlEncodedContent(parameter);
-                clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-                clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-                clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-                var response = await clientToken.PostAsync($"{tokenHost}", content);
-                var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                new("refresh_token", refreshToken),
+                new("client_id", clientId),
+                new("client_secret", clientSecret),
+                new("grant_type", "refresh_token")
+            };
+            var content = new FormUrlEncodedContent(parameter);
+            clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+            var response = await clientToken.PostAsync($"{tokenHost}", content);
+            var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                var token = JsonConvert.DeserializeObject<Token>(resContent);
+            var token = JsonConvert.DeserializeObject<Token>(resContent);
 
-                return token;
-            }
+            return token ?? throw new InvalidOperationException();
         }
 
         public async Task RevokeRefreshTokenAsync(string token)
         {
             var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
 
-            using (var clientToken = new HttpClient())
+            using var clientToken = new HttpClient();
+            var parameter = new List<KeyValuePair<string, string>>
             {
-                var parameter = new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("token", token)
-                };
-                var content = new FormUrlEncodedContent(parameter);
-                clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-                clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-                clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-                var response = await clientToken.PostAsync($"{tokenHost}/revoke", content);
+                new("token", token)
+            };
+            var content = new FormUrlEncodedContent(parameter);
+            clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+            var response = await clientToken.PostAsync($"{tokenHost}/revoke", content);
                 
-                var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                var srcJObj = JsonConvert.DeserializeObject<JObject>(resContent);
-                var status = srcJObj.GetValue("status")?.ToObject<string>();
+            var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var srcJObj = JsonConvert.DeserializeObject<JObject>(resContent);
+            var status = srcJObj?.GetValue("status")?.ToObject<string>();
 
-                if (status == null || !status.Equals("success"))
-                {
-                    throw new InvalidOperationException(resContent);
-                }
+            if (status is not "success")
+            {
+                throw new InvalidOperationException(resContent);
             }
         }
     }

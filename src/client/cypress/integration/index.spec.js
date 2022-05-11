@@ -1,4 +1,4 @@
-import { messageApiHandlers } from '../../test/api-mocks/show-message-api-handler'
+import { zohoTokenApiHandlers } from '../../test/api-mocks/zoho-token-api-handler.js'
 
 context('Index page', () => {
     beforeEach(() => {
@@ -11,31 +11,31 @@ context('Index page', () => {
         cy.url()
             .should('eq', 'http://localhost:3000/')
 
-        cy.findByText(/Zoho index page/i).should('exist')
+        cy.findByText(/authorized/i).should('exist')
         cy.findByText(/hello/i).should('exist')
     })
     
-    it('get default message api', () => {
+    it('get status zoho token api', () => {
         cy.window().then(window => {
             const { worker, rest, stop } = window.msw
-            worker.use(messageApiHandlers[0])
-            cy.findByText(/default: default message/i).should('exist')
+            worker.use(zohoTokenApiHandlers[0])
+            cy.findByText(/authorized: success/i).should('exist')
 
             stop
         })
         
     })
 
-    it('get param message api', () => {
-        cy.window().then(window => {
-            const { worker, rest, stop } = window.msw
-            worker.use(messageApiHandlers[1])
-            cy.findByText(/with msg: with custom test message/i).should('exist')
-
-            stop
-        })
-
-    })
+    // it('get param message api', () => {
+    //     cy.window().then(window => {
+    //         const { worker, rest, stop } = window.msw
+    //         worker.use(messageApiHandlers[1])
+    //         cy.findByText(/with msg: with custom test message/i).should('exist')
+    //
+    //         stop
+    //     })
+    //
+    // })
 
     it('can navigate to about', () => {
         cy.visit('http://localhost:3000')

@@ -1,7 +1,8 @@
 {
   "hello": "こんにちは",
   "button": {
-    "back": "戻る"
+    "back": "戻る",
+    "try-again": "もう一度やり直してください"
   },
   "pages": {
     "not-found": "見つかりません"

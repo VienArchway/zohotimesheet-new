@@ -9,35 +9,34 @@ namespace api.Services.Security;
 
 public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticationSchema>
 {
-    private readonly IConfiguration config;
-
     private readonly ITeamClient teamClient;
     
-    public ZohoAuthenticationHandler(ITeamClient teamClient, IOptionsMonitor<ZohoAuthenticationSchema> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IConfiguration config)
+    public ZohoAuthenticationHandler(
+        ITeamClient teamClient,
+        IOptionsMonitor<ZohoAuthenticationSchema> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder,
+        ISystemClock clock)
         : base(options, logger, encoder, clock)
     {
-        this.config = config;
         this.teamClient = teamClient;
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var endpoint = Context.GetEndpoint();
+        
+        // handle if controller have not required authorized annotation
         if (endpoint?.Metadata?.GetMetadata<IAuthorizeData>() == null)
         {
             return Task.FromResult(AuthenticateResult.NoResult());
         }
-
-        // check include clientId
-        if (!Request.Headers.ContainsKey(Options.ClientIdHeaderName))
-        {
-            return Task.FromResult(AuthenticateResult.Fail($"Required clientId: {Options.ClientIdHeaderName}"));
-        }
         
-        if (!Request.Headers[Options.ClientIdHeaderName].ToString().Equals(config["Zoho:ClientId"]))
+        // handle request only for refresh token
+        if (Request.Headers.ContainsKey(Options.RefreshTokenHeaderName)
+            || Request.Headers.ContainsKey(Options.IsRedirectUri))
         {
-            // check match clientId
-            return Task.FromResult(AuthenticateResult.Fail($"ClientId is not match: {Options.ClientIdHeaderName}"));
+            return Task.FromResult(AuthenticateResult.NoResult());
         }
         
         // check include access token
@@ -53,16 +52,13 @@ public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticatio
             return Task.FromResult(AuthenticateResult.Fail($"Required header for token: {Options.TokenHeaderName}"));
         }
         
-        // TODO: check expired
         var fetchTeam = teamClient.SearchAsync().GetAwaiter().GetResult();
         
-        if (!fetchTeam.Any())
+        if (string.IsNullOrEmpty(fetchTeam) || !fetchTeam.Equals("success"))
         {
             return Task.FromResult(AuthenticateResult.Fail($"Wrong access token: {Options.TokenHeaderName}"));
         }
         
-        // TODO: save refresh_token to somewhere
-
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, "NameIdentifier"),

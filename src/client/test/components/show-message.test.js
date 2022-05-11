@@ -1,7 +1,7 @@
 import { setupServer } from 'msw/node'
 import { render, screen } from '@testing-library/vue'
-import { getDefaultMessageApi, getMessageWithParamApi } from '../../src/api/resources/Message'
-import { messageApiHandlers, defaultMessage, paramMessage, unAuthorizedMesage } from '../api-mocks/show-message-api-handler'
+import { getDefaultMessageApi, getMessageWithParamApi } from '../../src/api/resources/Message.js'
+import { messageApiHandlers, defaultMessage, paramMessage, unAuthorizedMesage } from '../api-mocks/show-message-api-handler.js'
 import ShowMessage from '../../src/components/ShowMessage.vue'
 import 'whatwg-fetch'
 

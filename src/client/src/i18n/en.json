@@ -1,7 +1,8 @@
 {
   "hello": "hello",
   "button": {
-    "back": "back"
+    "back": "Back",
+    "try-again": "Try again"
   },
   "pages": {
     "not-found": "Not found"

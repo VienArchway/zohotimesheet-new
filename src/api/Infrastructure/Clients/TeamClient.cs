@@ -1,5 +1,4 @@
 using api.Infrastructure.Interfaces;
-using api.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,19 +11,20 @@ namespace api.Infrastructure.Clients
         {
         }
 
-        public async Task<IEnumerable<Team>> SearchAsync()
+        public async Task<string?> SearchAsync()
         {
             var response = await client.GetAsync("teams/").ConfigureAwait(false);
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            
             var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
             if (!response.IsSuccessStatusCode)
             {
-                return new List<Team>();
+                return string.Empty;
             }
-            var portals = srcJObj?.SelectToken("portals") as JArray;
-            return portals?.ToObject<List<Team>>() ?? new List<Team>();
+
+            // var getStatus = srcJObj?.Properties().Select(s => s);
+            // var status = getStatus?.ToList().Find(f => f.Name.Equals("status"));
+            return srcJObj?.GetValue("status")?.ToString();
         }
     }
 }
