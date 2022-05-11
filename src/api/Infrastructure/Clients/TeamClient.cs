@@ -17,14 +17,7 @@ namespace api.Infrastructure.Clients
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-            if (!response.IsSuccessStatusCode)
-            {
-                return string.Empty;
-            }
-
-            // var getStatus = srcJObj?.Properties().Select(s => s);
-            // var status = getStatus?.ToList().Find(f => f.Name.Equals("status"));
-            return srcJObj?.GetValue("status")?.ToString();
+            return !response.IsSuccessStatusCode ? string.Empty : srcJObj?.GetValue("status")?.ToString();
         }
     }
 }

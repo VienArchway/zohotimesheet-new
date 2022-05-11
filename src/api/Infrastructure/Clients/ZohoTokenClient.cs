@@ -37,7 +37,6 @@ namespace api.Infrastructure.Clients
             var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             var token = JsonConvert.DeserializeObject<Token>(resContent);
-            // return JsonConvert.DeserializeObject<AccessTokenResponse>(resContent).AccessToken;
             return token ?? throw new InvalidOperationException();
         }
 
