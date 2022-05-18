@@ -14,38 +14,39 @@
                         hide-details
                     ></v-text-field>
                     </v-card-title>
-                    <v-data-table
-                        v-model="searchConditions.projects"
-                        :headers="values.projectData.headers"
-                        :items="values.projectData.items"
-                        :search="values.projectData.projectNameFilter"
-                        :show-select="true"            
-                        :disable-pagination="true"
-                        hide-default-footer
-                        item-key="id"
-                        height="300px"
-                        fixed-header
-                    ></v-data-table>
-                    <v-table>
-                        <thead>
-                        <tr>
-                        <th class="text-left">
-                            Name
-                        </th>
-                        <th class="text-left">
-                            Calories
-                        </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr
-                            v-for="item in desserts"
-                            :key="item.name"
+                        <v-table 
+                            fixed-header
+                            height="300px"
                         >
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.calories }}</td>
-                        </tr>
-                        </tbody>
+                            <thead>
+                                <tr>
+                                    <th class="text-left">
+                                        <v-checkbox
+                                            v-model="searchConditions.projects"
+                                            value="all"
+                                            hide-details
+                                        ></v-checkbox>
+                                    </th>
+                                    <th class="text-left">
+                                        ProjName
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="item in values.projectData.items"
+                                    :key="item.projId"
+                                >
+                                    <td>
+                                        <v-checkbox
+                                            v-model="searchConditions.projects"
+                                            :value="item"
+                                            hide-details
+                                        ></v-checkbox>
+                                    </td>
+                                    <td>{{ item.projName }}</td>
+                                </tr>
+                            </tbody>
                     </v-table>
                 </v-card>
             </v-col>
@@ -63,7 +64,7 @@
                             ></v-select>
                     </v-col>
                 </v-row>
-                <!-- <v-row>
+                <v-row>
                     <v-col cols="12" md="6">
                         <v-menu
                             v-model="isShowStartDate"
@@ -118,7 +119,7 @@
                             ></v-date-picker>
                         </v-menu>
                     </v-col>
-                </v-row> -->
+                </v-row>
             <v-row>
                 <v-col>
                     <div>
@@ -168,11 +169,11 @@
     </v-container>
 </template>
 
-
 <script>
-import "./index.scss";
+import "./index.scss"
 import moment from "moment";
 import projectApi from '../../api/project.js'
+import logworkApi from '../../api/logwork.js'
 
 export default {
     components: {
@@ -199,17 +200,17 @@ export default {
                 },
                 sprintData: {
                     items: [
-                        {text: ("activesprint"), value: 2 },
-                        {text: ("allsprint"), value: 0 }
+                        {text: "activesprint", value: 2 },
+                        {text: "allsprint", value: 0 }
                     ]
                 },
                 logworkData: {
                     headers: [
-                        { text: ("project"), value: "projName" },
-                        { text: ("item"), value: "itemName" },
-                        { text: ("owner"), value: "OwnerName" },
-                        { text: ("logdate"), value: "logDate" },
-                        { text: ("logtime"), value: "logTime" },
+                        { text: "project", value: "projName" },
+                        { text: "item", value: "itemName" },
+                        { text: "owner", value: "OwnerName" },
+                        { text: "logdate", value: "logDate" },
+                        { text: "logtime", value: "logTime" },
                         { text: "", value: "json", sortable: false }
                     ],
                     items: []
@@ -229,7 +230,6 @@ export default {
         // moment.locale(this.$i18n.locale);
         // this.$store.commit("showLoading");
         try {
-            console.log(this.values.projectData.headers[0])
             const resProject = await projectApi.getAll({ headers: { AccessToken: localStorage.accessToken } });
             this.values.projectData.items = resProject;
         }catch (error) {
@@ -249,7 +249,7 @@ export default {
     },
     methods: {
         async upload() {
-            this.$store.commit("showLoading");
+            // this.$store.commit("showLoading");
             try {
 
                 this.values.logworkData.items = [];
@@ -258,10 +258,11 @@ export default {
                     startDate: new Date(this.searchConditions.startDate),
                     endDate: new Date(this.searchConditions.endDate),
                     sprintTypeId: this.searchConditions.sprintTypeId,
-                    projects: _.find(this.searchConditions.projects, { id: "" }) ? null : this.searchConditions.projects
+                    projects: this.searchConditions.projects
                 };
 
-                const response = await axios.post(`${this.urls.adlsApi}/transfer`,searchCondition);
+                // const response = await axios.post(`${this.urls.adlsApi}/transfer`,searchCondition);
+                const response = await logworkApi.find(searchCondition);
                 if (response.data !== null && response.data !== undefined)
                 {
                     this.values.logworkData.items = response.data;
@@ -269,7 +270,7 @@ export default {
                     this.$store.commit("notify.success", { content: ("datauploaded"), timeout:10000 });
                 }
             } finally {
-                this.$store.commit("closeLoading");
+                // this.$store.commit("closeLoading");
             }
         }
     }

@@ -1,12 +1,15 @@
 import { APISettings } from './config.js'
 
-const API_PATH_NAME = '/api/v1/project'
+const API_PATH_NAME = '/api/v1/logwork'
 
 export default {
-    getAll() {
+    find(requestInput) {
         return fetch(API_PATH_NAME, {
-            method: 'GET',
-            headers: APISettings.headers
+            method: 'POST',
+            headers: APISettings.headers,
+            body: {
+                requestInput
+            }
         })
         .then((response) => {
             if (response.status !== 200) {
