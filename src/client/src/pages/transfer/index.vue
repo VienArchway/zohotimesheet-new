@@ -132,10 +132,68 @@
         <v-row>
             <v-col cols="12" md="12">
                 <v-table v-show="values.logworkData.length > 0 || values.logworkData !== undefined || values.logworkData !== null"
-                    :headers="values.logworkData.headers"
-                    :items="values.logworkData.items"
                     fixed-header
                     height="400px" >
+                    <thead>
+                        <tr>
+                            <th class="text-left">
+                                project
+                            </th>
+                            <th class="text-left">
+                                item
+                            </th>
+                            <th class="text-left">
+                                owner
+                            </th>
+                            <th class="text-left">
+                                logdate
+                            </th>
+                            <th class="text-left">
+                                logtime
+                            </th>
+                            <th class="text-left">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="item in values.logworkData.items"
+                            :key="item.logTimeId"
+                        >
+                            <td>{{ item.projName }}</td>
+                            <td>{{ item.itemName }}</td>
+                            <td>{{ item.OwnerName }}</td>
+                            <td>{{ item.logDate }}</td>
+                            <td>{{ item.logTime }}</td>
+                            <td>
+                                <v-menu
+                                    offset-y
+                                    bottom
+                                    origin="center center"
+                                    transition="scale-transition"
+                                    open-on-hover
+                                    >
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                            color="primary"
+                                            dark
+                                            v-on="on"
+                                        >
+                                            {{ ('json')}}
+                                        </v-btn>
+                                    </template>
+
+                                    <v-list>
+                                        <v-list-item>
+                                            <vue-json-pretty
+                                                :data="item"
+                                            />
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+                            </td>
+                        </tr>
+                    </tbody>
                     <template v-slot:[`item.json`]="{ item }">
                         <v-menu
                             offset-y
@@ -263,9 +321,9 @@ export default {
 
                 // const response = await axios.post(`${this.urls.adlsApi}/transfer`,searchCondition);
                 const response = await logworkApi.find(searchCondition);
-                if (response.data !== null && response.data !== undefined)
+                if (response !== null && response !== undefined)
                 {
-                    this.values.logworkData.items = response.data;
+                    this.values.logworkData.items = response;
 
                     this.$store.commit("notify.success", { content: ("datauploaded"), timeout:10000 });
                 }

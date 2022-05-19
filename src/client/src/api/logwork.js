@@ -4,12 +4,11 @@ const API_PATH_NAME = '/api/v1/logwork'
 
 export default {
     find(requestInput) {
+        debugger
         return fetch(API_PATH_NAME, {
             method: 'POST',
             headers: APISettings.headers,
-            body: {
-                requestInput
-            }
+            body: JSON.stringify(requestInput)
         })
         .then((response) => {
             if (response.status !== 200) {
