@@ -1,12 +1,16 @@
 <script setup>
+import AppLogin from '@/components/app/AppLogin.vue'
 import AppContainer from '@/components/app/AppContainer.vue'
 </script>
+
 <template>
-  <main>
-    <AppContainer>
-      <router-view />
-    </AppContainer>
-  </main>
+  <AppLogin>
+    <main>
+      <AppContainer>
+        <router-view />
+      </AppContainer>
+    </main>
+  </AppLogin>
 </template>
 
 <script>
@@ -14,7 +18,3 @@ export default {
   name: "default"
 }
 </script>
-
-<style scoped>
-
-</style>

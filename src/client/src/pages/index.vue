@@ -12,15 +12,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <b>authorized: {{ status }}</b>
-  <h1>Zoho index page</h1>
-  {{ t('hello') }}
   <div>
-    <router-link data-cy="link-about" to="/about">About</router-link>
+    <b>authorized: {{ status }}</b>
+    <h1>Zoho index page</h1>
+    {{ t('hello') }}
+    <div>
+      <router-link data-cy="link-about" to="/about">About</router-link>
+    </div>
   </div>
 </template>
 
 <route lang="yaml">
 meta:
-  layout: auth
+  layout: default
 </route>

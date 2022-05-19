@@ -11,11 +11,13 @@ const AsyncShowMessage = defineAsyncComponent({
 </script>
 
 <template>
-  <AsyncShowMessage />
-  <router-link data-cy="link-index" to="/">Back to home</router-link>
+  <div>
+    <AsyncShowMessage />
+    <router-link data-cy="link-index" to="/">Back to home</router-link>
+  </div>
 </template>
 
 <route lang="yaml">
 meta:
-  layout: auth
+  layout: default
 </route>

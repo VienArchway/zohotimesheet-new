@@ -11,5 +11,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <slot v-if="auth.isAuthenticated" />
+  <div>
+    <slot v-if="auth.isAuthenticated" />
+  </div>
 </template>

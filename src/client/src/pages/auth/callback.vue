@@ -4,4 +4,9 @@ import { useHandleCallBack } from '@/lib/auth/callback.js'
 useHandleCallBack()
 </script>
 
-<template></template>
+<template />
+
+<route lang="yaml">
+meta:
+  layout: anonymous
+</route>

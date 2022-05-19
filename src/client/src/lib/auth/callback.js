@@ -21,7 +21,7 @@ export function useHandleCallBack() {
 
             localStorage.setItem('access-token', accessToken)
             if (refreshToken) {
-               localStorage.setItem('refresh-token', refreshToken)
+                localStorage.setItem('refresh-token', refreshToken)
             }
 
             window.location.href = '/'
@@ -45,5 +45,5 @@ export function useHandleCallBack() {
         }
     }
 
-    onMounted(() => handleRedirectFromCallBack())
+    onMounted(async () => { await handleRedirectFromCallBack() })
 }
