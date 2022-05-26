@@ -1,10 +1,13 @@
 import { APISettings } from './config.js'
+import { useRouter } from 'vue-router'
 
 const API_PATH_NAME = '/api/v1/logwork'
 
 export default {
-    find(requestInput) {
-        debugger
+
+    find(requestInput) {  
+    const router = useRouter() 
+        
         return fetch(API_PATH_NAME, {
             method: 'POST',
             headers: APISettings.headers,

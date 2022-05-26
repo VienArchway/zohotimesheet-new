@@ -20,8 +20,8 @@ namespace api.Application
             services.AddHostedService<QueuedHostedService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
-            // services.AddSingleton<ZohoHostedService>();
-            // services.AddSingleton<IHostedService, ZohoHostedService>(serviceProvider => serviceProvider.GetService<ZohoHostedService>());
+            services.AddSingleton<ZohoHostedService>();
+            services.AddSingleton<IHostedService, ZohoHostedService>(serviceProvider => serviceProvider.GetService<ZohoHostedService>());
         }
     }
 }

@@ -1,15 +1,38 @@
+<script setup>
+import {onMounted, ref} from 'vue'
+import {useI18n} from 'vue-i18n'
+import { getVerifyTokenApi } from '@/api/resources/ZohoToken.js'
+
+const { t } = useI18n()
+const status = ref(null)
+
+onMounted(async () => {
+  status.value = await getVerifyTokenApi()
+})
+
+</script>
+
 <template>
+  <div>
+    <b>authorized: {{ status }}</b>
+    <h1>Zoho index page</h1>
+    {{ t('hello') }}
+    <div>
+      <router-link data-cy="link-about" to="/about">About</router-link>
+    </div>
+    
     <v-container class="grey lighten-5">
         <v-row>
             <v-col cols="12" md="4">
                 <v-card class="pa-2" outlined tile>
                     <v-card-title>
-                    {{ ('project') }}
+                    {{ t('project') }}
                     <v-spacer></v-spacer>
                     <v-text-field
                         v-model="values.projectData.projectNameFilter"
                         append-icon="mdi-magnify"
-                        :label="('search')"
+                        :label="t('search')"
+                        @change="projectNameFilter"
                         single-line
                         hide-details
                     ></v-text-field>
@@ -21,11 +44,6 @@
                             <thead>
                                 <tr>
                                     <th class="text-left">
-                                        <v-checkbox
-                                            v-model="searchConditions.projects"
-                                            value="all"
-                                            hide-details
-                                        ></v-checkbox>
                                     </th>
                                     <th class="text-left">
                                         ProjName
@@ -34,7 +52,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="item in values.projectData.items"
+                                    v-for="item in values.projectData.filterItems"
                                     :key="item.projId"
                                 >
                                     <td>
@@ -56,7 +74,7 @@
                         <v-select
                                 v-model="searchConditions.sprintTypeId"
                                 :items="values.sprintData.items"
-                                :label="('sprint')"
+                                :label="t('sprint')"
                                 item-text="text"
                                 item-value="value"
                                 dense
@@ -66,34 +84,21 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12" md="6">
-                        <v-menu
-                            v-model="isShowStartDate"
-                            :close-on-content-click="false"
-                            :nudge-right="40"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="290px"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    :label="('startdate')"
-                                    prepend-icon="far fa-calendar-alt"
-                                    readonly
-                                    v-on="on"
-                                    :value="customStartDateFormatter"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker
-                                v-model="searchConditions.startDate"
-                                no-title
-                                @input="isShowStartDate = false"
-                                :min="searchConditions.minDate"
-                                :max="searchConditions.maxDate"
-                            ></v-date-picker>
-                        </v-menu>
+                        <v-text-field
+                            v-model="searchConditions.startDate"
+                            :label="t('startdate')"
+                            prepend-icon="far fa-calendar-alt"
+                            v-on="on"
+                        ></v-text-field>
                     </v-col>
                     <v-col cols="12" md="6">
-                        <v-menu
+                        <v-text-field
+                            v-model="searchConditions.endDate"
+                            :label="t('enddate')"
+                            prepend-icon="far fa-calendar-alt"
+                            v-on="on"
+                        ></v-text-field>
+                        <!-- <v-menu
                             v-model="isShowEndDate"
                             :close-on-content-click="false"
                             :nudge-right="40"
@@ -117,9 +122,12 @@
                                 :min="searchConditions.minDate"
                                 :max="searchConditions.maxDate"
                             ></v-date-picker>
-                        </v-menu>
+                        </v-menu> -->
                     </v-col>
                 </v-row>
+                <v-row justify="center">
+    <v-date-picker v-model="picker"></v-date-picker>
+  </v-row>
             <v-row>
                 <v-col>
                     <div>
@@ -137,19 +145,19 @@
                     <thead>
                         <tr>
                             <th class="text-left">
-                                project
+                                {{ t("project") }}
                             </th>
                             <th class="text-left">
-                                item
+                                {{ t("item") }}
                             </th>
                             <th class="text-left">
-                                owner
+                                {{ t("owner") }}
                             </th>
                             <th class="text-left">
-                                logdate
+                                {{ t("logdate") }}
                             </th>
                             <th class="text-left">
-                                logtime
+                                {{ t("logtime") }}
                             </th>
                             <th class="text-left">
                             </th>
@@ -166,75 +174,41 @@
                             <td>{{ item.logDate }}</td>
                             <td>{{ item.logTime }}</td>
                             <td>
-                                <v-menu
-                                    offset-y
-                                    bottom
-                                    origin="center center"
-                                    transition="scale-transition"
-                                    open-on-hover
-                                    >
-                                    <template v-slot:activator="{ on }">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ props }">
                                         <v-btn
-                                            color="primary"
-                                            dark
-                                            v-on="on"
+                                        color="primary"
+                                        dark
+                                        v-bind="props"
                                         >
-                                            {{ ('json')}}
+                                        {{ t('json')}}
                                         </v-btn>
                                     </template>
-
-                                    <v-list>
-                                        <v-list-item>
-                                            <vue-json-pretty
-                                                :data="item"
-                                            />
-                                        </v-list-item>
-                                    </v-list>
-                                </v-menu>
+                                    <span>{{ item }}</span>
+                                    <vue-json-pretty :path="'res'" :data="{ key: 'value' }" @click="handleClick"> </vue-json-pretty>
+                                    <!-- <vue-json-pretty
+                                        :data="item"
+                                    /> -->
+                                </v-tooltip>
                             </td>
                         </tr>
                     </tbody>
-                    <template v-slot:[`item.json`]="{ item }">
-                        <v-menu
-                            offset-y
-                            bottom
-                            origin="center center"
-                            transition="scale-transition"
-                            open-on-hover
-                            >
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    color="primary"
-                                    dark
-                                    v-on="on"
-                                >
-                                    {{ ('json')}}
-                                </v-btn>
-                            </template>
-
-                            <v-list>
-                                <v-list-item>
-                                    <vue-json-pretty
-                                        :data="item"
-                                    />
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </template>
                 </v-table>
             </v-col>
         </v-row>
     </v-container>
+  </div>
 </template>
-
 <script>
 import "./index.scss"
 import moment from "moment";
+import VueJsonPretty from "vue-json-pretty";
 import projectApi from '../../api/project.js'
 import logworkApi from '../../api/logwork.js'
 
 export default {
     components: {
+        VueJsonPretty
     },
     data() {
         return {
@@ -250,25 +224,26 @@ export default {
                     projectNameFilter: "",
                     headers: [
                         {
-                            text: "project",
+                            text: this.t("project"),
                             value: "projName"
                         }
                     ],
-                    items: []
+                    items: [],
+                    filterItems: []
                 },
                 sprintData: {
                     items: [
-                        {text: "activesprint", value: 2 },
-                        {text: "allsprint", value: 0 }
+                        {text: this.t("activesprint"), value: 2 },
+                        {text: this.t("allsprint"), value: 0 }
                     ]
                 },
                 logworkData: {
                     headers: [
-                        { text: "project", value: "projName" },
-                        { text: "item", value: "itemName" },
-                        { text: "owner", value: "OwnerName" },
-                        { text: "logdate", value: "logDate" },
-                        { text: "logtime", value: "logTime" },
+                        { text: this.t("project"), value: "projName" },
+                        { text: this.t("item"), value: "itemName" },
+                        { text: this.t("owner"), value: "OwnerName" },
+                        { text: this.t("logdate"), value: "logDate" },
+                        { text: this.t("logtime"), value: "logTime" },
                         { text: "", value: "json", sortable: false }
                     ],
                     items: []
@@ -288,8 +263,9 @@ export default {
         // moment.locale(this.$i18n.locale);
         // this.$store.commit("showLoading");
         try {
-            const resProject = await projectApi.getAll({ headers: { AccessToken: localStorage.accessToken } });
+            const resProject = await projectApi.getAll();
             this.values.projectData.items = resProject;
+            this.values.projectData.filterItems = resProject;
         }catch (error) {
             console.log(error)
         }
@@ -325,14 +301,24 @@ export default {
                 {
                     this.values.logworkData.items = response;
 
-                    this.$store.commit("notify.success", { content: ("datauploaded"), timeout:10000 });
+                    this.$store.commit("notify.success", { content: t("datauploaded"), timeout:10000 });
                 }
             } finally {
                 // this.$store.commit("closeLoading");
             }
+        },
+        projectNameFilter() {
+            debugger
+            const self = this
+            self.values.projectData.filterItems = self.values.projectData.items.find(item => item.projName.includes(self.values.projectData.projectNameFilter));
         }
     }
 
 
 };
 </script>
+
+<route lang="yaml">
+meta:
+  layout: default
+</route>
