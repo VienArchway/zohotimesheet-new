@@ -7,6 +7,8 @@ namespace api.Application.Interfaces
         Task<Token> GetAccessTokenAsync(string code);
         Task<Token> GetAccessTokenFromRefreshTokenAsync(string refreshToken);
 
+        Task<Token> GetAdminAccessTokenAsync();
+
         Task RevokeRefreshTokenAsync(string accessToken);
     }
 }

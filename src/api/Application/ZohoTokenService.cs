@@ -23,6 +23,11 @@ namespace api.Application
             return client.GetAccessTokenFromRefreshTokenAsync(refreshToken);
         }
 
+        public Task<Token> GetAdminAccessTokenAsync()
+        {
+            return client.GetAdminAccessTokenAsync();
+        }
+
         public async Task RevokeRefreshTokenAsync(string token)
         {
             await client.RevokeRefreshTokenAsync(token);

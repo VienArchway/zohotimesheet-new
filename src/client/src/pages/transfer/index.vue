@@ -125,9 +125,6 @@ onMounted(async () => {
                         </v-menu> -->
                     </v-col>
                 </v-row>
-                <v-row justify="center">
-    <v-date-picker v-model="picker"></v-date-picker>
-  </v-row>
             <v-row>
                 <v-col>
                     <div>
@@ -308,7 +305,6 @@ export default {
             }
         },
         projectNameFilter() {
-            debugger
             const self = this
             self.values.projectData.filterItems = self.values.projectData.items.find(item => item.projName.includes(self.values.projectData.projectNameFilter));
         }

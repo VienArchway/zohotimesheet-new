@@ -36,6 +36,14 @@ public class ZohoTokenController : ControllerBase
         return Ok(result.AccessToken);
     }
 
+    [HttpGet("get-admin-access-token")]
+    [ProducesResponseType(typeof(Token), 200)]
+    public async Task<IActionResult> GetAdminAccessTokenAsync()
+    {
+        var result = await service.GetAdminAccessTokenAsync().ConfigureAwait(false);
+        return Ok(result.AccessToken);
+    }
+
     [Authorize]
     [HttpGet("revoke")]
     [ProducesResponseType(typeof(Token), 200)]
