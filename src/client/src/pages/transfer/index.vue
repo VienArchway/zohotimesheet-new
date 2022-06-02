@@ -182,7 +182,6 @@ onMounted(async () => {
                                         </v-btn>
                                     </template>
                                     <span>{{ item }}</span>
-                                    <vue-json-pretty :path="'res'" :data="{ key: 'value' }" @click="handleClick"> </vue-json-pretty>
                                     <!-- <vue-json-pretty
                                         :data="item"
                                     /> -->
@@ -199,7 +198,8 @@ onMounted(async () => {
 <script>
 import "./index.scss"
 import moment from "moment";
-import VueJsonPretty from "vue-json-pretty";
+import VueJsonPretty from 'vue-json-pretty'
+import 'vue-json-pretty/lib/styles.css'
 import projectApi from '../../api/project.js'
 import logworkApi from '../../api/logwork.js'
 
@@ -298,7 +298,7 @@ export default {
                 {
                     this.values.logworkData.items = response;
 
-                    this.$store.commit("notify.success", { content: t("datauploaded"), timeout:10000 });
+                    // this.$store.commit("notify.success", { content: t("datauploaded"), timeout:10000 });
                 }
             } finally {
                 // this.$store.commit("closeLoading");

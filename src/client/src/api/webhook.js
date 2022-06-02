@@ -33,7 +33,6 @@ export default {
     },
     update(accessToken, requestInput) {    
         const router = useRouter() 
-        debugger
             
         return fetch(API_PATH_NAME + '/update-status', {
             method: 'POST',
