@@ -29,7 +29,7 @@ export default {
     },
     delete(requestInput) {
         const router = useRouter() 
-        debugger
+
         return fetch(API_PATH_NAME + '/delete-from-adls', {
             method: 'POST',
             headers: APISettings.headers,
@@ -48,7 +48,7 @@ export default {
             }
         })
         .catch((error) => {
-            // router.push({ name: 'error', params: { errorMessage: error.text, errorStatus: error.status } })
+            router.push({ name: 'error', params: { errorMessage: error.text, errorStatus: error.status } })
         })
     },
     restore() {

@@ -38,8 +38,8 @@ public class AdlsController : ControllerBase
     [ProducesResponseType(200)]
     public async Task<IActionResult> TransferAdlsAsync([FromBody]LogWorkSearchParameter parameter)
     {
-        var userName = User.FindFirst(ClaimTypes.Name).Value;
-        var result = await service.TransferAdlsAsync(parameter, userName).ConfigureAwait(false);
+        // var userName = User.FindFirst(ClaimTypes.Name).Value; // why we need this????
+        var result = await service.TransferAdlsAsync(parameter, null).ConfigureAwait(false);
         return Ok(result);
     }
 

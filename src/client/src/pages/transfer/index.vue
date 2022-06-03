@@ -202,6 +202,7 @@ import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
 import projectApi from '../../api/project.js'
 import logworkApi from '../../api/logwork.js'
+import adlsApi from '../../api/adls.js'
 
 export default {
     components: {
@@ -293,7 +294,7 @@ export default {
                 };
 
                 // const response = await axios.post(`${this.urls.adlsApi}/transfer`,searchCondition);
-                const response = await logworkApi.find(searchCondition);
+                const response = await adlsApi.transfer(searchCondition);
                 if (response !== null && response !== undefined)
                 {
                     this.values.logworkData.items = response;
