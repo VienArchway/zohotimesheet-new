@@ -26,9 +26,9 @@ public class AdlsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("delete-from-adls")]
+    [HttpPost("delete-from-adls")]
     [ProducesResponseType(204)]
-    public async Task<IActionResult> DeleteFromAdlsAsync([FromQuery] string[] AdlsIds)
+    public async Task<IActionResult> DeleteFromAdlsAsync([FromBody] string[] AdlsIds)
     {
         await service.DeleteFromAdlsAsync(AdlsIds).ConfigureAwait(false);
         return NoContent();
