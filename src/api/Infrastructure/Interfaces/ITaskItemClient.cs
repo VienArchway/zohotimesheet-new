@@ -19,14 +19,14 @@ namespace api.Infrastructure.Interfaces
             IEnumerable<string> TaskItemIds, 
             IEnumerable<string> TaskItemNos);
 
-        Task UpdateStatusAsync(UpdateTaskItemStatusParameter parameter);
+        Task UpdateStatusAsync(UpdateItemStatusParameter parameter);
 
-        Task<TaskItem> CreateAsync(TaskItemSaveParameter parameter);
+        Task<TaskItem> CreateAsync(ItemSaveParameter parameter);
 
-        Task<TaskItem> CreateSubTaskItemAsync(TaskItemSaveParameter parameter);
+        Task<TaskItem> CreateSubItemAsync(ItemSaveParameter parameter);
 
-        Task UpdateAsync(TaskItemSaveParameter parameter);
+        Task UpdateAsync(ItemSaveParameter parameter);
 
-        Task DeleteAsync(DeleteTaskItemParameter parameter);
+        Task DeleteAsync(DeleteItemParameter parameter);
     }
 }

@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 
 namespace api.Models
 {
-    public class DeleteTaskItemParameter
+    public class DeleteItemParameter
     {
-        public string TaskItemId { get; set; }
+        public string ItemId { get; set; }
 
         public string ProjId { get; set; }
 

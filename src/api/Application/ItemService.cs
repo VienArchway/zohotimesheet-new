@@ -32,27 +32,27 @@ namespace api.Application
                 parameter.TaskItemNos);
         }
 
-        public Task UpdateStatusAsync(UpdateTaskItemStatusParameter parameter)
+        public Task UpdateStatusAsync(UpdateItemStatusParameter parameter)
         {
             return client.UpdateStatusAsync(parameter);
         }
 
-        public Task<TaskItem> CreateAsync(TaskItemSaveParameter parameter)
+        public Task<TaskItem> CreateAsync(ItemSaveParameter parameter)
         {
             return client.CreateAsync(parameter);
         }
 
-        public Task<TaskItem> CreateSubTaskItemAsync(TaskItemSaveParameter parameter)
+        public Task<TaskItem> CreateSubTaskItemAsync(ItemSaveParameter parameter)
         {
-            return client.CreateSubTaskItemAsync(parameter);
+            return client.CreateSubItemAsync(parameter);
         }
 
-        public Task UpdateAsync(TaskItemSaveParameter parameter)
+        public Task UpdateAsync(ItemSaveParameter parameter)
         {
             return client.UpdateAsync(parameter);
         }
 
-        public Task DeleteAsync(DeleteTaskItemParameter parameter)
+        public Task DeleteAsync(DeleteItemParameter parameter)
         {
             return client.DeleteAsync(parameter);
         }

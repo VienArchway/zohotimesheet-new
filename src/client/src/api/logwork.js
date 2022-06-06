@@ -7,7 +7,7 @@ export default {
 
     find(requestInput) {  
     const router = useRouter() 
-        
+        debugger
         return fetch(API_PATH_NAME, {
             method: 'POST',
             headers: APISettings.headers,
@@ -28,5 +28,29 @@ export default {
         .catch((error) => {
             router.push({ name: 'error', params: { errorMessage: error.text, errorStatus: error.status } })
         })
-    }
+    },
+    searchByGlobalView(requestInput) {  
+        const router = useRouter() 
+            
+            return fetch(API_PATH_NAME +  '/search-by-global-view', {
+                method: 'POST',
+                headers: APISettings.headers,
+                body: JSON.stringify(requestInput)
+            })
+            .then((response) => {
+                if (response.status !== 200) {
+                    console.error(response.statusText)
+                    const error = {
+                        text: response.statusText,
+                        status: response.status
+                    }
+                    throw error
+                } else {
+                    return response.json()
+                }
+            })
+            .catch((error) => {
+                router.push({ name: 'error', params: { errorMessage: error.text, errorStatus: error.status } })
+            })
+        }
 }

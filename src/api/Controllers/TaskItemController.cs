@@ -34,35 +34,35 @@ public class TaskItemController : ControllerBase
         }
 
         [HttpPost("update-status")]
-        public async Task<IActionResult> UpdateStatusAsync([FromBody] UpdateTaskItemStatusParameter parameter)
+        public async Task<IActionResult> UpdateStatusAsync([FromBody] UpdateItemStatusParameter parameter)
         {
             await service.UpdateStatusAsync(parameter).ConfigureAwait(false);
             return NoContent();
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateAsync([FromBody] TaskItemSaveParameter parameter)
+        public async Task<IActionResult> CreateAsync([FromBody] ItemSaveParameter parameter)
         {
             var result = await service.CreateAsync(parameter).ConfigureAwait(false);
             return new CreatedResult(string.Empty, result);
         }
 
         [HttpPost("create-sub-TaskItem")]
-        public async Task<IActionResult> CreateSubTaskItemAsync([FromBody] TaskItemSaveParameter parameter)
+        public async Task<IActionResult> CreateSubTaskItemAsync([FromBody] ItemSaveParameter parameter)
         {
             var result = await service.CreateSubTaskItemAsync(parameter).ConfigureAwait(false);
             return new CreatedResult(string.Empty, result);
         }
 
         [HttpPost("update")]
-        public async Task<IActionResult> UpdateAsync([FromBody] TaskItemSaveParameter parameter)
+        public async Task<IActionResult> UpdateAsync([FromBody] ItemSaveParameter parameter)
         {
             await service.UpdateAsync(parameter).ConfigureAwait(false);
             return NoContent();
         }
 
         [HttpPost("delete")]
-        public async Task<IActionResult> DeleteAsync([FromBody] DeleteTaskItemParameter parameter)
+        public async Task<IActionResult> DeleteAsync([FromBody] DeleteItemParameter parameter)
         {
             await service.DeleteAsync(parameter).ConfigureAwait(false);
             return NoContent();

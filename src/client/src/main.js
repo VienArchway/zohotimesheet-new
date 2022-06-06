@@ -7,6 +7,7 @@ import vuetify from '@/plugins/vuetify/vuetify'
 import { loadFonts } from '@/plugins/vuetify/webfontloader'
 import useAuthStore from '@/store/auth.js'
 import { worker } from '@/mocks/browser.js'
+import _ from "lodash"
 
 loadFonts()
 
@@ -16,6 +17,7 @@ app
     .use(i18n)
     .use(router)
     .use(vuetify)
+    window._ = _
 
 if (import.meta.env.MODE === "e2e") {
     localStorage.setItem('access-token', 'test login')
