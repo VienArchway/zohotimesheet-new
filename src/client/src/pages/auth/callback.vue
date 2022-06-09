@@ -1,5 +1,5 @@
 <script setup>
-import { useHandleCallBack } from '@/lib/auth/callback.js'
+import { useHandleCallBack } from '@/lib/auth/callback'
 
 useHandleCallBack()
 </script>

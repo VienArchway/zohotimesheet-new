@@ -229,9 +229,9 @@
 
 <script>
 import "./index.scss"
-import moment from "moment";
-import projectApi from '../../api/project.js'
-import logworkApi from '../../api/logwork.js'
+import moment from "moment"
+import projectApi from '@/api/resources/project'
+import logworkApi from '@/api/resources/logwork'
 
 export default {
     components: {

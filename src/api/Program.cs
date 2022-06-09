@@ -1,12 +1,15 @@
-using api;
 using api.Application;
 using api.Infrastructure;
 using api.Services;
 using api.Services.Security;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-var configuration = builder.Configuration;
+
+builder.Configuration.AddAzureKeyVault(
+    new Uri("https://zohotoken.vault.azure.net/"), 
+    new DefaultAzureCredential());
 
 builder.Services.AddControllers();
 builder.Services.AddSpaStaticFiles(config => { config.RootPath = "dist"; });
