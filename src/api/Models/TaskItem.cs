@@ -6,7 +6,7 @@ namespace api.Models
     public class TaskItem
     {
         [JsonProperty(PropertyName = "id")]
-        public string TaskItemId { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty(PropertyName = "projId")]
         public string ProjId { get; set; }

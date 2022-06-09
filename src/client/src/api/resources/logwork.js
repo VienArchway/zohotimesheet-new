@@ -13,5 +13,17 @@ export default {
         if (res) {
             return await res.json()
         }
+    },
+    async create(requestInput) {
+        const res = await fetchApi('POST', API_PATH_NAME + '/create', null, requestInput)
+        if (res) {
+            return await res.json()
+        }
+    },
+    async update(requestInput) {
+        const res = await fetchApi('POST', API_PATH_NAME, null, requestInput)
+        if (res) {
+            return await res.json()
+        }
     }
 }

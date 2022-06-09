@@ -110,8 +110,7 @@ onMounted(async () => {
                 </th>
             </tr>
         </thead>
-        <tbody>
-            <div v-for="(proj, index) in values.data" :key="`project-${index}`">
+        <tbody v-for="(proj, index) in values.data" :key="`project-${index}`">
                 <tr >
                 <td :rowspan="proj.tasks.length ? (proj.tasks.length + 1) : 1">
                     <a :href="`${zohoSprintLink}#board/P${proj.projNo}`" target="_blank">{{ proj.name }}</a>
@@ -155,7 +154,6 @@ onMounted(async () => {
                     </div>
                 </td>
             </tr>
-            </div>
         </tbody>
         <tfoot>
             <tr>
@@ -239,7 +237,7 @@ export default {
             // this.values.assignee = _.find(this.assignees, { emailId : window.email }).id;
             // this.values.userLoginId = this.values.assignee;
             // const resUser = await axios.get(`${this.urls.userApi}/${window.zuid}`);
-            this.values.assignee = "52523000000003787";
+            this.values.assignee = "52523000000187565";
             this.values.userLoginId = this.values.assignee;
         },
         async search() {
@@ -296,7 +294,7 @@ export default {
                     });
                 }
 
-                const sortTaskItemsbyId = _.sortBy(allTaskItems, [ "taskItemId" ]);
+                const sortTaskItemsbyId = _.sortBy(allTaskItems, [ "id" ]);
                 let subItemids = [];
                 _.forEach(allTaskItems, (item) => {
                     if (item.subItemIds && item.subItemIds.length > 0) {
@@ -367,7 +365,6 @@ export default {
                         });
                     });
                 });
-                debugger
                 this.values.data = _.orderBy(projectsData, ["name"], ["asc"]);
                 this.$forceUpdate();
             } catch (error) {
@@ -436,27 +433,27 @@ export default {
                         decimal = duration % 1;
 
                     const parameter = {
-                        logTimeId: log.id,
+                        logTimeId: log.logTimeId,
                         projid : task.projId,
                         sprintid : task.sprintId,
                         itemid: task.id,
                         duration: decimal === 0 ? `${duration}` : `${Math.floor(duration)}:${decimal * 60}`,
                         users: this.values.assignee,
                         date: moment(logWork.date).format("YYYY-MM-DDTHH:mm:ssZ"),
-                        isbillable: 1
+                        isbillable: 1,
+                        actionField: null
                     };
 
                     try {
-                        const axiosCallBack = !log.id ? axios.post : axios.put;
-                        const url = !log.id ? `${this.urls.logWorkApi}/create` : this.urls.logWorkApi;
-
-                        const response = await axiosCallBack(url, parameter, { headers: { AccessToken: this.values.accessToken } });
+                        debugger
+                        // const response = await axiosCallBack(url, parameter, { headers: { AccessToken: this.values.accessToken } });
+                        const response = !log.logTimeId ? await logworkApi.create(parameter) : await logworkApi.update(parameter);
 
                         if (response.data !== null && response.data !== undefined)
                         {
-                            if (!log.id)
+                            if (!log.logTimeId)
                             {
-                                log.id = response.data.id;
+                                log.logTimeId = response.logTimeId;
                             }
 
                             // this.$store.commit("notify.success", { content: this.t("savesuccess"), timeout:3000 });

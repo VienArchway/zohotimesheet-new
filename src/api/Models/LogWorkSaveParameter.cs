@@ -6,7 +6,7 @@ namespace api.Models
 {
     public class LogWorkSaveParameter
     {
-        public string LogTimeId { get; set; }
+        public string? LogTimeId { get; set; }
 
         public string ProjId { get; set; }
 
@@ -15,7 +15,7 @@ namespace api.Models
         public string ItemId { get; set; }
 
         [JsonProperty(PropertyName = "action", NullValueHandling=NullValueHandling.Ignore)]
-        public string Action { get; set; }
+        public string? Action { get; set; }
 
         [JsonProperty(PropertyName = "duration", NullValueHandling=NullValueHandling.Ignore)]
         public string Duration { get; set; }

@@ -98,7 +98,7 @@ namespace api.Infrastructure.Clients
 
                         if (resultItem.IsParent)
                         {
-                            var urlSubItems = $"team/{teamId}/projects/{resultItem.ProjId}/sprints/{resultItem.SprintId}/item/{resultItem.TaskItemId}/subitem/?action=level";
+                            var urlSubItems = $"team/{teamId}/projects/{resultItem.ProjId}/sprints/{resultItem.SprintId}/item/{resultItem.Id}/subitem/?action=level";
                             var resSubItems = await client.GetAsync(urlSubItems).ConfigureAwait(false);
 
                             if (resSubItems.StatusCode == HttpStatusCode.OK)
@@ -163,7 +163,7 @@ namespace api.Infrastructure.Clients
 
                 if (resultItem.IsParent)
                 {
-                    var urlSubItems = $"team/{teamId}/projects/{resultItem.ProjId}/sprints/{resultItem.SprintId}/item/{resultItem.TaskItemId}/subitem/?action=level";
+                    var urlSubItems = $"team/{teamId}/projects/{resultItem.ProjId}/sprints/{resultItem.SprintId}/item/{resultItem.Id}/subitem/?action=level";
                     var resSubItems = await client.GetAsync(urlSubItems).ConfigureAwait(false);
 
                     if (resSubItems.StatusCode == HttpStatusCode.OK)
@@ -178,7 +178,7 @@ namespace api.Infrastructure.Clients
                 result.AddRange(resultItems);
             }
 
-            result = result.OrderBy(item => item.TaskItemId).ToList();
+            result = result.OrderBy(item => item.Id).ToList();
 
             return result;
         }

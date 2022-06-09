@@ -150,7 +150,7 @@ namespace api.Infrastructure.Clients
 
                 var filterEncode = HttpUtility.UrlEncode(JsonConvert.SerializeObject(filter));
 
-                var url = $"team/{teamId}/timesheet/?action=orgitemlogs&index={index}&range={range}&viewtype={viewType}";
+                var url = $"team/{teamId}/timesheet/?action=orglogs&index={index}&range={range}&viewtype={viewType}&logtype=0";
                 if (!string.IsNullOrEmpty(filterEncode))
                 {
                     url += $"&filter={filterEncode}";
