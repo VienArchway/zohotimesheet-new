@@ -25,15 +25,35 @@ public class ZohoTokenController : ControllerBase
     public async Task<IActionResult> GetAccessToken([FromQuery] string code)
     {
         var result = await service.GetAccessTokenAsync(code).ConfigureAwait(false);
+        
+        var cookieOptions = new CookieOptions
+        {
+            Secure = true,
+            HttpOnly = true,
+            SameSite = SameSiteMode.None
+        };
+        
+        Response.Cookies.Append("accessToken", result.AccessToken ?? string.Empty, cookieOptions);
+
         return Ok(result);
     }
     
     [HttpGet("refresh-access-token")]
     [ProducesResponseType(typeof(Token), 200)]
-    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync([FromQuery]string refreshToken)
+    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync()
     {
-        var result = await service.GetAccessTokenFromRefreshTokenAsync(refreshToken).ConfigureAwait(false);
-        return Ok(result.AccessToken);
+        var result = await service.GetAccessTokenFromRefreshTokenAsync().ConfigureAwait(false);
+        
+        var cookieOptions = new CookieOptions
+        {
+            Secure = true,
+            HttpOnly = true,
+            SameSite = SameSiteMode.None
+        };
+        
+        Response.Cookies.Append("accessToken", result.AccessToken ?? string.Empty, cookieOptions);
+
+        return Ok(result);
     }
 
     [HttpGet("get-admin-access-token")]
@@ -47,9 +67,9 @@ public class ZohoTokenController : ControllerBase
     [Authorize]
     [HttpGet("revoke")]
     [ProducesResponseType(typeof(Token), 200)]
-    public async Task<IActionResult> RevokeRefreshTokenAsync([FromQuery]string token)
+    public async Task<IActionResult> RevokeRefreshTokenAsync()
     {
-        await service.RevokeRefreshTokenAsync(token).ConfigureAwait(false);
+        await service.RevokeRefreshTokenAsync().ConfigureAwait(false);
         return Ok();
     }
     

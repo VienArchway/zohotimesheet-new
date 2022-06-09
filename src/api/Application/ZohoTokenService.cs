@@ -18,19 +18,14 @@ namespace api.Application
             return client.GetAccessTokenAsync(code);
         }
 
-        public Task<Token> GetAccessTokenFromRefreshTokenAsync(string refreshToken)
+        public Task<Token> GetAccessTokenFromRefreshTokenAsync()
         {
-            return client.GetAccessTokenFromRefreshTokenAsync(refreshToken);
+            return client.GetAccessTokenFromRefreshTokenAsync();
         }
 
-        public Task<Token> GetAdminAccessTokenAsync()
+        public async Task RevokeRefreshTokenAsync()
         {
-            return client.GetAdminAccessTokenAsync();
-        }
-
-        public async Task RevokeRefreshTokenAsync(string token)
-        {
-            await client.RevokeRefreshTokenAsync(token);
+            await client.RevokeRefreshTokenAsync();
         }
     }
 }

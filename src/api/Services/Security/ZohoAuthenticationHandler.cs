@@ -31,32 +31,11 @@ public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticatio
         {
             return Task.FromResult(AuthenticateResult.NoResult());
         }
-        
-        // handle request only for refresh token
-        if (Request.Headers.ContainsKey(Options.RefreshTokenHeaderName)
-            || Request.Headers.ContainsKey(Options.IsRedirectUri))
-        {
-            return Task.FromResult(AuthenticateResult.NoResult());
-        }
-        
-        // check include access token
-        if (!Request.Headers.ContainsKey(Options.TokenHeaderName))
-        {
-            return Task.FromResult(AuthenticateResult.Fail($"Required header for token: {Options.TokenHeaderName}"));
-        }
-        
-        var accessToken = Request.Headers[Options.TokenHeaderName].ToString();
 
-        if (accessToken is "null" or "" or "undefined")
-        {
-            return Task.FromResult(AuthenticateResult.Fail($"Required header for token: {Options.TokenHeaderName}"));
-        }
-        
         var fetchTeam = teamClient.SearchAsync().GetAwaiter().GetResult();
-        
         if (string.IsNullOrEmpty(fetchTeam) || !fetchTeam.Equals("success"))
         {
-            return Task.FromResult(AuthenticateResult.Fail($"Wrong access token: {Options.TokenHeaderName}"));
+            return Task.FromResult(AuthenticateResult.Fail($"Wrong access token"));
         }
         
         var claims = new[]

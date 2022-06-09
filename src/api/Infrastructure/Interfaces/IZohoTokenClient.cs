@@ -7,8 +7,7 @@ namespace api.Infrastructure.Interfaces
     public interface IZohoTokenClient
     {
         Task<Token> GetAccessTokenAsync(string code);
-        Task<Token> GetAccessTokenFromRefreshTokenAsync(string refreshToken);
-        Task<Token> GetAdminAccessTokenAsync();
-        Task RevokeRefreshTokenAsync(string token);
+        Task<Token> GetAccessTokenFromRefreshTokenAsync();
+        Task RevokeRefreshTokenAsync();
     }
 }
