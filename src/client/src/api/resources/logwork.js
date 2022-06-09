@@ -8,4 +8,10 @@ export default {
             return await res.json()
         }
     }
+    async searchByGlobalView(requestInput) {
+        const res = await fetchApi('POST', API_PATH_NAME + '/search-by-global-view', null, requestInput)
+        if (res) {
+            return await res.json()
+        }
+    }
 }

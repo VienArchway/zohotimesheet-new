@@ -175,11 +175,10 @@ onMounted(async () => {
 <script>
 import "./index.scss"
 import moment from "moment"
-import projectApi from '../../api/project.js'
-import logworkApi from '../../api/logwork.js'
-import itemApi from '../../api/item.js'
-import adlsApi from '../../api/adls.js'
-import zohoTokenApi from '../../api/zohotoken.js'
+import projectApi from '@/api/resources/project'
+import logworkApi from '@/api/resources/logwork'
+import itemApi from '@/api/resources/item'
+import adlsApi from '@/api/resources/adls'
 
 export default {
     data() {
@@ -515,10 +514,6 @@ export default {
                 });
             }
         },
-        async getAccessToken() {
-            const resToken = await zohoTokenApi.getAdminAccessToken();
-            return resToken;
-        }
     }
 };
 </script>

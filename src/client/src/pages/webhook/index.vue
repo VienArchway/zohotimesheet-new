@@ -61,8 +61,7 @@ meta:
 
 <script>
 import "./index.scss";
-import webhookApi from '../../api/webhook.js'
-import zohoTokenApi from '../../api/zohotoken.js'
+import webhookApi from '@/api/resources/webhook'
 
 export default {
     components: {
@@ -137,10 +136,6 @@ export default {
         closeDialog() {
             this.$refs.form.reset();
             this.dialog = false;
-        },
-        async getAccessToken() {
-            const resToken = await zohoTokenApi.getAdminAccessToken();
-            return resToken;
         }
     }
 };

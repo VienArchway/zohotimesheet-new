@@ -197,16 +197,15 @@ onMounted(async () => {
 </template>
 <script>
 import "./index.scss"
-import 'vue-json-pretty/lib/styles.css'
+// import '@/vue-json-pretty/lib/styles.css'
 import moment from "moment"
-import VueJsonPretty from 'vue-json-pretty'
+// import VueJsonPretty from 'vue-json-pretty'
 import adlsApi from '@/api/resources/adls'
 import projectApi from '@/api/resources/project'
-import logworkApi from '@/api/resources/logwork'
 
 export default {
     components: {
-        VueJsonPretty
+        // VueJsonPretty
     },
     data() {
         return {

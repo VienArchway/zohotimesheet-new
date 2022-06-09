@@ -68,9 +68,9 @@ meta:
 </route>
 
 <script>
-import "./index.scss";
-import moment from "moment";
-import zohoScheduleApi from '../../api/zohoschedule.js'
+import "./index.scss"
+import moment from "moment"
+import zohoScheduleApi from '@/api/resources/zohoschedule'
 
 export default {
     name: "schedule",
