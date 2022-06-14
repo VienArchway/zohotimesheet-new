@@ -8,7 +8,6 @@ import Layouts from 'vite-plugin-vue-layouts'
 const path = require('path')
 
 export default defineConfig({
-  mode: 'production',
   build: {
     minify: false
   },

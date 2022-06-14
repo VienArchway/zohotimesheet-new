@@ -82,7 +82,7 @@ export default {
             time: null,
             isShowTime: false,
             types: [
-                { text: this.t("time"), value: "TIME" }
+                { text: "time", value: "TIME" }
             ],
             values: {
                 schedule: {

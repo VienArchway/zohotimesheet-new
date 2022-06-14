@@ -221,7 +221,7 @@ export default {
                     projectNameFilter: "",
                     headers: [
                         {
-                            text: this.t("project"),
+                            text: "project",
                             value: "projName"
                         }
                     ],
@@ -230,17 +230,17 @@ export default {
                 },
                 sprintData: {
                     items: [
-                        {text: this.t("activesprint"), value: 2 },
-                        {text: this.t("allsprint"), value: 0 }
+                        {text: "activesprint", value: 2 },
+                        {text: "allsprint", value: 0 }
                     ]
                 },
                 logworkData: {
                     headers: [
-                        { text: this.t("project"), value: "projName" },
-                        { text: this.t("item"), value: "itemName" },
-                        { text: this.t("owner"), value: "OwnerName" },
-                        { text: this.t("logdate"), value: "logDate" },
-                        { text: this.t("logtime"), value: "logTime" },
+                        { text: "project", value: "projName" },
+                        { text: "item", value: "itemName" },
+                        { text: "owner", value: "OwnerName" },
+                        { text: "logdate", value: "logDate" },
+                        { text: "logtime", value: "logTime" },
                         { text: "", value: "json", sortable: false }
                     ],
                     items: []
