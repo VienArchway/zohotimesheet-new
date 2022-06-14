@@ -2,14 +2,9 @@ using api.Application;
 using api.Infrastructure;
 using api.Services;
 using api.Services.Security;
-using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-
-builder.Configuration.AddAzureKeyVault(
-    new Uri("https://zohotoken.vault.azure.net/"), 
-    new DefaultAzureCredential());
 
 builder.Services.AddControllers();
 builder.Services.AddSpaStaticFiles(config => { config.RootPath = "dist"; });
@@ -30,7 +25,7 @@ InfrastructureConfig.ConfigureService(builder.Services);
 var app = builder.Build();
 
 // Set up build docker
-// app.Urls.Add("http://0.0.0.0:5000");
+app.Urls.Add("http://0.0.0.0:5000");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -39,6 +34,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+builder.Configuration
+    .SetBasePath(app.Environment.ContentRootPath)
+    .AddJsonFile($"appsettings.json", true, true)
+    .AddJsonFile($"appsettings.{app.Environment.EnvironmentName}.json", true,true)
+    .AddEnvironmentVariables();
 
 app.UseSpaStaticFiles();
 app.UseRouting();

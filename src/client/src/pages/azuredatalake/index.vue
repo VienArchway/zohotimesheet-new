@@ -150,7 +150,7 @@ meta:
 
 <script>
 import "./index.scss";
-import adlsApi from '../../api/adls.js'
+import adlsApi from '@/api/resources/adls'
 
 export default {
     components: {

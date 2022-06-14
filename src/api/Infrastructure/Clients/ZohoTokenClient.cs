@@ -4,6 +4,7 @@ using api.Models;
 using api.Infrastructure.Interfaces;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
+using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 
@@ -31,7 +32,7 @@ namespace api.Infrastructure.Clients
                 new("client_secret", clientSecret),
                 new("redirect_uri", redirectUri),
                 new("grant_type", "authorization_code"),
-                new("prompt", "consent")
+                // new("prompt", "consent") // just enable when need to get new refresh token always
             };
             var content = new FormUrlEncodedContent(parameter);
             clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
@@ -43,11 +44,18 @@ namespace api.Infrastructure.Clients
             var token = JsonConvert.DeserializeObject<Token>(resContent);
 
             if (token == null) return token ?? throw new InvalidOperationException();
+            
             var secretClient = new SecretClient(
                 new Uri("https://zohotoken.vault.azure.net/"),
                 new DefaultAzureCredential());
- 
-            await secretClient.SetSecretAsync($"refreshtoken-{configuration["userName"]}", token.RefreshToken, CancellationToken.None);
+            var refreshToken = await secretClient.GetSecretAsync(
+                $"refreshtoken-{configuration["userName"]}", null, CancellationToken.None);
+            if (string.IsNullOrEmpty(refreshToken.Value.Value))
+            {
+                await secretClient.SetSecretAsync(
+                    $"refreshtoken-{configuration["userName"]}", token.RefreshToken, CancellationToken.None);
+            }
+
             return token ?? throw new InvalidOperationException();
         }
 
@@ -56,7 +64,8 @@ namespace api.Infrastructure.Clients
             var secretClient = new SecretClient(
                 new Uri("https://zohotoken.vault.azure.net/"),
                 new DefaultAzureCredential());
-            var refreshToken = await secretClient.GetSecretAsync($"refreshtoken-{configuration["userName"]}", null, CancellationToken.None);
+            var refreshToken = await secretClient.GetSecretAsync(
+                $"refreshtoken-{configuration["userName"]}", null, CancellationToken.None);
             if (refreshToken.Value.Value == null) throw new OperationCanceledException();
             var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
             var clientId = configuration.GetValue<string>("Zoho:ClientId");
@@ -102,7 +111,7 @@ namespace api.Infrastructure.Clients
             clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
             clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
             var response = await clientToken.PostAsync($"{tokenHost}/revoke", content);
-                
+ 
             var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var srcJObj = JsonConvert.DeserializeObject<JObject>(resContent);
             var status = srcJObj?.GetValue("status")?.ToObject<string>();

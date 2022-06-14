@@ -28,13 +28,12 @@ public class ZohoTokenController : ControllerBase
         
         var cookieOptions = new CookieOptions
         {
-            Secure = true,
-            HttpOnly = true,
-            SameSite = SameSiteMode.None
+            // Secure = true,
+            // HttpOnly = true,
+            SameSite = SameSiteMode.Unspecified
         };
-        
         Response.Cookies.Append("accessToken", result.AccessToken ?? string.Empty, cookieOptions);
-
+        
         return Ok(result);
     }
     
@@ -46,11 +45,10 @@ public class ZohoTokenController : ControllerBase
         
         var cookieOptions = new CookieOptions
         {
-            Secure = true,
-            HttpOnly = true,
-            SameSite = SameSiteMode.None
+            // Secure = true,
+            // HttpOnly = true,
+            SameSite = SameSiteMode.Unspecified
         };
-        
         Response.Cookies.Append("accessToken", result.AccessToken ?? string.Empty, cookieOptions);
 
         return Ok(result);

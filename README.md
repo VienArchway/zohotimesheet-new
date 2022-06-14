@@ -1,10 +1,74 @@
 # zohotimesheet-new
 
-zoho state: 67452389162534
+## Setup
+
+### Frontend
+
+go to /src/client
+
+1. Install package
+
+```js
+npm install
+```
+
+2. Setting env
+
+- create 2 files `.env.local` and `.env.production` in /src/client
+```env
+// .env.local
+FE_ZOHO_CLIENT_ID=1000.1KQGLWBUATFDBEE1S19FVN59D339GN
+FE_ZOHO_REDIRECT_URI=http://localhost:3000/auth/callback
+FE_ZOHO_ACCESS_TYPE=offline
+FE_ZOHO_CODE_RESPONSE_TYPE=code
+FE_ZOHO_TOKEN_PATH=oauth/v2/token
+FE_ZOHO_LOGIN_URL=https://accounts.zoho.com/oauth/v2/auth
+FE_ZOHO_LOGIN_SCOPE=ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ+ZohoSprints.sprints.READ
+```
+
+```env
+// .env.production
+FE_ZOHO_CLIENT_ID=1000.Z1JHOXVXLJRC1BXDJX7HQJUVGSDKED
+FE_ZOHO_REDIRECT_URI=http://zohotimesheet.japaneast.azurecontainer.io:5000/auth/callback
+FE_ZOHO_ACCESS_TYPE=offline
+FE_ZOHO_CODE_RESPONSE_TYPE=code
+FE_ZOHO_TOKEN_PATH=oauth/v2/token
+FE_ZOHO_LOGIN_URL=https://accounts.zoho.com/oauth/v2/auth
+FE_ZOHO_LOGIN_SCOPE=ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ+ZohoSprints.sprints.READ
+```
+
+3. Run app
+
+```js
+npm run dev
+```
+
+### Backend
+
+1. Build project
+
+```js
+dotnet restore
+dotnet build
+```
+
+2. Setup environment
+
+Edit `userName` to your name in `appsettings.Development.json` and `appsettings.Production.json`
+
+3. Install extension
+
+Vscode: https://marketplace.visualstudio.com/items?itemName=ms-vscode.azure-account
+
+Read more: https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme#environment-variables
+
+## Deploy
 
 1. build client
 
-> dist
+```js
+npm run build
+```
 
 2. publish api
 
@@ -12,33 +76,11 @@ zoho state: 67452389162534
 dotnet publish -c Release
 ```
 
-3. Copy prod
+3. Prepare build docker
 
-- Edit `program.css` in src/api
-
-```c#
-// Set up build docker
-app.Urls.Add("http://0.0.0.0:5000");
-```
-
-- Edit `vite.config.js` in src/client
-
-```javascript
-server: {
-    proxy: {
-      // '/api': 'http://localhost:5000' // config build local dev
-      '/api': 'http://0.0.0.0:5000' // config build docker
-    }
-}
-```
-
-- Run dotnet publish in src/api
-  - copy file in api/bin/Release/Publish
-- Run npm run build in src/client
-  - copy folder `dist` in src/client/dist
-
-- Test prod/
-
+- copy file from api/bin/Release/Publish to /prod
+- copy folder `dist` from src/client/dist to /prod
+- verify /prod
 ```
 dotnet api.dll
 ```
@@ -52,17 +94,8 @@ dotnet api.dll
 docker build -t aci-zohotimesheet:v1 .
 ```
 
-```
-docker images
-docker image rm aci-zohotimesheet:v1
-```
-
 5. Run docker
 
 ```
 docker run -d -p 5000:5000 aci-zohotimesheet:v1
 ```
-
-6. Deploy
-
-https://docs.microsoft.com/en-us/azure/container-instances/

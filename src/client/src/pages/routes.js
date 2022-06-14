@@ -12,7 +12,7 @@ const errorPage = {
 routes.push(errorPage)
 
 export default function (history) {
-    return  createRouter({
+    return createRouter({
         history,
         routes
     })

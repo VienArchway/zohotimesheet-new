@@ -8,15 +8,19 @@ import Layouts from 'vite-plugin-vue-layouts'
 const path = require('path')
 
 export default defineConfig({
+  mode: 'production',
+  build: {
+    minify: false
+  },
   plugins: [
     vue(),
     vuetify({
       autoImport: true, // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
     }),
     VueI18n({
-      runtimeOnly: true,
+      runtimeOnly: false,
       compositionOnly: true,
-      include: [path.resolve(__dirname, 'i18n/**')],
+      include: [path.resolve(__dirname, './i18n/**')],
     }),
     Pages({
       dirs: [
@@ -36,7 +40,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://localhost:5000', // config server api
+      '/api': 'http://0.0.0.0:5000', // config server api
       '/zohoauth': {
         target: 'https://accounts.zoho.com',
         changeOrigin: true,
