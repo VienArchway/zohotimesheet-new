@@ -6,9 +6,9 @@ using api.Services.Security;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
-builder.Configuration.AddAzureKeyVault(
-    new Uri("https://zohotoken.vault.azure.net/"), 
-    new DefaultAzureCredential());
+// builder.Configuration.AddAzureKeyVault(
+//     new Uri("https://zohotoken.vault.azure.net/"), 
+//     new DefaultAzureCredential());
 
 builder.Services.AddControllers();
 builder.Services.AddSpaStaticFiles(config => { config.RootPath = "dist"; });

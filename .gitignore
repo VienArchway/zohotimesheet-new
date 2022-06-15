@@ -29,3 +29,5 @@ obj/*
 node_modules/
 prod/*
 bin/*
+**/*/bin/*
+**/*/obj/*

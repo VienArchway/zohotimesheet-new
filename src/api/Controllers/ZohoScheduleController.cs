@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using api.Models;
 using api.Application;
+using Microsoft.AspNetCore.Authorization;
 
 namespace api.Controllers;
 
-// [Authorize]
+[Authorize]
 [Route("/api/v1/[controller]")]
 [ApiController]
 public class ZohoScheduleController : ControllerBase

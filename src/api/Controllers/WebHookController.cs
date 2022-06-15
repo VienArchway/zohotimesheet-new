@@ -5,7 +5,7 @@ using api.Models;
 
 namespace api.Controllers;
 
-// [Authorize]
+[Authorize]
 [Route("/api/v1/[controller]")]
 [ApiController]
 public class WebHookController : ControllerBase

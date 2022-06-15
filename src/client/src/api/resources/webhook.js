@@ -2,7 +2,7 @@ import { fetchApi } from '@/api/apis'
 const API_PATH_NAME = '/api/v1/webhook'
 
 export default {
-    async getAll() {
+    async getAll(accessToken) {
         const res = await fetchApi('GET', API_PATH_NAME)
         if (res) {
             return await res.json()
