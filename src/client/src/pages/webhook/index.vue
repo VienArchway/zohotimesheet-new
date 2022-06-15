@@ -1,7 +1,7 @@
 <script setup>
 import {onMounted, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
-import { getVerifyTokenApi } from '@/api/resources/ZohoToken.js'
+import { getVerifyTokenApi, getAdminAccessTokenApi } from '@/api/resources/zohoToken'
 
 const { t } = useI18n()
 const status = ref(null)
@@ -136,6 +136,10 @@ export default {
         closeDialog() {
             this.$refs.form.reset();
             this.dialog = false;
+        },
+        async getAccessToken() {
+             const resToken = await getAdminAccessTokenApi();
+             return resToken;
         }
     }
 };

@@ -401,6 +401,7 @@ export default {
             ];
         },
         async changeWeek() {
+            debugger
             this.startdayOfWeek = this.selectDateRange === "thisweek" ? moment().startOf("week") : moment().startOf("week").add(-7, "days");
 
             this.getWeekDateData();
@@ -495,7 +496,7 @@ export default {
                 statusId: "52523000000002619"
             };
 
-            await axios.post(`${this.urls.itemApi}/update-status`, taskItemStatusParameter, { headers: { AccessToken: accessToken } });
+            await this.itemApi.updateStatus(taskItemStatusParameter);
 
             // this.$store.commit("notify.success", { content: this.t("savesuccess"), timeout:3000 });
 

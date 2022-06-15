@@ -120,5 +120,32 @@ namespace api.Infrastructure.Clients
                 throw new InvalidOperationException(resContent);
             }
         }
+
+        public async Task<Token> GetAdminAccessTokenAsync()
+        {
+            var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
+            var clientId = configuration.GetValue<string>("Zoho:ClientId");
+            var clientSecret = configuration.GetValue<string>("Zoho:ClientSecret");
+            var refreshToken = configuration.GetValue<string>("Zoho:RefreshToken");
+
+            using var clientToken = new HttpClient();
+            var parameter = new List<KeyValuePair<string, string>>
+            {
+                new("refresh_token", refreshToken),
+                new("client_id", clientId),
+                new("client_secret", clientSecret),
+                new("grant_type", "refresh_token")
+            };
+            var content = new FormUrlEncodedContent(parameter);
+            clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+            var response = await clientToken.PostAsync($"{tokenHost}", content);
+            var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            var token = JsonConvert.DeserializeObject<Token>(resContent);
+
+            return token ?? throw new InvalidOperationException();
+        }
     }
 }

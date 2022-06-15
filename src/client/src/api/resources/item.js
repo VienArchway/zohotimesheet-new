@@ -9,5 +9,11 @@ export default {
         if (res) {
             return await res.json()
         }
+    },
+    async updateStatus(requestInput) {
+        const res = await fetchApi('POST', API_PATH_NAME + '/update-status', null, requestInput)
+        if (res) {
+            return await res.json()
+        }
     }
 }

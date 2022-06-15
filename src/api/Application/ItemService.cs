@@ -42,7 +42,7 @@ namespace api.Application
             return client.CreateAsync(parameter);
         }
 
-        public Task<TaskItem> CreateSubTaskItemAsync(ItemSaveParameter parameter)
+        public Task<TaskItem> CreateSubItemAsync(ItemSaveParameter parameter)
         {
             return client.CreateSubItemAsync(parameter);
         }

@@ -9,6 +9,13 @@ export async function getVerifyTokenApi() {
     }
 }
 
+export async function getAdminAccessTokenApi() {
+    const res = await fetchApi('GET', API_PATH_NAME + '/get-admin-access-token')
+    if (res) {
+        return await res.json()
+    }
+}
+
 export async function getAccessTokenByRefreshTokenApi() {
     const res = await fetchApi('GET', API_PATH_NAME + '/refresh-access-token')
     if (res) {

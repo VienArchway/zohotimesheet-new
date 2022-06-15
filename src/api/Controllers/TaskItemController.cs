@@ -47,10 +47,10 @@ public class TaskItemController : ControllerBase
             return new CreatedResult(string.Empty, result);
         }
 
-        [HttpPost("create-sub-TaskItem")]
-        public async Task<IActionResult> CreateSubTaskItemAsync([FromBody] ItemSaveParameter parameter)
+        [HttpPost("create-sub-item")]
+        public async Task<IActionResult> CreateSubItemAsync([FromBody] ItemSaveParameter parameter)
         {
-            var result = await service.CreateSubTaskItemAsync(parameter).ConfigureAwait(false);
+            var result = await service.CreateSubItemAsync(parameter).ConfigureAwait(false);
             return new CreatedResult(string.Empty, result);
         }
 

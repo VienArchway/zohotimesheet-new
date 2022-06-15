@@ -12,7 +12,7 @@ namespace api.Application.Interfaces
 
         Task<TaskItem> CreateAsync(ItemSaveParameter parameter);
 
-        Task<TaskItem> CreateSubTaskItemAsync(ItemSaveParameter parameter);
+        Task<TaskItem> CreateSubItemAsync(ItemSaveParameter parameter);
 
         Task UpdateAsync(ItemSaveParameter parameter);
 
