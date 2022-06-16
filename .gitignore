@@ -28,3 +28,4 @@ dist-ssr
 obj/
 node_modules/
 prod/*
+bin/*
