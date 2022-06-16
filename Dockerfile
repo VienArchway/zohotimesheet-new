@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY prod .
 
-EXPOSE 5000
+EXPOSE 80
 
 CMD ["dotnet", "api.dll"]

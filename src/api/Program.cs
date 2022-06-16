@@ -28,15 +28,18 @@ InfrastructureConfig.ConfigureService(builder.Services);
 
 var app = builder.Build();
 
-// Set up build docker
-app.Urls.Add("http://0.0.0.0:5000");
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.Urls.Add("http://0.0.0.0:5000");
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    // Set up build docker
+    app.Urls.Add("http://0.0.0.0:80");
 }
 
 builder.Configuration

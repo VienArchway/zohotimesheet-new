@@ -23,18 +23,22 @@ FE_ZOHO_ACCESS_TYPE=offline
 FE_ZOHO_CODE_RESPONSE_TYPE=code
 FE_ZOHO_TOKEN_PATH=oauth/v2/token
 FE_ZOHO_LOGIN_URL=https://accounts.zoho.com/oauth/v2/auth
-FE_ZOHO_LOGIN_SCOPE=ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ+ZohoSprints.sprints.READ
+FE_ZOHO_LOGIN_SCOPE=ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ+ZohoSprints.sprints.READ+aaaserver.profile.READ
+
+FE_API_URL=http://localhost:5000
 ```
 
 ```env
 // .env.production
 FE_ZOHO_CLIENT_ID=1000.Z1JHOXVXLJRC1BXDJX7HQJUVGSDKED
-FE_ZOHO_REDIRECT_URI=http://zohotimesheet.japaneast.azurecontainer.io:5000/auth/callback
+FE_ZOHO_REDIRECT_URI=http://zohotimesheetaw.japaneast.azurecontainer.io/auth/callback
 FE_ZOHO_ACCESS_TYPE=offline
 FE_ZOHO_CODE_RESPONSE_TYPE=code
 FE_ZOHO_TOKEN_PATH=oauth/v2/token
 FE_ZOHO_LOGIN_URL=https://accounts.zoho.com/oauth/v2/auth
-FE_ZOHO_LOGIN_SCOPE=ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ+ZohoSprints.sprints.READ
+FE_ZOHO_LOGIN_SCOPE=ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ+ZohoSprints.sprints.READ+aaaserver.profile.READ
+
+FE_API_URL=http://0.0.0.0:80
 ```
 
 3. Run app

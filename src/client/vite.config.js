@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from '@vuetify/vite-plugin'
 import VueI18n from '@intlify/vite-plugin-vue-i18n'
@@ -7,48 +7,52 @@ import Layouts from 'vite-plugin-vue-layouts'
 
 const path = require('path')
 
-export default defineConfig({
-  build: {
-    minify: false
-  },
-  plugins: [
-    vue(),
-    vuetify({
-      autoImport: true, // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
-    }),
-    VueI18n({
-      runtimeOnly: false,
-      compositionOnly: true,
-      include: [path.resolve(__dirname, './i18n/**')],
-    }),
-    Pages({
-      dirs: [
-        { dir: 'src/pages', baseRoute: '' },
-      ],
-    }),
-    Layouts({
-      defaultLayout: 'default'
-    }),
-  ],
-  define: { 'process.env': {} },
-  envPrefix: 'FE_',
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
+export default ({ mode }) => {
+  process.env = {...process.env, ...loadEnv(mode, process.cwd(), '')}
+
+  return defineConfig({
+    build: {
+      minify: false
     },
-  },
-  server: {
-    proxy: {
-      '/api': 'http://0.0.0.0:5000', // config server api
-      '/zohoauth': {
-        target: 'https://accounts.zoho.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/zohoauth/, ''),
+    plugins: [
+      vue(),
+      vuetify({
+        autoImport: true, // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
+      }),
+      VueI18n({
+        runtimeOnly: false,
+        compositionOnly: true,
+        include: [path.resolve(__dirname, './i18n/**')],
+      }),
+      Pages({
+        dirs: [
+          { dir: 'src/pages', baseRoute: '' },
+        ],
+      }),
+      Layouts({
+        defaultLayout: 'default'
+      }),
+    ],
+    define: { 'process.env': {} },
+    envPrefix: 'FE_',
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
       },
-    }
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom'
-  },
-})
+    },
+    server: {
+      proxy: {
+        '/api': process.env.FE_API_URL, // config server api
+        '/zohoauth': {
+          target: 'https://accounts.zoho.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/zohoauth/, ''),
+        },
+      }
+    },
+    test: {
+      globals: true,
+      environment: 'jsdom'
+    },
+  })
+}
