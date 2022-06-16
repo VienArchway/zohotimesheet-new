@@ -4,14 +4,14 @@ https://api-console.zoho.com
 
 ## Register
 
-https://www.zoho.com/crm/developer/docs/api/v2.1/register-client.html
+[Register application on Zoho for authentication](https://www.zoho.com/crm/developer/docs/api/v2.1/register-client.html)
 
-https://www.zoho.com/accounts/protocol/oauth-setup.html
+[Zoho OAuth setup](https://www.zoho.com/accounts/protocol/oauth-setup.html)
 
 
 ## Step
 
-- Get url for reqeusting to authentication 
+- Get url for requesting to authentication 
 
 ```js
 
