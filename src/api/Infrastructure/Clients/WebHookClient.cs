@@ -8,14 +8,17 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using api.Models;
 using api.Infrastructure.Interfaces;
+using System.Net.Http.Headers;
 
 namespace api.Infrastructure.Clients
 {
     public class WebHookClient : ZohoServiceClient, IWebHookClient
     {
-        public WebHookClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider)
+        public WebHookClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider, IZohoTokenClient zohoTokenClient)
             : base(client, configuration, svcProvider)
         {
+            var accessToken = zohoTokenClient.GetAdminAccessTokenAsync();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken.Result.AccessToken);
         }
 
         public async Task<IEnumerable<WebHook>> GetAllAsync()

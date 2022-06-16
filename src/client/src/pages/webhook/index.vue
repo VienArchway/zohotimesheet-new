@@ -1,7 +1,7 @@
 <script setup>
 import {onMounted, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
-import { getVerifyTokenApi, getAdminAccessTokenApi } from '@/api/resources/zohoToken'
+import { getVerifyTokenApi } from '@/api/resources/zohoToken'
 
 const { t } = useI18n()
 const status = ref(null)
@@ -98,7 +98,7 @@ export default {
         // this.$store.commit("showLoading");
         try {
             const accessToken = await this.getAccessToken();
-            const resWebHook = await webhookApi.getAll(accessToken);
+            const resWebHook = await webhookApi.getAll();
             this.items = resWebHook;
         }
         catch (error) {
@@ -136,10 +136,6 @@ export default {
         closeDialog() {
             this.$refs.form.reset();
             this.dialog = false;
-        },
-        async getAccessToken() {
-             const resToken = await getAdminAccessTokenApi();
-             return resToken;
         }
     }
 };
