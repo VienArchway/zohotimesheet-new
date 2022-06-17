@@ -25,6 +25,7 @@ onMounted(async () => {
                 v-model="logItemFilter"
                 append-icon="mdi-magnify"
                 :label="t('searchcondition')"
+                @change="search"
                 hide-details
             ></v-text-field>
         </v-col>
@@ -76,7 +77,7 @@ onMounted(async () => {
         </thead>
         <tbody>
             <tr
-                v-for="item in items"
+                v-for="item in filterItems"
                 :key="item.logTimeId"
             >
                 <v-checkbox
@@ -169,6 +170,7 @@ export default {
                 { text: this.t(""), value: "action", sort: false }
             ],
             items: [],
+            filterItems: [],
             selectedItems: [],
             state: {
                 isEmptyData: false
@@ -191,6 +193,7 @@ export default {
              try {
                 const resData = await adlsApi.getAll();
                 this.items = resData;
+                this.filterItems = resData;
             }
             catch (error) {
                 const resMessage = error.response?.data?.message;
@@ -251,6 +254,9 @@ export default {
         closeDialog() {
             this.$refs.form.reset();
             this.dialog = false;
+        },
+        search() {
+            this.filterItems = _.filter(this.items, (item) => { return item.itemName?.includes(this.logItemFilter) || item.ownerName?.includes(this.logItemFilter)|| item.logDate?.includes(this.logItemFilter)|| item.projName?.includes(this.logItemFilter)});
         }
     }
 };

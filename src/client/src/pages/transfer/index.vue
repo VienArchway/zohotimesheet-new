@@ -46,7 +46,7 @@ onMounted(async () => {
                                     <th class="text-left">
                                     </th>
                                     <th class="text-left">
-                                        ProjName
+                                        {{ t('project') }}
                                     </th>
                                 </tr>
                             </thead>
@@ -305,8 +305,7 @@ export default {
             }
         },
         projectNameFilter() {
-            const self = this
-            self.values.projectData.filterItems = self.values.projectData.items.find(item => item.projName.includes(self.values.projectData.projectNameFilter));
+            this.values.projectData.filterItems = _.filter(this.values.projectData.items, (proj) => { return proj.projName.includes(this.values.projectData.projectNameFilter)});
         }
     }
 

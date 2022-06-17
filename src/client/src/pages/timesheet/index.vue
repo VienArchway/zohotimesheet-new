@@ -19,7 +19,7 @@ onMounted(async () => {
     {{ t('hello') }}
     <div>
       <router-link data-cy="link-about" to="/about">About</router-link>
-    </div>
+    </div>    
     
     <v-table fixed-header>
         <thead>
@@ -27,14 +27,10 @@ onMounted(async () => {
                 <th colspan="2">
                     <v-row justify="start">
                         <v-select
-                        :items="dateRanges"
-                        v-model="selectDateRange"
-                        item-text="text"
-                        item-value="value"
-                        :label="t('completeon')"
-                        dark
-                        @change="changeWeek"
-                    />
+                            v-model="selectDateRange"
+                            :label="t('completeon')"
+                            :items="dateRanges"
+                        />
                     <v-menu bottom left>
                         <template v-slot:activator="{ on }">
                         <v-btn style="margin-top: 20px;"
@@ -181,18 +177,9 @@ import adlsApi from '@/api/resources/adls'
 export default {
     data() {
         return {
-            dateRanges: [
-                {
-                    text: this.t("thisweek"),
-                    value: "thisweek"
-                },
-                {
-                    text: this.t("lastweek"),
-                    value: "lastweek"
-                }
-            ],
+            dateRanges: ["thisweek", "lastweek"],
             assignees: [],
-            selectDateRange: "thisweek",
+            selectDateRange: "lastweek",
             urls: {
                 tokenApi: "api/zohotoken",
                 itemApi: "api/taskitem",
@@ -227,7 +214,7 @@ export default {
     async created() {
 
         await this.loadUsers();
-
+        
         await this.search();
     },
     methods: {
@@ -251,6 +238,7 @@ export default {
 
             try 
             {
+                debugger
                 const sprintTypeIds = this.selectDateRange === "thisweek" ? [ "2" ] :[ "2", "3" ],
                     assignees = !this.isSelectedLoginUser ? [this.values.assignee] : null,
                     openTaskCondition = {
