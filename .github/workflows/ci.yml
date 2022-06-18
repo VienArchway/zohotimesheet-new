@@ -1,4 +1,4 @@
-name: CI
+name: Build to prod and deploy to Azure container registry
 
 on:
   push:
@@ -7,11 +7,11 @@ on:
       - 'bug/**'
       - 'fix/**'
 
-  pull_request:
-    branches:
-      - main
+  pull_request_target:
     types:
       - closed
+    branches:
+      - main
 
 jobs:
   client-build:
