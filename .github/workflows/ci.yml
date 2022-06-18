@@ -3,19 +3,20 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - 'feature/**'
+      - 'bug/**'
+      - 'fix/**'
 
   pull_request:
     branches:
-      - feature/*
-
-#defaults:
-#  run:
-#    working-directory: ./src/client
+      - main
+    types:
+      - closed
 
 jobs:
-  install:
+  client-build:
     runs-on: ubuntu-latest
+    name: Client build
     steps:
       - uses: actions/checkout@v2
 
@@ -23,7 +24,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      
+
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
@@ -32,40 +33,118 @@ jobs:
           restore-keys: npm-
 
       - name: Install dependencies
-        run: |
-          ls -la
-          cd ./src/client
-          npm ci --ignore-scripts
-      - name: Check and run build
-        run: |
-          cd ./src/client
-          npm run build
-          ls -la
+        working-directory: ./src/client
+        run: npm ci --ignore-scripts
+        
+      - name: Create .env.production file
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_FE_ZOHO_CLIENT_ID: 1000.Z1JHOXVXLJRC1BXDJX7HQJUVGSDKED
+          envkey_FE_ZOHO_REDIRECT_URI: https://zohotimesheetaw.azurewebsites.net/auth/callback
+          envkey_FE_ZOHO_ACCESS_TYPE: offline
+          envkey_FE_ZOHO_CODE_RESPONSE_TYPE: code
+          envkey_FE_ZOHO_TOKEN_PATH: oauth/v2/token
+          envkey_FE_ZOHO_LOGIN_URL: https://accounts.zoho.com/oauth/v2/auth
+          envkey_FE_ZOHO_LOGIN_SCOPE: ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ+ZohoSprints.sprints.READ+aaaserver.profile.READ
+          envkey_FE_API_URL: http://0.0.0.0:80
+          directory: ./src/client
+          file_name: .env.production
 
-#      - name: Unit Test
-#        run: npm run test
+      - name: Build production
+        working-directory: ./src/client
+        run: npm run build
 
-#  cypress-run:
-#    runs-on: ubuntu-20.04
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#        
-#      - name: Install dependencies
-#        run: npm install
-#
-#      - name: Cypress run
-#        uses: cypress-io/github-action@v2
-#        with:
-#          working-directory: ./src/client/
-#          install-command: echo
-#          build: npm run build
-#          start: npx vite --port 3000
-  build-and-deploy:
+      - name: Upload build dist
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: ${{ github.workspace }}/src/client/dist
+  
+  #      - name: Unit Test
+  #        run: npm run test
+  
+  #  cypress-run:
+  #    runs-on: ubuntu-20.04
+  #    steps:
+  #      - name: Checkout
+  #        uses: actions/checkout@v2
+  #        
+  #      - name: Install dependencies
+  #        run: npm install
+  #
+  #      - name: Cypress run
+  #        uses: cypress-io/github-action@v2
+  #        with:
+  #          working-directory: ./src/client/
+  #          install-command: echo
+  #          build: npm run build
+  #          start: npx vite --port 3000
+        
+  api-build:
     runs-on: ubuntu-latest
-    
+    name: Api build
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x' # SDK Version to use; x will use the latest version
+      - run: dotnet build 
+        working-directory: ${{ github.workspace }}/src/api
+        
+      - name: Publish the package to prod
+        working-directory: ${{ github.workspace }}/src/api
+        run: dotnet publish -c Release
+
+      - name: Upload publish 
+        uses: actions/upload-artifact@v3
+        with:
+          name: publish
+          path: ${{ github.workspace }}/src/api/bin/Release/net6.0/publish/
+  
+  
+  create-and-copy-dist-to-prod:
+    name: Copy to prod
+    if: ${{ always() }}
+    needs: [client-build, api-build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: create prod dir
+        run: |
+          mkdir prod
+          mkdir prod/dist
+      - name: copy dist to prod
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: ${{ github.workspace }}/prod/dist
+      - name: copy publish to prod
+        uses: actions/download-artifact@v3
+        with:
+          name: publish
+          path: ${{ github.workspace }}/prod/
+      - name: show prod
+        run: |
+          ls -la prod/
+          ls -la prod/dist
+          rm -rf prod/runtimes
+
+      - name: Upload prod
+        uses: actions/upload-artifact@v3
+        with:
+          name: prod
+          path: ${{ github.workspace }}/prod
+
+  build-and-deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    name: Create image and push to ACR
+    needs: create-and-copy-dist-to-prod
     steps:
       - uses: actions/checkout@main
+      - name: create prod dir
+        run: |
+          mkdir prod
 
       - name: Authenticate using a Service Principal
         uses: azure/actions/login@v1
@@ -78,10 +157,17 @@ jobs:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: copy dist to prod
+        uses: actions/download-artifact@v3
+        with:
+          name: prod
+          path: ${{ github.workspace }}/prod
+
       - name: Build and push the image tagged with the git commit hash
         run: |
-          docker build . -t zohotimesheetaw/demo:${{ github.sha }}
-          ls -la
-          rm -rf prod
-          mkdir prod
-          ls -la /prod
+          ls -la ${{ github.workspace }}
+          ls -la ${{ github.workspace }}/prod
+          docker build . -t aci-zohotimesheet:v1.1
+          docker tag aci-zohotimesheet:v1.1 ${{ secrets.REGISTRY_LOGIN_SERVER }}/aci-zohotimesheet:v1.1
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/aci-zohotimesheet:v1.1
