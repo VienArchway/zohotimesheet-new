@@ -1,5 +1,5 @@
 import { createTestingPinia } from '@pinia/testing'
-import AppLogin from '../../src/components/app/AppLogin.vue'
+import AppLogin from '../../src/components/templates/AppLogin.vue'
 import { render, screen } from '@testing-library/vue'
 import useAuthStore from '../../src/store/auth'
 

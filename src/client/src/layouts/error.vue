@@ -1,5 +1,5 @@
 <script setup>
-import AppContainer from '@/components/app/AppContainer.vue'
+import AppContainer from '@/components/templates/AppContainer.vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
