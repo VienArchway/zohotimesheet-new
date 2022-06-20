@@ -229,7 +229,6 @@ export default {
 
             try 
             {
-                debugger
                 const sprintTypeIds = this.selectDateRange === "thisweek" ? [ "2" ] :[ "2", "3" ],
                     assignees = !this.isSelectedLoginUser ? [this.values.assignee] : null,
                     openTaskCondition = {
@@ -379,7 +378,6 @@ export default {
             ];
         },
         async changeWeek() {
-            debugger
             this.startdayOfWeek = this.selectDateRange === "thisweek" ? moment().startOf("week") : moment().startOf("week").add(-7, "days");
 
             this.getWeekDateData();
@@ -424,7 +422,6 @@ export default {
                     };
 
                     try {
-                        debugger
                         // const response = await axiosCallBack(url, parameter, { headers: { AccessToken: this.values.accessToken } });
                         const response = !log.logTimeId ? await logworkApi.create(parameter) : await logworkApi.update(parameter);
 
