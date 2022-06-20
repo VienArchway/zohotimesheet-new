@@ -23,3 +23,12 @@ export async function getAccessTokenFromCode(code) {
     }
     // 'Content-Type': 'application/x-www-form-urlencoded'
 }
+
+export async function getZohoUserDisplayName() {
+    const res = await fetchApi('GET', API_PATH_NAME + '/display-name')
+    if (res) {
+        const displayName = await res.text()
+        localStorage.setItem('displayName', displayName)
+        return displayName
+    }
+}

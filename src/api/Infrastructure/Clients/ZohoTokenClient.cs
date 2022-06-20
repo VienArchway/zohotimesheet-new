@@ -45,28 +45,17 @@ namespace api.Infrastructure.Clients
 
             if (token == null) return token ?? throw new InvalidOperationException();
             
-            var secretClient = new SecretClient(
-                new Uri("https://zohotoken.vault.azure.net/"),
-                new DefaultAzureCredential());
-            var refreshToken = await secretClient.GetSecretAsync(
-                $"refreshtoken-{configuration["userName"]}", null, CancellationToken.None);
-            if (string.IsNullOrEmpty(refreshToken.Value.Value) || token.RefreshToken != null)
-            {
-                await secretClient.SetSecretAsync(
-                    $"refreshtoken-{configuration["userName"]}", token.RefreshToken, CancellationToken.None);
-            }
+            // get user
+            await FetchSecretRefreshToken(token);
 
             return token ?? throw new InvalidOperationException();
         }
 
         public async Task<Token> GetAccessTokenFromRefreshTokenAsync()
         {
-            var secretClient = new SecretClient(
-                new Uri("https://zohotoken.vault.azure.net/"),
-                new DefaultAzureCredential());
-            var refreshToken = await secretClient.GetSecretAsync(
-                $"refreshtoken-{configuration["userName"]}", null, CancellationToken.None);
-            if (refreshToken.Value.Value == null) throw new OperationCanceledException();
+            var refreshToken = await FetchSecretRefreshToken(null);
+            if (refreshToken == null) throw new OperationCanceledException();
+            
             var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
             var clientId = configuration.GetValue<string>("Zoho:ClientId");
             var clientSecret = configuration.GetValue<string>("Zoho:ClientSecret");
@@ -74,7 +63,7 @@ namespace api.Infrastructure.Clients
             using var clientToken = new HttpClient();
             var parameter = new List<KeyValuePair<string, string>>
             {
-                new("refresh_token", refreshToken.Value.Value),
+                new("refresh_token", refreshToken),
                 new("client_id", clientId),
                 new("client_secret", clientSecret),
                 new("grant_type", "refresh_token")
@@ -88,29 +77,25 @@ namespace api.Infrastructure.Clients
 
             var token = JsonConvert.DeserializeObject<Token>(resContent);
 
-            if (token?.AccessToken == null) throw new AuthenticationException("Wrong refresh token");
+            if (token?.AccessToken == null) throw new AuthenticationException("Access token null");
             return token ?? throw new InvalidOperationException();
         }
 
         public async Task RevokeRefreshTokenAsync()
         {
-            var secretClient = new SecretClient(
-                new Uri("https://zohotoken.vault.azure.net/"),
-                new DefaultAzureCredential());
-            var refreshToken = await secretClient.GetSecretAsync($"refreshtoken-{configuration["userName"]}", null, CancellationToken.None);
-            if (refreshToken.Value.Value == null) throw new OperationCanceledException();
-            var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
-
+            var refreshToken = await FetchSecretRefreshToken(null);
+            if (refreshToken == null) throw new OperationCanceledException();
+            
             using var clientToken = new HttpClient();
             var parameter = new List<KeyValuePair<string, string>>
             {
-                new("token", refreshToken.Value.Value)
+                new("token", refreshToken)
             };
             var content = new FormUrlEncodedContent(parameter);
             clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
             clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
             clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-            var response = await clientToken.PostAsync($"{tokenHost}/revoke", content);
+            var response = await clientToken.PostAsync($"{configuration["Zoho:TokenHost"]}/revoke", content);
  
             var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var srcJObj = JsonConvert.DeserializeObject<JObject>(resContent);
@@ -147,6 +132,52 @@ namespace api.Infrastructure.Clients
             var token = JsonConvert.DeserializeObject<Token>(resContent);
 
             return token ?? throw new InvalidOperationException();
+        }
+        
+        private async Task<ZohoUser> GetZohoUserInfo(string accessToken)
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", "Archway");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken);
+            var resUser = await client.GetAsync(configuration["Zoho:UserHost"]);
+            var userInfo = await resUser.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var user = JsonConvert.DeserializeObject<ZohoUser>(userInfo);
+
+            return user ?? throw new InvalidOperationException();
+        }
+        
+        private async Task<string> FetchSecretRefreshToken(Token? token)
+        {
+            if (token is not null)
+            {
+                var zohoUser = await GetZohoUserInfo(token.AccessToken);
+                Environment.SetEnvironmentVariable("displayName", zohoUser.DisplayName);
+            }
+            
+            var secretClient = new SecretClient(
+                new Uri("https://zohotoken.vault.azure.net/"),
+                new DefaultAzureCredential());
+            Response<KeyVaultSecret> refreshToken;
+
+            try
+            {
+                refreshToken = await secretClient.GetSecretAsync(
+                    $"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}", null, CancellationToken.None);
+            }
+            catch (RequestFailedException e)
+            {
+                Console.WriteLine(e);
+                if (e.Status == 404)
+                {
+                    refreshToken = await secretClient.SetSecretAsync(
+                        $"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}", token.RefreshToken, CancellationToken.None);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return refreshToken.Value.Value;
         }
     }
 }
