@@ -13,14 +13,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <b>authorized: {{ status }}</b>
-    <h1>Zoho index page</h1>
-    {{ t('hello') }}
-    <div>
-      <router-link data-cy="link-about" to="/about">About</router-link>
-    </div>    
-    
+  <div>    
     <v-table fixed-header>
         <thead>
             <tr>
@@ -35,11 +28,9 @@ onMounted(async () => {
                         <template v-slot:activator="{ on }">
                         <v-btn style="margin-top: 20px;"
                             dark
-                            icon
+                            icon="mdi-information-outline"
                             v-on="on"
-                        >
-                            <v-icon>fas fa-info</v-icon>
-                        </v-btn>
+                        />
                         </template>
 
                         <v-list>
