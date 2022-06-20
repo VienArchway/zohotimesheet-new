@@ -33,15 +33,6 @@ namespace api.Application
             return result;
         }
 
-        public async Task<IEnumerable<LogWork>> SearchByGlobalViewAsync(LogWorkSearchParameter parameter)
-        {
-            var projects = parameter.Projects;
-            var delaySeconds = projects != null && projects.Count() > 6 ? 10 : 0;
-            var projectIds = projects != null ? projects.Select(x => x.ProjId) : null;
-            var result = await client.SearchByGlobalViewAsync(parameter.StartDate, parameter.EndDate, projectIds, parameter.OwnerIds, delaySeconds).ConfigureAwait(false);
-            return result;
-        }
-
         public Task<LogWork> CreateAsync(LogWorkSaveParameter parameter)
         {
             return client.CreateAsync(parameter);

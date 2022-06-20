@@ -170,7 +170,7 @@ export default {
         return {
             dateRanges: ["thisweek", "lastweek"],
             assignees: [],
-            selectDateRange: "lastweek",
+            selectDateRange: "thisweek",
             urls: {
                 tokenApi: "api/zohotoken",
                 itemApi: "api/taskitem",
@@ -252,11 +252,10 @@ export default {
                 const logworkSearchCondition = {
                     StartDate: new Date(moment(this.startdayOfWeek).add(1, "days")),
                     EndDate: new Date(moment(this.startdayOfWeek).add(7, "days")),
-                    SprintTypeId: 2,
                     ownerIds: this.isSelectedLoginUser ? null : [ this.values.assignee ]
                 };
 
-                const reslogWork = await this.logworkApi.searchByGlobalView(logworkSearchCondition);
+                const reslogWork = await this.logworkApi.find(logworkSearchCondition);
                 this.values.logWorkData = reslogWork;
 
                 if (this.selectDateRange !== "thisweek")

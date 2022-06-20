@@ -6,8 +6,6 @@ namespace api.Application.Interfaces
     {
         Task<IEnumerable<LogWork>> SearchAsync(LogWorkSearchParameter parameter);
 
-        Task<IEnumerable<LogWork>> SearchByGlobalViewAsync(LogWorkSearchParameter parameter);
-
         Task<LogWork> CreateAsync(LogWorkSaveParameter parameter);
 
         Task UpdateAsync(LogWorkSaveParameter parameter);

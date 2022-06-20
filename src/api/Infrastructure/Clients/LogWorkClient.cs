@@ -96,9 +96,6 @@ namespace api.Infrastructure.Clients
                         var properties = srcJObj?.GetValue("log_prop");
                         var logworkItems = srcJObj?.GetValue("logJObj");
                         var resultTaskItems = ConvertJsonResponseToClass<LogWork>(properties, logworkItems);
-
-                        totalResult.AddRange(resultTaskItems);
-
                         hasData = srcJObj.GetValue("hasData").ToObject<bool>();
 
                         if (hasData)
@@ -108,79 +105,6 @@ namespace api.Infrastructure.Clients
                             totalResult.AddRange(resultItems);
                             index += range;
                         }
-                    }
-                }
-            }
-
-            return totalResult;
-        }
-
-        public async Task<IEnumerable<LogWork>> SearchByGlobalViewAsync(
-            DateTime? logdateFrom,
-            DateTime? logdateTo,
-            IEnumerable<string> projectIds,
-            IEnumerable<string> ownerIds,
-            int delayTimeoutBySeconds = 0)
-        {
-            var index = 1;
-            var range = 100;
-            var viewType = ownerIds != null && ownerIds.Any() ? 0 : 1;
-            var hasData = true;
-            var totalResult = new List<LogWork>();
-
-            while (hasData)
-            {
-                // Because Zoho limit the number requests on a minutue, we must delay requests to avoid Zoho error response.
-                var delayTask = Task.Run(async () =>
-                        {
-                            await Task.Delay(TimeSpan.FromSeconds(delayTimeoutBySeconds)).ConfigureAwait(false);
-                        });
-                delayTask.Wait();
-
-                var filter = new JObject();
-                if (projectIds != null && projectIds.Any())
-                {
-                    filter.Add("projectIds", JArray.FromObject(projectIds));
-                }
-
-                if (ownerIds != null && ownerIds.Any())
-                {
-                    filter.Add("logowner", JArray.FromObject(ownerIds));
-                }
-
-                if (logdateFrom.HasValue && logdateTo.HasValue)
-                {
-                    filter.Add("logdate", JArray.FromObject(new string[] { "custom" }));
-                    filter.Add("logdate_fromdate", logdateFrom.Value.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
-                    filter.Add("logdate_todate", logdateTo.Value.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
-                }
-
-                var filterEncode = HttpUtility.UrlEncode(JsonConvert.SerializeObject(filter));
-
-                var url = $"team/{teamId}/timesheet/?action=orglogs&index={index}&range={range}&viewtype={viewType}&logtype=0";
-                if (!string.IsNullOrEmpty(filterEncode))
-                {
-                    url += $"&filter={filterEncode}";
-                }
-
-                var response = await client.GetAsync(url).ConfigureAwait(false);
-                var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-                if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new InvalidOperationException(responseContent);
-                }
-                else
-                {
-                    var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-                    hasData = srcJObj.GetValue("hasData").ToObject<bool>();
-
-                    if (hasData)
-                    {
-                        var resultItems = GetLogWorkFromResponse(srcJObj);
-
-                        totalResult.AddRange(resultItems);
-                        index += range;
                     }
                 }
             }

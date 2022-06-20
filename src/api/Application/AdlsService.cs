@@ -159,7 +159,7 @@ namespace api.Application
                     StartDate = logDate,
                     EndDate = logDate
             };
-            var AdlsItems = await logWorkService.SearchByGlobalViewAsync(param).ConfigureAwait(false);
+            var AdlsItems = await logWorkService.SearchAsync(param).ConfigureAwait(false);
             var data = AdlsItems.Where(x => x.LogTimeId == logId);
             var isExist = AdlsClient.CheckExist(logWorkFilePath);
 

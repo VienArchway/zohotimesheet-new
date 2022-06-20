@@ -32,7 +32,7 @@ namespace api.Infrastructure.Clients
                 new("client_secret", clientSecret),
                 new("redirect_uri", redirectUri),
                 new("grant_type", "authorization_code"),
-                // new("prompt", "consent")
+                new("prompt", "consent")
             };
             var content = new FormUrlEncodedContent(parameter);
             clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));

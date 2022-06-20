@@ -14,13 +14,6 @@ namespace api.Infrastructure.Interfaces
             IEnumerable<string> ownerIds,
             int delayTimeoutBySeconds = 0);
 
-        Task<IEnumerable<LogWork>> SearchByGlobalViewAsync(
-            DateTime? logdateFrom,
-            DateTime? logdateTo,
-            IEnumerable<string> projectIds,
-            IEnumerable<string> ownerIds,
-            int delayTimeoutBySeconds = 0);
-
         Task<LogWork> CreateAsync(LogWorkSaveParameter parameter);
 
         Task UpdateAsync(LogWorkSaveParameter parameter);

@@ -25,14 +25,6 @@ public class LogWorkController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("search-by-global-view")]
-    [ProducesResponseType(typeof(IEnumerable<LogWork>), 200)]
-    public async Task<IActionResult> SearchByGlobalViewAsync([FromBody]LogWorkSearchParameter parameter)
-    {
-        var result = await service.SearchByGlobalViewAsync(parameter).ConfigureAwait(false);
-        return Ok(result);
-    }
-
     [HttpPost("create")]
     [ProducesResponseType(typeof(LogWork), 201)]
     public async Task<IActionResult> CreateAsync([FromBody]LogWorkSaveParameter parameter)
