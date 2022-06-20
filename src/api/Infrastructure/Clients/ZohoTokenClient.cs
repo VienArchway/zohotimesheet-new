@@ -161,7 +161,7 @@ namespace api.Infrastructure.Clients
             try
             {
                 refreshToken = await secretClient.GetSecretAsync(
-                    $"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}", null, CancellationToken.None);
+                    $"refreshtoken-Archway-Ha", null, CancellationToken.None);
             }
             catch (RequestFailedException e)
             {

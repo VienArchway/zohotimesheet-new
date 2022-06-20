@@ -118,8 +118,12 @@ onMounted(async () => {
                     <v-chip v-show="task.statusName === 'Done'" color="teal" text-color="white">Done</v-chip>
                 </td>
                 <td class="text-center">
-                    <v-btn v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done' && isSelectedLoginUser" color="light-blue darken-4" @click="updateStatus(task)" dark fab x-small>
-                        <v-icon>fas fa-check</v-icon>
+                    <v-btn
+                        v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done' && isSelectedLoginUser"
+                        color="light-blue darken-4" @click="updateStatus(task)"
+                        dark fab x-small
+                        icon="mdi-check-outline"
+                    >
                     </v-btn>
                 </td>
                 <td>{{ task.estimatePoint }}</td>

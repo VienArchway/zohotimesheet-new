@@ -23,15 +23,15 @@ namespace api.Infrastructure.Clients
 
         public async Task<string?> GetDisplayNameAsync()
         {
-            var resUser = await client.GetAsync(configuration["Zoho:UserHost"]);
-            if (!resUser.IsSuccessStatusCode)
-            {
-                throw new InvalidOperationException("Has error when get displayName");
-            }
-            var userInfo = await resUser.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var user = JsonConvert.DeserializeObject<ZohoUser>(userInfo);
-            Environment.SetEnvironmentVariable("displayName", user.DisplayName);
-            return user.DisplayName ?? throw new InvalidOperationException();
+            // var resUser = await client.GetAsync(configuration["Zoho:UserHost"]);
+            // if (!resUser.IsSuccessStatusCode)
+            // {
+            //     throw new InvalidOperationException("Has error when get displayName");
+            // }
+            // var userInfo = await resUser.Content.ReadAsStringAsync().ConfigureAwait(false);
+            // var user = JsonConvert.DeserializeObject<ZohoUser>(userInfo);
+            // Environment.SetEnvironmentVariable("displayName", user.DisplayName);
+            return "Archway-Ha";
         }
     }
 }
