@@ -95,9 +95,10 @@ export default {
         };
     },
     async created() {
-        // moment.locale(this.$i18n.locale);
-        // this.$store.commit("showLoading");
         try {
+            await app.load(async () => {
+                    
+            })
             const response = await zohoScheduleApi.get();
             this.values.schedule = response;
             this.convertLastRunToLocalTime();
@@ -113,50 +114,49 @@ export default {
             this.values.schedule.lastRunDate = moment(moment.utc(lastRun).toDate()).local().format("LLLL");
         },
         async setSchedule() {
-            // this.$store.commit("showLoading");
-            
             let time = "";
             const type = this.values.schedule.type;
             time = this.values.schedule.time;
 
             try {
-                const schedule = this.values.schedule;
-                schedule.TimeZoneOffSet = (new Date()).getTimezoneOffset().toString();
-                schedule.Time = time;
-                schedule.Type = type;
-                
-                const response = await zohoScheduleApi.start(schedule);
-                this.values.schedule = response;
-                this.convertLastRunToLocalTime();
-                // this.$store.commit("notify.success", { content: this.t("schedulesave"), timeout:3000 });
+                await app.load(async () => {
+                    const schedule = this.values.schedule;
+                    schedule.TimeZoneOffSet = (new Date()).getTimezoneOffset().toString();
+                    schedule.Time = time;
+                    schedule.Type = type;
+                    
+                    const response = await zohoScheduleApi.start(schedule);
+                    this.values.schedule = response;
+                    this.convertLastRunToLocalTime();
+                })
 
             } catch (error) {
                 console.log(error);
             } finally {
-                // this.$store.commit("closeLoading");
+                app.success(this.t("schedulesave"), 5000);
             }
         },
         async stopSchedule() {
-            // this.$store.commit("showLoading");
             try {
-                const response = await zohoScheduleApi.stop();
-                this.values.schedule = response;
-                this.convertLastRunToLocalTime();
-                if (!this.values.schedule.type) {
-                    this.values.schedule.type = "TIME";
-                }
-                if (!this.values.schedule.time) {
-                    this.values.schedule.time = "12:00";
-                }
-                // this.$store.commit("notify.success", { content: this.t("schedulestop"), timeout:3000 });
+                await app.load(async () => {
+                    const response = await zohoScheduleApi.stop();
+                    this.values.schedule = response;
+                    this.convertLastRunToLocalTime();
+                    if (!this.values.schedule.type) {
+                        this.values.schedule.type = "TIME";
+                    }
+                    if (!this.values.schedule.time) {
+                        this.values.schedule.time = "12:00";
+                    }
+                })
             } catch (error) {
                 const resMessage = error.response?.data?.message;
                 const errorDetail = JSON.parse(resMessage);
                 if (errorDetail) {
-                    this.$store.commit("notify.error", { content: errorDetail.message});
+                    app.error(errorDetail.message, 100000);
                 }
             } finally {
-                // this.$store.commit("closeLoading");
+                app.success(this.t("schedulestop"), 5000);
             }
         }
     }

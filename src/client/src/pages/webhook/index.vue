@@ -95,41 +95,37 @@ export default {
         };
     },
     async created() {
-        // this.$store.commit("showLoading");
         try {
-            const accessToken = await this.getAccessToken();
-            const resWebHook = await webhookApi.getAll();
-            this.items = resWebHook;
+            await app.load(async () => {
+                const accessToken = await this.getAccessToken();
+                const resWebHook = await webhookApi.getAll();
+                this.items = resWebHook;
+            })
         }
         catch (error) {
             const resMessage = error.response?.data?.message;
             const errorDetail = JSON.parse(resMessage);
             if (errorDetail) {
-                this.$store.commit("notify.error", { content: errorDetail.message, timeout:100000 });
+                app.error(errorDetail.message, 100000);
             }
             
-        }
-        finally {
-            // this.$store.commit("closeLoading");
         }
     },
     methods: {
         async updateStatus(item) {
-            // this.$store.commit("showLoading");
             try {
-                const accessToken = await this.getAccessToken();
-                const resWebHook = await webhookApi.update(accessToken, { WebHookId: item.webHookId, HookStatus: this.webhookStatus.enable, Action: 'updatestatus' }); 
-                this.items = resWebHook;
+                await app.load(async () => {
+                    const accessToken = await this.getAccessToken();
+                    const resWebHook = await webhookApi.update(accessToken, { WebHookId: item.webHookId, HookStatus: this.webhookStatus.enable, Action: 'updatestatus' }); 
+                    this.items = resWebHook;
+                })
             }catch (error) {
                 const resMessage = error.response?.data?.message;
                 const errorDetail = JSON.parse(resMessage);
                 if (errorDetail) {
-                    this.$store.commit("notify.error", { content: errorDetail.message, timeout:100000 });
+                    app.error(errorDetail.message, 100000);
                 }
                 
-            }
-            finally {
-                // this.$store.commit("closeLoading");
             }
 
         },
