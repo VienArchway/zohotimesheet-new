@@ -161,7 +161,7 @@ onMounted(async () => {
                     >
                         <td>{{ item.projName }}</td>
                         <td>{{ item.itemName }}</td>
-                        <td>{{ item.OwnerName }}</td>
+                        <td>{{ item.ownerName }}</td>
                         <td>{{ item.logDate }}</td>
                         <td>{{ item.logTime }}</td>
                         <td>
@@ -213,7 +213,7 @@ export default {
                     projectNameFilter: "",
                     headers: [
                         {
-                            text: "project",
+                            text: this.t("project"),
                             value: "projName"
                         }
                     ],
@@ -222,17 +222,17 @@ export default {
                 },
                 sprintData: {
                     items: [
-                        {text: "activesprint", value: 2 },
-                        {text: "allsprint", value: 0 }
+                        {text: this.t("activesprint"), value: 2 },
+                        {text: this.t("allsprint"), value: 0 }
                     ]
                 },
                 logworkData: {
                     headers: [
-                        { text: "project", value: "projName" },
-                        { text: "item", value: "itemName" },
-                        { text: "owner", value: "OwnerName" },
-                        { text: "logdate", value: "logDate" },
-                        { text: "logtime", value: "logTime" },
+                        { text: this.t("project"), value: "projName" },
+                        { text: this.t("item"), value: "itemName" },
+                        { text: this.t("owner"), value: "OwnerName" },
+                        { text: this.t("logdate"), value: "logDate" },
+                        { text: this.t("logtime"), value: "logTime" },
                         { text: "", value: "json", sortable: false }
                     ],
                     items: []
@@ -249,8 +249,6 @@ export default {
         };
     },
     async created() {
-        // moment.locale(this.$i18n.locale);
-        // this.$store.commit("showLoading");
         try {
             await app.load(async () => {
                 const resProject = await projectApi.getAll();
@@ -258,7 +256,6 @@ export default {
                 this.values.projectData.items = resProject;
                 this.values.projectData.filterItems = resProject;
 
-                app.success("loading completed", 5000);
             })            
         }catch (error) {
             console.log(error)
@@ -277,36 +274,33 @@ export default {
     },
     methods: {
         async upload() {
-            // this.$store.commit("showLoading");
             try {
+                await app.load(async () => {
 
-                this.values.logworkData.items = [];
+                    this.values.logworkData.items = [];
 
-                const searchCondition = {
-                    startDate: new Date(this.searchConditions.startDate),
-                    endDate: new Date(this.searchConditions.endDate),
-                    sprintTypeId: this.searchConditions.sprintTypeId,
-                    projects: this.searchConditions.projects
-                };
+                    const searchCondition = {
+                        startDate: new Date(this.searchConditions.startDate),
+                        endDate: new Date(this.searchConditions.endDate),
+                        sprintTypeId: this.searchConditions.sprintTypeId,
+                        projects: this.searchConditions.projects
+                    };
 
-                // const response = await axios.post(`${this.urls.adlsApi}/transfer`,searchCondition);
-                const response = await adlsApi.transfer(searchCondition);
-                if (response !== null && response !== undefined)
-                {
-                    this.values.logworkData.items = response;
+                    const response = await adlsApi.transfer(searchCondition);
 
-                    // this.$store.commit("notify.success", { content: t("datauploaded"), timeout:10000 });
-                }
+                    if (response !== null && response !== undefined)
+                    {
+                        this.values.logworkData.items = response;
+                    }
+                })
             } finally {
-                // this.$store.commit("closeLoading");
+                app.success(this.t("dataloaded"), 5000);
             }
         },
         projectNameFilter() {
             this.values.projectData.filterItems = _.filter(this.values.projectData.items, (proj) => { return proj.projName.includes(this.values.projectData.projectNameFilter)});
         }
     }
-
-
 };
 </script>
 
