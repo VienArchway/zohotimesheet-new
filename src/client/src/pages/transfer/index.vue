@@ -66,14 +66,14 @@ onMounted(async () => {
             <v-row>
                 <v-col cols="12" md="12">
                     <v-select
-                            v-model="searchConditions.sprintTypeId"
-                            :items="values.sprintData.items"
-                            :label="t('sprint')"
-                            item-text="text"
-                            item-value="value"
-                            dense
-                            outlined
-                        ></v-select>
+                        v-model="searchConditions.sprintTypeId"
+                        :items="values.sprintData.items"
+                        :label="t('sprint')"
+                        item-title="text"
+                        item-value="value"
+                        dense
+                        outlined
+                    />
                 </v-col>
             </v-row>
             <v-row>
