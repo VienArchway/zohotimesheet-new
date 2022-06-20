@@ -2,7 +2,6 @@
 import {onMounted, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
 import { getVerifyTokenApi } from '@/api/resources/zohoToken'
-
 const { t } = useI18n()
 const status = ref(null)
 
@@ -152,6 +151,8 @@ meta:
 <script>
 import "./index.scss";
 import adlsApi from '@/api/resources/adls'
+import appStore from '@/store/app.js'
+const app = appStore()
 
 export default {
     components: {
@@ -190,66 +191,40 @@ export default {
     },
     methods: {
         async loadData() {
-             try {
+            await app.load(async () => {
                 const resData = await adlsApi.getAll();
                 this.items = resData;
                 this.filterItems = resData;
-            }
-            catch (error) {
-                const resMessage = error.response?.data?.message;
-                const errorDetail = JSON.parse(resMessage);
-                if (errorDetail) {
-                    this.$store.commit("notify.error", { content: errorDetail.message, timeout:100000 });
-                }
-                
-            } finally {
-                // this.$store.commit("closeLoading");
-            }
+            })
         },
         async remove() {
-            const ids = ["52523000002003313"] //this.selectedItems.map(item => item.logTimeId);
-            
-            try {
+            const ids = this.selectedItems.map(item => item.logTimeId);
+            await app.load(async () => {
                 if (ids.length > 0)
                 {
-                    // this.$store.commit("showLoading");
-
                     await adlsApi.delete(ids);
                     this.selectedItems = [];
                     this.items = this.items.filter(logwork => !ids.includes(logwork.logTimeId));
-
-                    // this.$store.commit("notify.success", { content: this.t("deletesuccess"), timeout:3000 });
-
-                    // this.$store.commit("closeLoading");
                 }
-            }
-            catch (error) {
-                const resMessage = error.response?.data?.message;
-                const errorDetail = JSON.parse(resMessage);
-                if (errorDetail) {
-                    this.$store.commit("notify.error", { content: errorDetail.message, timeout:100000 });
-                }
-                
-            } finally {
-                // this.$store.commit("closeLoading");
-            }
+            })
+            
+            app.success(this.t("deletesuccess"), 5000);
+
+            await this.loadData()
         },
         async restore() {
             this.valid = this.$refs.form.validate();
             if(!this.valid)
                 return;
+                
+             await app.load(async () => {
+                await adlsApi.restore();
+                this.closeDialog();
+            })
 
-            // this.$store.commit("showLoading");
+            app.success(this.t("restoresuccess"), 5000);
 
-
-            const response = await adlsApi.restore();
-            if(response.status !== 200) {
-                // this.$store.commit("closeLoading");
-                return;
-            }
-            // this.$store.commit("notify.success", { content: this.t("restoresuccess"), timeout:3000 });
-            this.closeDialog();
-            this.loadData();
+            await this.loadData();
         },
         closeDialog() {
             this.$refs.form.reset();

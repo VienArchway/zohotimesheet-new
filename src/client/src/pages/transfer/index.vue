@@ -2,8 +2,6 @@
 import {onMounted, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
 import { getVerifyTokenApi } from '@/api/resources/zohoToken'
-import appStore from '@/store/app.js'
-
 
 const { t } = useI18n()
 const status = ref(null)
@@ -195,7 +193,7 @@ import moment from "moment"
 // import VueJsonPretty from 'vue-json-pretty'
 import adlsApi from '@/api/resources/adls'
 import projectApi from '@/api/resources/project'
-
+import appStore from '@/store/app.js'
 const app = appStore()
 
 export default {
@@ -257,9 +255,13 @@ export default {
                 this.values.projectData.filterItems = resProject;
 
             })            
-        }catch (error) {
-            console.log(error)
-        }
+        } catch (error) {
+            const resMessage = error.response?.data?.message;
+            const errorDetail = JSON.parse(resMessage);
+            if (errorDetail) {
+                app.error(errorDetail.message, 100000);
+            }
+        } 
         // finally {
         //     this.$store.commit("closeLoading");
         // }
@@ -293,6 +295,12 @@ export default {
                         this.values.logworkData.items = response;
                     }
                 })
+            } catch (error) {
+                const resMessage = error.response?.data?.message;
+                const errorDetail = JSON.parse(resMessage);
+                if (errorDetail) {
+                    app.error(errorDetail.message, 100000);
+                }
             } finally {
                 app.success(this.t("dataloaded"), 5000);
             }

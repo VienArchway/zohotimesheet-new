@@ -25,7 +25,7 @@ public class ZohoScheduleController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("stop")]
+    [HttpPost("stop")]
     [ProducesResponseType(typeof(ScheduleSetting), 200)]
     public async Task<IActionResult> StopAsync()
     {

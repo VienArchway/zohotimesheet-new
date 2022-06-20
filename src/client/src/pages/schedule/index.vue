@@ -2,6 +2,7 @@
 import {onMounted, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
 import { getVerifyTokenApi } from '@/api/resources/zohoToken'
+import appStore from '@/store/app.js'
 
 const { t } = useI18n()
 const status = ref(null)
@@ -71,6 +72,7 @@ meta:
 import "./index.scss"
 import moment from "moment"
 import zohoScheduleApi from '@/api/resources/zohoschedule'
+const app = appStore()
 
 export default {
     name: "schedule",
@@ -95,18 +97,11 @@ export default {
         };
     },
     async created() {
-        try {
-            await app.load(async () => {
-                    
-            })
+        await app.load(async () => {
             const response = await zohoScheduleApi.get();
             this.values.schedule = response;
             this.convertLastRunToLocalTime();
-        } catch (error) {
-            console.error(error);
-        } finally {
-            // this.$store.commit("closeLoading");
-        }
+        })
     },
     methods: {
         convertLastRunToLocalTime() {
@@ -118,46 +113,31 @@ export default {
             const type = this.values.schedule.type;
             time = this.values.schedule.time;
 
-            try {
-                await app.load(async () => {
-                    const schedule = this.values.schedule;
-                    schedule.TimeZoneOffSet = (new Date()).getTimezoneOffset().toString();
-                    schedule.Time = time;
-                    schedule.Type = type;
-                    
-                    const response = await zohoScheduleApi.start(schedule);
-                    this.values.schedule = response;
-                    this.convertLastRunToLocalTime();
-                })
-
-            } catch (error) {
-                console.log(error);
-            } finally {
-                app.success(this.t("schedulesave"), 5000);
-            }
+            await app.load(async () => {
+                const schedule = this.values.schedule;
+                schedule.TimeZoneOffSet = (new Date()).getTimezoneOffset().toString();
+                schedule.Time = time;
+                schedule.Type = type;
+                
+                const response = await zohoScheduleApi.start(schedule);
+                this.values.schedule = response;
+                this.convertLastRunToLocalTime();
+            })
+            app.success(this.t("schedulesave"), 5000);
         },
         async stopSchedule() {
-            try {
-                await app.load(async () => {
-                    const response = await zohoScheduleApi.stop();
-                    this.values.schedule = response;
-                    this.convertLastRunToLocalTime();
-                    if (!this.values.schedule.type) {
-                        this.values.schedule.type = "TIME";
-                    }
-                    if (!this.values.schedule.time) {
-                        this.values.schedule.time = "12:00";
-                    }
-                })
-            } catch (error) {
-                const resMessage = error.response?.data?.message;
-                const errorDetail = JSON.parse(resMessage);
-                if (errorDetail) {
-                    app.error(errorDetail.message, 100000);
+            await app.load(async () => {
+                const response = await zohoScheduleApi.stop();
+                this.values.schedule = response;
+                this.convertLastRunToLocalTime();
+                if (!this.values.schedule.type) {
+                    this.values.schedule.type = "TIME";
                 }
-            } finally {
-                app.success(this.t("schedulestop"), 5000);
-            }
+                if (!this.values.schedule.time) {
+                    this.values.schedule.time = "12:00";
+                }
+            })
+            app.success(this.t("schedulestop"), 5000);
         }
     }
 };

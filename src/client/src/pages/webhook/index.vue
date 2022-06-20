@@ -62,6 +62,8 @@ meta:
 <script>
 import "./index.scss";
 import webhookApi from '@/api/resources/webhook'
+import appStore from '@/store/app.js'
+const app = appStore()
 
 export default {
     components: {
@@ -97,7 +99,6 @@ export default {
     async created() {
         try {
             await app.load(async () => {
-                const accessToken = await this.getAccessToken();
                 const resWebHook = await webhookApi.getAll();
                 this.items = resWebHook;
             })
@@ -115,8 +116,7 @@ export default {
         async updateStatus(item) {
             try {
                 await app.load(async () => {
-                    const accessToken = await this.getAccessToken();
-                    const resWebHook = await webhookApi.update(accessToken, { WebHookId: item.webHookId, HookStatus: this.webhookStatus.enable, Action: 'updatestatus' }); 
+                    const resWebHook = await webhookApi.update({ WebHookId: item.webHookId, HookStatus: this.webhookStatus.enable}); 
                     this.items = resWebHook;
                 })
             }catch (error) {
@@ -125,7 +125,6 @@ export default {
                 if (errorDetail) {
                     app.error(errorDetail.message, 100000);
                 }
-                
             }
 
         },

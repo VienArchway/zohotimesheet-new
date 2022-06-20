@@ -2,7 +2,6 @@
 import {onMounted, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
 import { getVerifyTokenApi } from '@/api/resources/zohoToken'
-
 const { t } = useI18n()
 const status = ref(null)
 
@@ -164,6 +163,8 @@ import projectApi from '@/api/resources/project'
 import logworkApi from '@/api/resources/logwork'
 import itemApi from '@/api/resources/item'
 import adlsApi from '@/api/resources/adls'
+import appStore from '@/store/app.js'
+const app = appStore()
 
 export default {
     data() {
@@ -225,8 +226,6 @@ export default {
             this.values.logWorkData = [];
             this.values.sortTaskItems = [];
 
-            // // this.$store.commit("showLoading");
-
             try 
             {
                 const sprintTypeIds = this.selectDateRange === "thisweek" ? [ "2" ] :[ "2", "3" ],
@@ -240,110 +239,125 @@ export default {
                         assignees
                     },
                     closedTaskCondition = { sprintTypeIds, statusId : 1, completedOn : this.selectDateRange === "thisweek" ? [ "thisweek" ] : [ "thisweek", "lastweek" ], assignees};
+                await app.load(async () => {
+                    const [ resOpenTaskItems, resClosedTaskItems ]= await Promise.all([ 
+                        this.itemApi.find(openTaskCondition), // sprinttype = 2 : Active Sprint, status = 0 : open
+                        this.itemApi.find(closedTaskCondition) // sprinttype = 2 : Active Sprint, status = 1 : closed
+                    ]);
 
-                const [ resOpenTaskItems, resClosedTaskItems ]= await Promise.all([ 
-                    this.itemApi.find(openTaskCondition), // sprinttype = 2 : Active Sprint, status = 0 : open
-                    this.itemApi.find(closedTaskCondition) // sprinttype = 2 : Active Sprint, status = 1 : closed
-                ]);
+                    const allTaskItems = resOpenTaskItems.concat(resClosedTaskItems);
 
-                const allTaskItems = resOpenTaskItems.concat(resClosedTaskItems);
+                    const logworkSearchCondition = {
+                        StartDate: new Date(moment(this.startdayOfWeek).add(1, "days")),
+                        EndDate: new Date(moment(this.startdayOfWeek).add(7, "days")),
+                        ownerIds: this.isSelectedLoginUser ? null : [ this.values.assignee ]
+                    };
 
-                const logworkSearchCondition = {
-                    StartDate: new Date(moment(this.startdayOfWeek).add(1, "days")),
-                    EndDate: new Date(moment(this.startdayOfWeek).add(7, "days")),
-                    ownerIds: this.isSelectedLoginUser ? null : [ this.values.assignee ]
-                };
+                    const reslogWork = await this.logworkApi.find(logworkSearchCondition);
+                    this.values.logWorkData = reslogWork;
 
-                const reslogWork = await this.logworkApi.find(logworkSearchCondition);
-                this.values.logWorkData = reslogWork;
-
-                if (this.selectDateRange !== "thisweek")
-                {
-                    const extraTaskData = _.filter(this.values.logWorkData, (logWorkitem) => { return !_.find(allTaskItems, (task) => { return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0; }); });
-                    extraTaskData.forEach((taskitem) => {
-                        allTaskItems.push({
-                            id: taskitem.itemId,
-                            itemNo: taskitem.itemNo,
-                            itemName: taskitem.itemName,
-                            projName: taskitem.projName,
-                            projNo: taskitem.projNo
-                        });
-                    });
-                }
-
-                const sortTaskItemsbyId = _.sortBy(allTaskItems, [ "id" ]);
-                let subItemids = [];
-                _.forEach(allTaskItems, (item) => {
-                    if (item.subItemIds && item.subItemIds.length > 0) {
-                        subItemids = subItemids.concat(item.subItemIds);
-                    }
-                });
-
-                //sort items by subitems
-                sortTaskItemsbyId.forEach(item => {
-                    item.estimatePoint = this.estimatedPointVals[item.points];
-                    const exist = _.find(this.values.sortTaskItems, { id: item.id });
-                    const isSubItems = _.includes(subItemids, item.id);
-                    if (!exist && !isSubItems) {
-                        item.indent = 0;
-                        this.values.sortTaskItems.push(item);
-                        if (item.isParent) {
-                            this.getSubItemsOfItem(item, item.subItemIds, allTaskItems);
-                        }
-                    }
-                });
-
-                const projectsData = _(this.values.sortTaskItems)
-                    .groupBy("projName")
-                    .map((items, projName) => {
-                        let defaultItem = _.find(items, (item) => { return item.id && item.projNo; });
-                        if (!defaultItem) {
-                            defaultItem = items[0];
-                        }
-
-                        return {
-                            id: defaultItem.id,
-                            name: projName,
-                            tasks: items,
-                            projNo: defaultItem.projNo
-                        };
-                    })
-                    .value();
-
-                projectsData.forEach(proj => {
-                    proj.tasks.forEach(task => {
-                        task.logWorks = [];
-                        this.daysOfWeek.forEach(date => {
-                            let logWorkByDate = _.filter(this.values.logWorkData, (log)=>{
-                                return log.itemId === task.id && _.startsWith(log.logDate, date.date);
+                    if (this.selectDateRange !== "thisweek")
+                    {
+                        const extraTaskData = _.filter(this.values.logWorkData, (logWorkitem) => { return !_.find(allTaskItems, (task) => { return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0; }); });
+                        extraTaskData.forEach((taskitem) => {
+                            allTaskItems.push({
+                                id: taskitem.itemId,
+                                itemNo: taskitem.itemNo,
+                                itemName: taskitem.itemName,
+                                projName: taskitem.projName,
+                                projNo: taskitem.projNo
                             });
-                            
-                            if (logWorkByDate === null || logWorkByDate.length === 0)
-                            {
-                                logWorkByDate = [
-                                    {
-                                        Owner: this.values.assignee,
-                                        itemName: task.itemName,
-                                        itemNo: task.itemNo,
-                                        logDate: date.date,
-                                        projItemTypeId: task.projItemTypeId,
-                                        logTime: null
-                                    }
-                                ];
+                        });
+                    }
+
+                    if (this.selectDateRange !== "thisweek")
+                    {
+                        const extraTaskData = _.filter(this.values.logWorkData, (logWorkitem) => { return !_.find(allTaskItems, (task) => { return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0; }); });
+                        extraTaskData.forEach((taskitem) => {
+                            allTaskItems.push({
+                                id: taskitem.itemId,
+                                itemNo: taskitem.itemNo,
+                                itemName: taskitem.itemName,
+                                projName: taskitem.projName,
+                                projNo: taskitem.projNo
+                            });
+                        });
+                    }
+
+                    const sortTaskItemsbyId = _.sortBy(allTaskItems, [ "id" ]);
+                    let subItemids = [];
+                    _.forEach(allTaskItems, (item) => {
+                        if (item.subItemIds && item.subItemIds.length > 0) {
+                            subItemids = subItemids.concat(item.subItemIds);
+                        }
+                    });
+
+                    //sort items by subitems
+                    sortTaskItemsbyId.forEach(item => {
+                        item.estimatePoint = this.estimatedPointVals[item.points];
+                        const exist = _.find(this.values.sortTaskItems, { id: item.id });
+                        const isSubItems = _.includes(subItemids, item.id);
+                        if (!exist && !isSubItems) {
+                            item.indent = 0;
+                            this.values.sortTaskItems.push(item);
+                            if (item.isParent) {
+                                this.getSubItemsOfItem(item, item.subItemIds, allTaskItems);
                             }
-                            else
-                            {
-                                _.forEach(logWorkByDate, (item) => {
-                                    date.total += item.logTime;
-                                });
+                        }
+                    });
+
+                    const projectsData = _(this.values.sortTaskItems)
+                        .groupBy("projName")
+                        .map((items, projName) => {
+                            let defaultItem = _.find(items, (item) => { return item.id && item.projNo; });
+                            if (!defaultItem) {
+                                defaultItem = items[0];
                             }
 
-                            task.logWorks.push({ dayOfWeek: date.dayOfWeek, date: date.date, logs: logWorkByDate, isDisabled : date.isDisabled});
+                            return {
+                                id: defaultItem.id,
+                                name: projName,
+                                tasks: items,
+                                projNo: defaultItem.projNo
+                            };
+                        })
+                        .value();
+
+                    projectsData.forEach(proj => {
+                        proj.tasks.forEach(task => {
+                            task.logWorks = [];
+                            this.daysOfWeek.forEach(date => {
+                                let logWorkByDate = _.filter(this.values.logWorkData, (log)=>{
+                                    return log.itemId === task.id && _.startsWith(log.logDate, date.date);
+                                });
+                                
+                                if (logWorkByDate === null || logWorkByDate.length === 0)
+                                {
+                                    logWorkByDate = [
+                                        {
+                                            Owner: this.values.assignee,
+                                            itemName: task.itemName,
+                                            itemNo: task.itemNo,
+                                            logDate: date.date,
+                                            projItemTypeId: task.projItemTypeId,
+                                            logTime: null
+                                        }
+                                    ];
+                                }
+                                else
+                                {
+                                    _.forEach(logWorkByDate, (item) => {
+                                        date.total += item.logTime;
+                                    });
+                                }
+
+                                task.logWorks.push({ dayOfWeek: date.dayOfWeek, date: date.date, logs: logWorkByDate, isDisabled : date.isDisabled});
+                            });
                         });
                     });
-                });
-                this.values.data = _.orderBy(projectsData, ["name"], ["asc"]);
-                this.$forceUpdate();
+                    this.values.data = _.orderBy(projectsData, ["name"], ["asc"]);
+                    this.$forceUpdate();
+                })
             } catch (error) {
                 console.log(error);
             } finally {
@@ -420,9 +434,7 @@ export default {
                         isbillable: 1,
                         actionField: null
                     };
-
                     try {
-                        // const response = await axiosCallBack(url, parameter, { headers: { AccessToken: this.values.accessToken } });
                         const response = !log.logTimeId ? await logworkApi.create(parameter) : await logworkApi.update(parameter);
 
                         if (response.data !== null && response.data !== undefined)
@@ -432,7 +444,7 @@ export default {
                                 log.logTimeId = response.logTimeId;
                             }
 
-                            // this.$store.commit("notify.success", { content: this.t("savesuccess"), timeout:3000 });
+                            app.success(this.t("savesuccess"), 5000);
 
                             let total = 0;
                             const inputs = this.$el.querySelectorAll(`.v-input.input-${logWork.dayOfWeek} input`);
@@ -470,11 +482,12 @@ export default {
                 sprintId: task.sprintId,
                 statusId: "52523000000002619"
             };
+            await app.load(async () => {
+                await this.itemApi.updateStatus(taskItemStatusParameter);
+            })
 
-            await this.itemApi.updateStatus(taskItemStatusParameter);
-
-            // this.$store.commit("notify.success", { content: this.t("savesuccess"), timeout:3000 });
-
+            app.success(this.t("savesuccess"), 5000);
+            
             task.statusName = "Done";
             if (task.isParent)
             {
