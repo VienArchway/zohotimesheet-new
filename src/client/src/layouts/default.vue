@@ -8,7 +8,7 @@ import AppHeader from '@/components/templates/AppHeader.vue'
 
 <template>
   <AppLogin>
-      <AppHeader class="pb-10" />
+      <AppHeader />
       <v-main class="mt-10">
         <AppContainer>
           <Loading />
