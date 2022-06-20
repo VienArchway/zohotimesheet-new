@@ -3,11 +3,13 @@ import AppLogin from '@/components/templates/AppLogin.vue'
 import AppContainer from '@/components/templates/AppContainer.vue'
 import Message from '@/components/atoms/Message.vue'
 import Loading from '@/components/atoms/Loading.vue'
+import AppHeader from '@/components/templates/AppHeader.vue'
 </script>
 
 <template>
   <AppLogin>
-      <v-main>
+      <AppHeader class="pb-10" />
+      <v-main class="mt-10">
         <AppContainer>
           <Loading />
           <router-view />
