@@ -100,7 +100,14 @@ namespace api.Infrastructure.Clients
                         totalResult.AddRange(resultTaskItems);
 
                         hasData = srcJObj.GetValue("hasData").ToObject<bool>();
-                        index += range;
+
+                        if (hasData)
+                        {
+                            var resultItems = GetLogWorkFromResponse(srcJObj);
+
+                            totalResult.AddRange(resultItems);
+                            index += range;
+                        }
                     }
                 }
             }
