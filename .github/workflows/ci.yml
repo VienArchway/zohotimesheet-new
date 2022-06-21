@@ -47,8 +47,8 @@ jobs:
           envkey_FE_ZOHO_LOGIN_URL: https://accounts.zoho.com/oauth/v2/auth
           envkey_FE_ZOHO_LOGIN_SCOPE: ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ+ZohoSprints.sprints.READ+aaaserver.profile.READ
           envkey_FE_API_URL: http://0.0.0.0:80
-          directory: ./src/client
           file_name: .env.production
+          directory: ./src/client
 
       - name: Build production
         working-directory: ./src/client

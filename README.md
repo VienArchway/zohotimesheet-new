@@ -1,6 +1,8 @@
 # zohotimesheet-new
 
-[![Build to prod and deploy to Azure container registry](https://github.com/VienArchway/zohotimesheet-new/actions/workflows/ci.yml/badge.svg?branch=main&event=pull_request)](https://github.com/VienArchway/zohotimesheet-new/actions/workflows/ci.yml)
+[![Build to prod and deploy to Azure container registry](https://github.com/VienArchway/zohotimesheet-new/actions/workflows/ci.yml/badge.svg)](https://github.com/VienArchway/zohotimesheet-new/actions/workflows/ci.yml)
+
+URL: https://zohotimesheetaw.azurewebsites.net
 
 ## Setup
 

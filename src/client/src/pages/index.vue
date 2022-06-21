@@ -1,26 +1,16 @@
 <script setup>
-import { getZohoUserDisplayName } from '@/api/resources/zohoToken'
-import { onMounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import useAppStore from '@/store/app'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
-const app = useAppStore()
+const router = useRouter()
 
-const { t } = useI18n()
-const userName = ref(null)
-
-onMounted(async () => {
-  await app.load(async () => {
-    userName.value = await getZohoUserDisplayName()
-  })
+onMounted(() => {
+  router.replace({ path: '/transfer' })
 })
 </script>
 
 <template>
-  <div>
-    <h1>{{ userName }}</h1>
-    {{ t('hello') }}
-  </div>
+  <div />
 </template>
 
 <route lang="yaml">

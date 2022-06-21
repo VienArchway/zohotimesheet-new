@@ -40,14 +40,6 @@ export function useHandleCallBack() {
             
             window.location.href = '/'
         }
-        // window.location.href = `${ZOHO_SETTINGS.login_url}?scope=${ZOHO_SETTINGS.scope}&client_id=${ZOHO_SETTINGS.client_id}&response_type=${ZOHO_SETTINGS.response_type}&redirect_uri=${ZOHO_SETTINGS.redirect_uri}&prompt=consent&access_type=offline`
-        // const { accessToken } = await getAccessTokenByRefreshTokenApi()
-        // if (accessToken) {
-        //     localStorage.setItem('authorized', true)
-        //     window.location.href = '/'
-        // } else {
-        //     console.error('Failed when try to get access token. Please contact admin')
-        // }
     }
 
     onMounted(async () => {
