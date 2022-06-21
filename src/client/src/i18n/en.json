@@ -44,6 +44,7 @@
     "searchcondition": "Input Project name, Item name, Owner name, Log date, log time to filter data.",
     "delete": "DELETE",
     "date": "Date",
+    "completeon": "Completed on",
     "assignee": "Assignee",
     "completedon": "Completed on",
     "sun": "Sun",

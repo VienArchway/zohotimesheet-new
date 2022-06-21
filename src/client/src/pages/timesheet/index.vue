@@ -20,13 +20,15 @@ onMounted(async () => {
                     <v-row justify="start">
                         <v-select
                             v-model="selectDateRange"
-                            :label="t('completeon')"
                             :items="dateRanges"
+                            :label="t('completeon')"
                             @update:modelValue="changeWeek"
+                            item-title="text"
+                            item-value="value"
                         />
                         <v-tooltip bottom>
                             <template v-slot:activator="{ props }">
-                                <v-btn style="margin-top: 20px;"
+                                <v-icon style="margin-top: 30px;"
                                     dark
                                     icon="mdi-information-outline"
                                     v-on="on"
@@ -95,9 +97,9 @@ onMounted(async () => {
             </tr>
             <tr v-for="(task, taskIndex) in proj.tasks" :key="`task-${index}-${taskIndex}`">
                 <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
-                    <v-icon v-if="task.projItemName === 'Task'" color="blue" small>fas fa-file-alt</v-icon>
-                    <v-icon v-else-if="task.projItemName === 'Bug'" color="pink" small>fas fa-bug</v-icon>
-                    <v-icon v-else-if="task.projItemName === 'Story'" color="green" small>fas fa-flag</v-icon>
+                    <v-icon v-if="task.projItemName === 'Task'" color="blue" small icon="mdi-file"></v-icon>
+                    <v-icon v-else-if="task.projItemName === 'Bug'" color="pink" small icon="mdi-bug"></v-icon>
+                    <v-icon v-else-if="task.projItemName === 'Story'" color="green" small icon="mdi-flag"></v-icon>
                     <a :href="`${zohoSprintLink}#itemdetails/P${proj.projNo}/I${task.itemNo}`" target="_blank" class="pl-2">
                         {{ task.itemName }}
                     </a>
@@ -109,13 +111,14 @@ onMounted(async () => {
                     <v-chip v-show="task.statusName === 'Done'" color="teal" text-color="white">Done</v-chip>
                 </td>
                 <td class="text-center">
-                    <v-btn
+                    <v-icon
                         v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done' && isSelectedLoginUser"
                         color="light-blue darken-4" @click="updateStatus(task)"
                         dark fab x-small
                         icon="mdi-check-outline"
+                        start
                     >
-                    </v-btn>
+                    </v-icon>
                 </td>
                 <td>{{ task.estimatePoint }}</td>
                 <td v-for="(logWork, logWorkIndex) in task.logWorks" :key="`logwork-${logWorkIndex}`" v-show="selecteddayOfWeek.includes(logWork.dayOfWeek)">
@@ -164,7 +167,16 @@ const app = appStore()
 export default {
     data() {
         return {
-            dateRanges: ["thisweek", "lastweek"],
+            dateRanges: [
+                {
+                    text: this.t("thisweek"),
+                    value: "thisweek"
+                },
+                {
+                    text: this.t("lastweek"),
+                    value: "lastweek"
+                }
+            ],
             assignees: [],
             selectDateRange: "thisweek",
             urls: {
