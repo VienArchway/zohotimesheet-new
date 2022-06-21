@@ -150,7 +150,7 @@ namespace api.Infrastructure.Clients
             if (token is not null)
             {
                 var zohoUser = await GetZohoUserInfo(token.AccessToken);
-                Environment.SetEnvironmentVariable("displayName", zohoUser.DisplayName);
+                Environment.SetEnvironmentVariable("displayName", zohoUser.FirstName.Replace(" ",""));
             }
             
             var secretClient = new SecretClient(
