@@ -139,7 +139,7 @@ namespace api.Infrastructure.Clients
             client.DefaultRequestHeaders.Add("User-Agent", "Archway");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken);
             var resUser = await client.GetAsync(configuration["Zoho:UserHost"]);
-            var userInfo = await resUser.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var userInfo = await resUser.Content.ReadAsStringAsync();
             var user = JsonConvert.DeserializeObject<ZohoUser>(userInfo);
 
             return user ?? throw new InvalidOperationException();
@@ -156,24 +156,49 @@ namespace api.Infrastructure.Clients
             var secretClient = new SecretClient(
                 new Uri("https://zohotoken.vault.azure.net/"),
                 new DefaultAzureCredential());
-            Response<KeyVaultSecret> refreshToken;
+            Response<KeyVaultSecret> refreshToken = null;
 
             try
             {
-                refreshToken = await secretClient.GetSecretAsync(
-                    $"refreshtoken-Archway-Ha", null, CancellationToken.None);
+                refreshToken = await secretClient
+                    .GetSecretAsync($"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}");
             }
             catch (RequestFailedException e)
             {
                 Console.WriteLine(e);
                 if (e.Status == 404)
                 {
-                    refreshToken = await secretClient.SetSecretAsync(
-                        $"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}", token.RefreshToken, CancellationToken.None);
+                    refreshToken = await secretClient
+                        .SetSecretAsync(
+                            $"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}",
+                            token?.RefreshToken,
+                            CancellationToken.None);
+                    Console.WriteLine("New secret has created");
                 }
                 else
                 {
                     throw;
+                }
+            }
+            finally
+            {
+                var newRefreshToken = token?.RefreshToken?.Equals(refreshToken?.Value.Value);
+                if (!string.IsNullOrEmpty(token?.RefreshToken) && newRefreshToken is false)
+                {
+                    var currentSecretAsync = await secretClient
+                        .GetSecretAsync(
+                            $"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}",
+                            refreshToken.Value.Properties.Version
+                        );
+                    Console.WriteLine("Get current secret success");
+                    
+                    currentSecretAsync.Value.Properties.Enabled = false;
+                    await secretClient.UpdateSecretPropertiesAsync(currentSecretAsync.Value.Properties);
+                    Console.WriteLine("Old secret has been disabled");
+                    
+                    refreshToken = await secretClient.SetSecretAsync(
+                        $"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}", token?.RefreshToken);
+                    Console.WriteLine("New secret has updated");
                 }
             }
 

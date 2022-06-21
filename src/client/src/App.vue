@@ -7,6 +7,3 @@
     </Suspense>
   </RouterView>
 </template>
-
-<script setup>
-</script>

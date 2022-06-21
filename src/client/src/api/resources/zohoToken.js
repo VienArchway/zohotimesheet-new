@@ -21,7 +21,6 @@ export async function getAccessTokenFromCode(code) {
     if (res) {
         return await res.json()
     }
-    // 'Content-Type': 'application/x-www-form-urlencoded'
 }
 
 export async function getZohoUserDisplayName() {
@@ -30,5 +29,12 @@ export async function getZohoUserDisplayName() {
         const displayName = await res.text()
         localStorage.setItem('displayName', displayName)
         return displayName
+    }
+}
+
+export async function logout() {
+    const res = await fetchApi('GET', API_PATH_NAME + '/logout')
+    if (res) {
+        return
     }
 }

@@ -1,25 +1,14 @@
 <script setup>
-import {onMounted, ref} from 'vue'
-import {useI18n} from 'vue-i18n'
-import { getVerifyTokenApi } from '@/api/resources/zohoToken'
-import appStore from '@/store/app.js'
+import { onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import appStore from '@/store/app'
 
 const { t } = useI18n()
-const status = ref(null)
-
-onMounted(async () => {
-  status.value = await getVerifyTokenApi()
-})
+onMounted(async () => {})
 </script>
 
 <template>
   <div>
-    <b>authorized: {{ status }}</b>
-    <h1>Zoho index page</h1>
-    {{ t('hello') }}
-    <div>
-      <router-link data-cy="link-about" to="/about">About</router-link>
-    </div>
     <v-card class="mx-auto" max-width="1000" outlined>
         <v-card-title>
             {{ t("autotransferschedule") }}

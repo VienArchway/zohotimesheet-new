@@ -96,4 +96,17 @@ public class ZohoTokenController : ControllerBase
 
         return Ok(result);
     }
+    
+    [Authorize]
+    [HttpGet("logout")]
+    public Task<IActionResult> Logout()
+    {
+        var cookieOptions = new CookieOptions
+        {
+            SameSite = SameSiteMode.Unspecified
+        };
+        Response.Cookies.Append("accessToken", string.Empty, cookieOptions);
+
+        return Task.FromResult<IActionResult>(Ok());
+    }
 }

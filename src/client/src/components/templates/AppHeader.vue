@@ -1,20 +1,21 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
-import { getZohoUserDisplayName } from '@/api/resources/zohoToken'
 import { onMounted, ref } from 'vue'
 
 const { t } = useI18n()
 const userName = ref(null)
 
-onMounted(async () => {
-  userName.value = await getZohoUserDisplayName()
+onMounted(() => {
+  userName.value = localStorage.getItem('displayName')
 })
 
 </script>
 
 <template>
   <v-app-bar app color="teal" dark>
-    <img src="@/assets/images/zohoImage.png" alt="logo" width="48" height="36" />
+    <v-btn href="/">
+      <img src="@/assets/images/zohoImage.png" alt="logo" width="48" height="36" />
+    </v-btn>
     <v-menu>
       <template v-slot:activator="{ props }">
         <v-btn color="primary" v-bind="props">
@@ -55,5 +56,8 @@ onMounted(async () => {
       <img src="https://contacts.zoho.com/file?fs=thumb&exp=600" alt="user-avatar"/>
     </v-avatar>
     <div class="ml-2 mr-2">{{ userName }}</div>
+    <v-btn to="/auth/callback?logout=true">
+      {{ t("signOut") }}
+    </v-btn>
   </v-app-bar>
 </template>
