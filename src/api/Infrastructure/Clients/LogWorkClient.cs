@@ -38,9 +38,9 @@ namespace api.Infrastructure.Clients
             {
                 // Because Zoho limit the number requests on a minutue, we must delay requests to avoid Zoho error response.
                 var delayTask = Task.Run(async () =>
-                        {
-                            await Task.Delay(TimeSpan.FromSeconds(delayTimeoutBySeconds)).ConfigureAwait(false);
-                        });
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(delayTimeoutBySeconds)).ConfigureAwait(false);
+                    });
                 delayTask.Wait();
 
                 if (delayTask.Status == TaskStatus.RanToCompletion)
@@ -75,7 +75,7 @@ namespace api.Infrastructure.Clients
 
                     var filterEncode = HttpUtility.UrlEncode(JsonConvert.SerializeObject(filter));
 
-                    var url = $"team/{teamId}/timesheet/?action=orglogs&viewtype=0&index={index}&range={range}&logtype=0";
+                    var url = $"team/{teamId}/timesheet/?action=orglogs&viewtype=1&index={index}&range={range}&logtype=0";
 
 
                     if (!string.IsNullOrEmpty(filterEncode))

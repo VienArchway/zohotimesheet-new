@@ -21,9 +21,6 @@ export default {
         }
     },
     async update(requestInput) {
-        const res = await fetchApi('POST', API_PATH_NAME, null, requestInput)
-        if (res) {
-            return await res.json()
-        }
+        await fetchApi('PUT', API_PATH_NAME, null, requestInput)
     }
 }

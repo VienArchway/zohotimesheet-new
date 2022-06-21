@@ -22,35 +22,26 @@ onMounted(async () => {
                             v-model="selectDateRange"
                             :label="t('completeon')"
                             :items="dateRanges"
+                            @update:modelValue="changeWeek"
                         />
-                    <v-menu bottom left>
-                        <template v-slot:activator="{ on }">
-                        <v-btn style="margin-top: 20px;"
-                            dark
-                            icon="mdi-information-outline"
-                            v-on="on"
-                        />
-                        </template>
-
-                        <v-list>
-                            <v-list-item
-                            >
-                            <v-alert
-                                dense
-                                outlined
-                                type="warning"
-                                dismissible
-                                >
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-btn style="margin-top: 20px;"
+                                    dark
+                                    icon="mdi-information-outline"
+                                    v-on="on"
+                                    v-bind="props"
+                                />
+                            </template>
+                            <span>
                                 <p>This week items include all items of active sprint that have been started on last week and this week and not done yet(Open items)
-                                and all items of active sprints that have been done on this week(Closed items).
+                                    and all items of active sprints that have been done on this week(Closed items).
                                 </p>
                                 <p>Last week items include all items of active and closed sprint that have been started on lastweek and not done yet(Open items).
                                 and all items of active and closed sprints that have been done on this week or last week(Closed items).
                                 </p>
-                            </v-alert>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu>
+                            </span>
+                        </v-tooltip>
                     </v-row>
                 </th>
                 <th colspan="3">
@@ -396,6 +387,7 @@ export default {
             ];
         },
         async changeWeek() {
+            debugger
             this.startdayOfWeek = this.selectDateRange === "thisweek" ? moment().startOf("week") : moment().startOf("week").add(-7, "days");
 
             this.getWeekDateData();
@@ -439,9 +431,10 @@ export default {
                         actionField: null
                     };
                     try {
+                        const isUpdate = log.logTimeId ? true : false;
                         const response = !log.logTimeId ? await logworkApi.create(parameter) : await logworkApi.update(parameter);
 
-                        if (response.data !== null && response.data !== undefined)
+                        if ((response !== null && response !== undefined ) || isUpdate)
                         {
                             if (!log.logTimeId)
                             {
