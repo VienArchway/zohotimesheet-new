@@ -1,5 +1,7 @@
 # zohotimesheet-new
 
+[![Build to prod and deploy to Azure container registry](https://github.com/VienArchway/zohotimesheet-new/actions/workflows/ci.yml/badge.svg?branch=main&event=pull_request)](https://github.com/VienArchway/zohotimesheet-new/actions/workflows/ci.yml)
+
 ## Setup
 
 ### Frontend
@@ -31,7 +33,7 @@ FE_API_URL=http://localhost:5000
 ```env
 // .env.production
 FE_ZOHO_CLIENT_ID=1000.Z1JHOXVXLJRC1BXDJX7HQJUVGSDKED
-FE_ZOHO_REDIRECT_URI=http://zohotimesheetaw.japaneast.azurecontainer.io/auth/callback
+FE_ZOHO_REDIRECT_URI=https://zohotimesheetaw.azurewebsites.net/auth/callback
 FE_ZOHO_ACCESS_TYPE=offline
 FE_ZOHO_CODE_RESPONSE_TYPE=code
 FE_ZOHO_TOKEN_PATH=oauth/v2/token
