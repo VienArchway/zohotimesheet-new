@@ -6,6 +6,6 @@ namespace api.Infrastructure.Interfaces
 {
     public interface IUserClient
     {
-        Task<ZohoUser> GetCurrentZohoUser();
+        Task<ZohoUser> GetCurrentZohoUser(string accessToken = null);
     }
 }
