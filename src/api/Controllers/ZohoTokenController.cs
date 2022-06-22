@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using api.Application.Interfaces;
 using api.Infrastructure.Interfaces;
 using api.Models;
+using System.Security.Claims;
 
 namespace api.Controllers;
 
@@ -37,9 +38,10 @@ public class ZohoTokenController : ControllerBase
     
     [HttpGet("refresh-access-token")]
     [ProducesResponseType(typeof(Token), 200)]
-    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync([FromQuery] string displayName)
+    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync()
     {
-        var result = await service.GetAccessTokenFromRefreshTokenAsync(displayName).ConfigureAwait(false);
+        var userName = User.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)?.Value;
+        var result = await service.GetAccessTokenFromRefreshTokenAsync(userName).ConfigureAwait(false);
         
         var cookieOptions = new CookieOptions
         {

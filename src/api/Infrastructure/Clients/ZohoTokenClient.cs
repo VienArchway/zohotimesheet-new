@@ -12,9 +12,12 @@ namespace api.Infrastructure.Clients
 {
     public class ZohoTokenClient: ZohoServiceClient, IZohoTokenClient
     {
-        public ZohoTokenClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider)
+        private IUserClient userClient;
+
+        public ZohoTokenClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider,IUserClient userClient)
             : base(client, configuration, svcProvider)
         {
+            this.userClient = userClient;
         }
 
         public async Task<Token> GetAccessTokenAsync(string code)
@@ -51,7 +54,6 @@ namespace api.Infrastructure.Clients
 
         public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string displayName)
         {
-            Environment.SetEnvironmentVariable("displayName", displayName);
             var refreshToken = await FetchSecretRefreshToken(null);
             if (refreshToken == null) throw new OperationCanceledException();
             
@@ -133,34 +135,24 @@ namespace api.Infrastructure.Clients
             return token ?? throw new InvalidOperationException();
         }
         
-        private async Task<ZohoUser> GetZohoUserInfo(string accessToken)
-        {
-            client.DefaultRequestHeaders.Add("User-Agent", "Archway");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken);
-            var resUser = await client.GetAsync(configuration["Zoho:UserHost"]);
-            var userInfo = await resUser.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var user = JsonConvert.DeserializeObject<ZohoUser>(userInfo);
-
-            return user ?? throw new InvalidOperationException();
-        }
-        
         private async Task<string> FetchSecretRefreshToken(Token? token)
         {
+            var firstName = "";
             if (token is not null)
             {
-                var zohoUser = await GetZohoUserInfo(token.AccessToken).ConfigureAwait(false);
-                Environment.SetEnvironmentVariable("displayName", zohoUser.FirstName.Replace(" ",""));
+                var zohoUser = await userClient.GetCurrentZohoUser(token.AccessToken).ConfigureAwait(false);
+                firstName = zohoUser?.FirstName?.Replace(" ","");
             }
 
             var secretClient = new SecretClient(
                 new Uri("https://zohotoken.vault.azure.net/"),
                 new DefaultAzureCredential());
-            Response<KeyVaultSecret> refreshToken = null;
+            Response<KeyVaultSecret>? refreshToken = null;
 
             try
             {
                 refreshToken = await secretClient
-                    .GetSecretAsync($"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}").ConfigureAwait(false);
+                    .GetSecretAsync($"refreshtoken-{firstName}").ConfigureAwait(false);
             }
             catch (RequestFailedException e)
             {
@@ -169,7 +161,7 @@ namespace api.Infrastructure.Clients
                 {
                     refreshToken = await secretClient
                         .SetSecretAsync(
-                            $"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}",
+                            $"refreshtoken-{firstName}",
                             token?.RefreshToken,
                             CancellationToken.None).ConfigureAwait(false);
                     Console.WriteLine("New secret has created");
@@ -186,7 +178,7 @@ namespace api.Infrastructure.Clients
                 {
                     var currentSecretAsync = await secretClient
                         .GetSecretAsync(
-                            $"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}",
+                            $"refreshtoken-{firstName}",
                             refreshToken.Value.Properties.Version
                         ).ConfigureAwait(false);
                     Console.WriteLine("Get current secret success");
@@ -196,7 +188,7 @@ namespace api.Infrastructure.Clients
                     Console.WriteLine("Old secret has been disabled");
                     
                     refreshToken = await secretClient.SetSecretAsync(
-                        $"refreshtoken-{Environment.GetEnvironmentVariable("displayName")}", token?.RefreshToken).ConfigureAwait(false);
+                        $"refreshtoken-{firstName}", token?.RefreshToken).ConfigureAwait(false);
                     Console.WriteLine("New secret has updated");
                 }
             }

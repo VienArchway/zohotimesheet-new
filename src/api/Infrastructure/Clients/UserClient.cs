@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using api.Models;
 using api.Infrastructure.Interfaces;
+using System.Net.Http.Headers;
 
 namespace api.Infrastructure.Clients
 {
@@ -18,8 +19,12 @@ namespace api.Infrastructure.Clients
         {
         }
 
-        public async Task<ZohoUser> GetCurrentZohoUser()
+        public async Task<ZohoUser> GetCurrentZohoUser(string? accessToken)
         {
+            if (!string.IsNullOrEmpty(accessToken)) {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken);
+            }
+
             var resUser = await client.GetAsync(configuration["Zoho:UserHost"]).ConfigureAwait(false);
             if (!resUser.IsSuccessStatusCode)
             {
@@ -27,7 +32,6 @@ namespace api.Infrastructure.Clients
             }
             var userInfo = await resUser.Content.ReadAsStringAsync().ConfigureAwait(false);
             var zohoUser = JsonConvert.DeserializeObject<ZohoUser>(userInfo);
-            Environment.SetEnvironmentVariable("displayName", zohoUser?.DisplayName);
 
             return zohoUser;
         }
