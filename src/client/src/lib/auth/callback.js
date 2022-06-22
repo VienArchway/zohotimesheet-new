@@ -49,6 +49,7 @@ export function useHandleCallBack() {
             localStorage.setItem('authorized', true)
             var user = await getCurrentUser()
             localStorage.setItem('displayName', user.displayName)
+            localStorage.setItem('zsUserId', user.zsUserId)
             
             window.location.href = '/'
         }

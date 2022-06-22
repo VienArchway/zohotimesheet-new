@@ -39,19 +39,6 @@ const { t } = useI18n()
                         </v-tooltip>
                     </v-row>
                 </th>
-                <th colspan="3">
-                    <!-- <v-select
-                        ref="assignees"
-                        :items="assignees"
-                        v-model="values.assignee"
-                        v-show="assignees.length > 0"
-                        item-text="displayName"
-                        item-value="id"
-                        :label="t('assignee')"
-                        dark
-                        @change="search"
-                    /> -->
-                </th>
                 <th :colspan="totalDateColumn">
                     <v-row justify="start">
                         <v-checkbox
@@ -105,7 +92,7 @@ const { t } = useI18n()
                 </td>
                 <td class="text-center">
                     <v-icon
-                        v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done' && isSelectedLoginUser"
+                        v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done'"
                         color="light-blue darken-4" @click="updateStatus(task)"
                         dark fab x-small
                         icon="mdi-check-outline"
@@ -119,7 +106,7 @@ const { t } = useI18n()
                         <v-text-field
                             type="number"
                             v-model="log.logTime" 
-                            :disabled="logWork.isDisabled || !isSelectedLoginUser"
+                            :disabled="logWork.isDisabled"
                             :class="`input-${logWork.dayOfWeek}`" 
                             hide-details
                             dense
@@ -170,7 +157,6 @@ export default {
                     value: "lastweek"
                 }
             ],
-            assignees: [],
             selectDateRange: "thisweek",
             urls: {
                 tokenApi: "api/zohotoken",
@@ -183,8 +169,6 @@ export default {
                 data: [],
                 usersData: [],
                 sortTaskItems: [],
-                assignee: null,
-                userLoginId: null,
                 oldLogTime: ""
             },
             daysOfWeek: [],
@@ -198,27 +182,12 @@ export default {
     computed: {
         totalDateColumn() {
             return this.selecteddayOfWeek.length;
-        },
-        isSelectedLoginUser() {
-            return this.values.assignee === this.values.userLoginId ? true : false;
         }
     },
     async created() {
-
-        await this.loadUsers();
-        
         await this.search();
     },
     methods: {
-        async loadUsers() {
-            // const resUsers = await axios.get(this.urls.userApi);
-            // this.assignees = resUsers.data;
-            // this.values.assignee = _.find(this.assignees, { emailId : window.email }).id;
-            // this.values.userLoginId = this.values.assignee;
-            // const resUser = await axios.get(`${this.urls.userApi}/${window.zuid}`);
-            this.values.assignee = "52523000000187565";
-            this.values.userLoginId = this.values.assignee;
-        },
         async search() {
             this.getWeekDateData();
 
@@ -229,16 +198,14 @@ export default {
             try 
             {
                 const sprintTypeIds = this.selectDateRange === "thisweek" ? [ "2" ] :[ "2", "3" ],
-                    assignees = !this.isSelectedLoginUser ? [this.values.assignee] : null,
                     openTaskCondition = {
                         sprintTypeIds,
                         statusId : 0,
                         startDateFrom: this.selectDateRange === "thisweek" ? null: new Date(moment(this.startdayOfWeek).add(0, "days")),
                         startDateTo: this.selectDateRange === "thisweek" ? null : new Date(moment(this.startdayOfWeek).add(6, "days")),
-                        completedOn : [],
-                        assignees
+                        completedOn : []
                     },
-                    closedTaskCondition = { sprintTypeIds, statusId : 1, completedOn : this.selectDateRange === "thisweek" ? [ "thisweek" ] : [ "thisweek", "lastweek" ], assignees};
+                    closedTaskCondition = { sprintTypeIds, statusId : 1, completedOn : this.selectDateRange === "thisweek" ? [ "thisweek" ] : [ "thisweek", "lastweek" ] };
                 await app.load(async () => {
                     const [ resOpenTaskItems, resClosedTaskItems ]= await Promise.all([ 
                         this.itemApi.find(openTaskCondition), // sprinttype = 2 : Active Sprint, status = 0 : open
@@ -249,8 +216,7 @@ export default {
 
                     const logworkSearchCondition = {
                         StartDate: new Date(moment(this.startdayOfWeek).add(1, "days")),
-                        EndDate: new Date(moment(this.startdayOfWeek).add(7, "days")),
-                        ownerIds: this.isSelectedLoginUser ? null : [ this.values.assignee ]
+                        EndDate: new Date(moment(this.startdayOfWeek).add(7, "days"))
                     };
 
                     const reslogWork = await this.logworkApi.find(logworkSearchCondition);
@@ -335,7 +301,6 @@ export default {
                                 {
                                     logWorkByDate = [
                                         {
-                                            Owner: this.values.assignee,
                                             itemName: task.itemName,
                                             itemNo: task.itemNo,
                                             logDate: date.date,
@@ -392,7 +357,6 @@ export default {
             ];
         },
         async changeWeek() {
-            debugger
             this.startdayOfWeek = this.selectDateRange === "thisweek" ? moment().startOf("week") : moment().startOf("week").add(-7, "days");
 
             this.getWeekDateData();
@@ -406,10 +370,6 @@ export default {
             this.values.oldLogTime = logTime;
         },
         async save($event, task, logWork, log) {
-            if (!this.isSelectedLoginUser) {
-                return;
-            }
-
             const target = $event.target,
                 vInput = target.closest(".v-input"),
                 processEle = vInput.nextElementSibling;
@@ -430,7 +390,7 @@ export default {
                         sprintid : task.sprintId,
                         itemid: task.id,
                         duration: decimal === 0 ? `${duration}` : `${Math.floor(duration)}:${decimal * 60}`,
-                        users: this.values.assignee,
+                        users: app.zsUserId,
                         date: moment(logWork.date).format("YYYY-MM-DDTHH:mm:ssZ"),
                         isbillable: 1,
                         actionField: null

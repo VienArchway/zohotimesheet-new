@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 
 export default defineStore('app', {
     state: () => ({
+        zsUserId: localStorage.getItem('zsUserId'),
         isLoading: false,
         messages: []
     }),
