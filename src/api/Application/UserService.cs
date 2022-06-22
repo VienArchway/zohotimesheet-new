@@ -8,19 +8,27 @@ namespace api.Application
     {
         private readonly IUserClient client;
 
-        public UserService(IUserClient client)
+        private readonly ITeamClient teamClient;
+
+        public UserService(IUserClient client, ITeamClient teamClient)
         {
             this.client = client;
+            this.teamClient = teamClient;
         }
 
-        public Task<IEnumerable<User>> GetAllAsync()
+        public async Task<User> GetCurrentUser()
         {
-            return client.GetAllAsync();
-        }
+            var zohoUser = await client.GetCurrentZohoUser();
 
-        public Task<string> GetZSUserIdIdByUserIdAsync(string userId)
-        {
-            return client.GetZSUserIdIdByUserIdAsync(userId);
+            var sprintSetting = await teamClient.GetTeamSettingAsync().ConfigureAwait(false);
+
+            var user = new User();
+            user.DisplayName = zohoUser?.DisplayName;
+            user.EmailId = zohoUser?.Email;
+            user.FirstName = zohoUser?.FirstName;
+            user.ZSUserId = sprintSetting["zsuserId"].ToString();
+
+            return user;
         }
     }
 }

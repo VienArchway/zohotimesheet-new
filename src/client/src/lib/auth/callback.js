@@ -1,6 +1,7 @@
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getAccessTokenFromCode, getAccessTokenByRefreshTokenApi, getZohoUserDisplayName, logout } from '@/api/resources/zohoToken'
+import { getAccessTokenFromCode, getAccessTokenByRefreshTokenApi, logout } from '@/api/resources/zohoToken'
+import { getCurrentUser } from '@/api/resources/user'
 import ZOHO_SETTINGS from '@/lib/zoho'
 import useAppStore from '@/store/app'
 
@@ -47,7 +48,9 @@ export function useHandleCallBack() {
             }
 
             localStorage.setItem('authorized', true)
-            await getZohoUserDisplayName()
+            var user = await getCurrentUser()
+            localStorage.setItem('displayName', user.displayName)
+            
             window.location.href = '/'
         }
     }

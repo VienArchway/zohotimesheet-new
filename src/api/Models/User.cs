@@ -14,6 +14,8 @@ namespace api.Models
         [JsonProperty(PropertyName = "displayName")]
         public string DisplayName { get; set; }
 
+        public string FirstName { get; set; }
+
         [JsonProperty(PropertyName = "emailId")]
         public string EmailId { get; set; }
 

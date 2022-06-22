@@ -1,14 +1,7 @@
 <script setup>
 import {onMounted, ref} from 'vue'
 import {useI18n} from 'vue-i18n'
-import { getVerifyTokenApi } from '@/api/resources/zohoToken'
 const { t } = useI18n()
-const status = ref(null)
-
-onMounted(async () => {
-  status.value = await getVerifyTokenApi()
-})
-
 </script>
 
 <template>

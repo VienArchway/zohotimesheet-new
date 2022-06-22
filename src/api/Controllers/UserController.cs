@@ -17,19 +17,11 @@ public class UserController : ControllerBase
         this.service = service;
     }
 
-    [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<User>), 200)]
-    public async Task<IActionResult> GetAllAsync()
-    {
-        var result = await service.GetAllAsync().ConfigureAwait(false);
-        return Ok(result);
-    }
-
-    [HttpGet("{userid}")]
+    [HttpGet("info")]
     [ProducesResponseType(typeof(string), 200)]
-    public async Task<IActionResult> GetZSUserIdIdByUserIdAsync(string userid)
+    public async Task<IActionResult> GetCurrentUser()
     {
-        var result = await service.GetZSUserIdIdByUserIdAsync(userid).ConfigureAwait(false);
+        var result = await service.GetCurrentUser().ConfigureAwait(false);
         return Ok(result);
     }
 }

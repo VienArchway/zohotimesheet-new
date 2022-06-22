@@ -10,16 +10,20 @@ namespace api.Services.Security;
 public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticationSchema>
 {
     private readonly ITeamClient teamClient;
+
+    private String archwayTeamId;
     
     public ZohoAuthenticationHandler(
         ITeamClient teamClient,
         IOptionsMonitor<ZohoAuthenticationSchema> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        ISystemClock clock)
+        ISystemClock clock,
+        IConfiguration configuration)
         : base(options, logger, encoder, clock)
     {
         this.teamClient = teamClient;
+        this.archwayTeamId = configuration.GetValue<string>("Zoho:TeamId");
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -32,15 +36,15 @@ public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticatio
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        var fetchTeam = teamClient.SearchAsync().GetAwaiter().GetResult();
-        if (string.IsNullOrEmpty(fetchTeam) || !fetchTeam.Equals("success"))
+        var fetchTeam = teamClient.GetTeamSettingAsync("signout").GetAwaiter().GetResult();
+        if (fetchTeam == null)
         {
             return Task.FromResult(AuthenticateResult.Fail($"Wrong access token"));
         }
         
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, "NameIdentifier"),
+            new Claim(ClaimTypes.NameIdentifier, fetchTeam?["firstName"].ToString()),
             new Claim(ClaimTypes.Name, "Name"),
         };
 

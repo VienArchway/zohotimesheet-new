@@ -12,12 +12,10 @@ public class ZohoTokenController : ControllerBase
 {
     private readonly IZohoTokenService service;
 
-    private readonly ITeamClient teamClient;
 
     public ZohoTokenController(IZohoTokenService service, ITeamClient teamClient)
     {
         this.service = service;
-        this.teamClient = teamClient;
     }
 
     [HttpGet]
@@ -70,31 +68,6 @@ public class ZohoTokenController : ControllerBase
     {
         await service.RevokeRefreshTokenAsync().ConfigureAwait(false);
         return Ok();
-    }
-    
-    [Authorize]
-    [HttpGet("verify-token")]
-    public async Task<IActionResult> VerifyToken()
-    {
-        var result = await teamClient.SearchAsync().ConfigureAwait(false);
-        if (string.IsNullOrEmpty(result))
-        {
-            return Unauthorized();
-        }
-        return Ok(result);
-    }
-    
-    [Authorize]
-    [HttpGet("display-name")]
-    public async Task<IActionResult> GetDisplayName()
-    {
-        var result = Environment.GetEnvironmentVariable("displayName");
-        if (string.IsNullOrEmpty(result))
-        {
-           result = await teamClient.GetDisplayNameAsync();
-        }
-
-        return Ok(result);
     }
     
     [Authorize]

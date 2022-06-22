@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Net;
 using api.Infrastructure.Interfaces;
 using api.Models;
 using Newtonsoft.Json;
@@ -12,28 +14,14 @@ namespace api.Infrastructure.Clients
         {
         }
 
-        public async Task<string?> SearchAsync()
+        public async Task<JObject?> GetTeamSettingAsync(string? action = null)
         {
-            var response = await client.GetAsync("teams/").ConfigureAwait(false);
-            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            
-            var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-            return !response.IsSuccessStatusCode ? string.Empty : srcJObj?.GetValue("status")?.ToString();
-        }
+            var response = await client.GetAsync($"team/{teamId}/settings/?action=" + action).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode) return null;
 
-        public async Task<string?> GetDisplayNameAsync()
-        {
-            var resUser = await client.GetAsync(configuration["Zoho:UserHost"]).ConfigureAwait(false);
-            if (!resUser.IsSuccessStatusCode)
-            {
-                throw new InvalidOperationException("Has error when get displayName");
-            }
-            var userInfo = await resUser.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var user = JsonConvert.DeserializeObject<ZohoUser>(userInfo);
-            var displayName = user?.FirstName?.Replace(" ", "");
-            
-            Environment.SetEnvironmentVariable("displayName", displayName);
-            return displayName ?? throw new InvalidOperationException();
+            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var result = JsonConvert.DeserializeObject<JObject>(responseContent);
+            return result;
         }
     }
 }

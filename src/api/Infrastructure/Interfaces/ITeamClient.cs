@@ -1,11 +1,10 @@
 using api.Models;
+using Newtonsoft.Json.Linq;
 
 namespace api.Infrastructure.Interfaces
 {
     public interface ITeamClient
     {
-        Task<string?> SearchAsync();
-
-        Task<string?> GetDisplayNameAsync();
+        Task<JObject?> GetTeamSettingAsync(string action = null);
     }
 }

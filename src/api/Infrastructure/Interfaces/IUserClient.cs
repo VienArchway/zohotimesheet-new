@@ -6,8 +6,6 @@ namespace api.Infrastructure.Interfaces
 {
     public interface IUserClient
     {
-        Task<IEnumerable<User>> GetAllAsync();
-
-        Task<string> GetZSUserIdIdByUserIdAsync(string userId);
+        Task<ZohoUser> GetCurrentZohoUser();
     }
 }

@@ -18,32 +18,18 @@ namespace api.Infrastructure.Clients
         {
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public async Task<ZohoUser> GetCurrentZohoUser()
         {
-            var response = await client.GetAsync($"team/{teamId}/users/allzuid/?action=zpuidVSzuid").ConfigureAwait(false);
-            // var response = await client.GetAsync($"team/{teamId}/globalview/?action=users").ConfigureAwait(false);
-            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var resUser = await client.GetAsync(configuration["Zoho:UserHost"]).ConfigureAwait(false);
+            if (!resUser.IsSuccessStatusCode)
+            {
+                throw new InvalidOperationException("Has error when get displayName");
+            }
+            var userInfo = await resUser.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var zohoUser = JsonConvert.DeserializeObject<ZohoUser>(userInfo);
+            Environment.SetEnvironmentVariable("displayName", zohoUser?.DisplayName);
 
-            var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-            var properties = new JObject();
-            properties.Add("displayName", 0);
-            properties.Add("emailId", 1);
-            properties.Add("userRole", 2);
-            var items = srcJObj.GetValue("userIdvsDetails");
-            var result = ConvertJsonResponseToClass<User>(properties, items);
-
-            return result;
-        }
-
-        public async Task<string> GetZSUserIdIdByUserIdAsync(string userId)
-        {
-            var response = await client.GetAsync($"team/{teamId}/users/allzuid/?action=zpuidVSzuid").ConfigureAwait(false);
-            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-            var items = (JObject)srcJObj.GetValue("zsuserIdvsIAMUserId");
-            var result = items.Properties().FirstOrDefault(x => x.HasValues && x.Value.ToString() == userId);
-            return result.Name;
+            return zohoUser;
         }
     }
 }
