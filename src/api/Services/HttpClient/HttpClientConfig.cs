@@ -10,8 +10,8 @@ public static class HttpClientConfig {
         {
             var httpContext = services.GetRequiredService<IHttpContextAccessor>();
             var accessToken = httpContext.HttpContext?.Request.Cookies["accessToken"];
+
             httpClient.BaseAddress = new Uri(zohoSprintApiHost);
-            
             httpClient.DefaultRequestHeaders.Add("User-Agent", "Archway");
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken);
         });

@@ -30,8 +30,10 @@ namespace api.Infrastructure.Clients
             }
             var userInfo = await resUser.Content.ReadAsStringAsync().ConfigureAwait(false);
             var user = JsonConvert.DeserializeObject<ZohoUser>(userInfo);
-            Environment.SetEnvironmentVariable("displayName", user.DisplayName);
-            return user.DisplayName ?? throw new InvalidOperationException();
+            var displayName = user?.FirstName?.Replace(" ", "");
+            
+            Environment.SetEnvironmentVariable("displayName", displayName);
+            return displayName ?? throw new InvalidOperationException();
         }
     }
 }
