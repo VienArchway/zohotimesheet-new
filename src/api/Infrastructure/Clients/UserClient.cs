@@ -19,9 +19,9 @@ namespace api.Infrastructure.Clients
         {
         }
 
-        public async Task<ZohoUser> GetCurrentZohoUser(string accessToken = null)
+        public async Task<ZohoUser> GetCurrentZohoUser(string? accessToken)
         {
-            if (!String.IsNullOrEmpty(accessToken)) {
+            if (!string.IsNullOrEmpty(accessToken)) {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken);
             }
 
