@@ -39,9 +39,9 @@ public class ZohoTokenController : ControllerBase
     
     [HttpGet("refresh-access-token")]
     [ProducesResponseType(typeof(Token), 200)]
-    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync()
+    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync([FromQuery] string displayName)
     {
-        var result = await service.GetAccessTokenFromRefreshTokenAsync().ConfigureAwait(false);
+        var result = await service.GetAccessTokenFromRefreshTokenAsync(displayName).ConfigureAwait(false);
         
         var cookieOptions = new CookieOptions
         {
@@ -105,7 +105,7 @@ public class ZohoTokenController : ControllerBase
         {
             SameSite = SameSiteMode.Unspecified
         };
-        Response.Cookies.Append("accessToken", string.Empty, cookieOptions);
+        Response.Cookies.Delete("accessToken", cookieOptions);
 
         return Task.FromResult<IActionResult>(Ok());
     }

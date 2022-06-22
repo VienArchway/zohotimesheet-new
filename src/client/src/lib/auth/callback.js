@@ -1,6 +1,6 @@
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getAccessTokenFromCode, getZohoUserDisplayName, logout } from '@/api/resources/zohoToken'
+import { getAccessTokenFromCode, getAccessTokenByRefreshTokenApi, getZohoUserDisplayName, logout } from '@/api/resources/zohoToken'
 import ZOHO_SETTINGS from '@/lib/zoho'
 import useAppStore from '@/store/app'
 
@@ -20,7 +20,18 @@ export function useHandleCallBack() {
         
         // revoke token
         if (route.query?.revoke) {
-            window.location.href = `${ZOHO_SETTINGS.login_url}?scope=${ZOHO_SETTINGS.scope}&client_id=${ZOHO_SETTINGS.client_id}&response_type=${ZOHO_SETTINGS.response_type}&redirect_uri=${ZOHO_SETTINGS.redirect_uri}&prompt=consent&access_type=offline`
+            const displayName = localStorage.getItem('displayName')
+            if (displayName) {
+                const { accessToken } = await getAccessTokenByRefreshTokenApi(displayName)
+                if (accessToken) {
+                    localStorage.setItem('authorized', true)
+                    window.location.href = '/'
+                } else {
+                    console.error('Failed when try to get access token. Please contact admin')
+                }
+            } else {
+                window.location.href = `${ZOHO_SETTINGS.login_url}?scope=${ZOHO_SETTINGS.scope}&client_id=${ZOHO_SETTINGS.client_id}&response_type=${ZOHO_SETTINGS.response_type}&redirect_uri=${ZOHO_SETTINGS.redirect_uri}&prompt=consent&access_type=offline`
+            }
         }
 
         // login
@@ -37,7 +48,6 @@ export function useHandleCallBack() {
 
             localStorage.setItem('authorized', true)
             await getZohoUserDisplayName()
-            
             window.location.href = '/'
         }
     }
