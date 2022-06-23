@@ -10,7 +10,7 @@
                     v-model="values.projectData.projectNameFilter"
                     append-icon="mdi-magnify"
                     :label="t('search')"
-                    @change="projectNameFilter"
+                    @update:modelValue="projectNameFilter"
                     single-line
                     hide-details
                 ></v-text-field>

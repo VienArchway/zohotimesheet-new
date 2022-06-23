@@ -12,7 +12,7 @@ const { t } = useI18n()
                 v-model="logItemFilter"
                 append-icon="mdi-magnify"
                 :label="t('searchcondition')"
-                @change="search"
+                @update:modelValue="search"
                 hide-details
             ></v-text-field>
         </v-col>
@@ -38,7 +38,7 @@ const { t } = useI18n()
     </v-row>
     <v-table
         fixed-header
-        height="400px" >
+        height="700px" >
         <thead>
             <tr>
                 <th class="text-left">
@@ -164,6 +164,9 @@ export default {
             state: {
                 isEmptyData: false
             },
+            page: 1,
+            pageSize : 10,
+            pageLength: 0,
             dialog: false,
             valid: true,
             fileName: "",

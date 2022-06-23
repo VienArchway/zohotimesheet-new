@@ -18,7 +18,7 @@
   "allsprint": "全スプリント",
   "startdate": "開始日",
   "enddate": "終了日",
-  "datauploaded": "データがアップロードしました。",
+  "dataloaded": "データがアップロードしました。",
   "json": "JSON",
   "search": "検索",
   "autotransferschedule": "自動的に作業実績の転送スケジュール",
