@@ -27,7 +27,7 @@ FE_ZOHO_ACCESS_TYPE=offline
 FE_ZOHO_CODE_RESPONSE_TYPE=code
 FE_ZOHO_TOKEN_PATH=oauth/v2/token
 FE_ZOHO_LOGIN_URL=https://accounts.zoho.com/oauth/v2/auth
-FE_ZOHO_LOGIN_SCOPE=ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ+ZohoSprints.sprints.READ+aaaserver.profile.READ
+FE_ZOHO_LOGIN_SCOPE=aaaserver.profile.READ%20ZohoSprints.teams.READ%20ZohoSprints.projects.READ%20ZohoSprints.sprints.READ%20ZohoSprints.timesheets.READ%20ZohoSprints.items.READ%20ZohoSprints.timesheets.CREATE%20ZohoSprints.timesheets.UPDATE%20ZohoSprints.timesheets.DELETE%20ZohoSprints.items.UPDATE%20ZohoSprints.teamusers.READ%20ZohoSprints.webhook.READ%20ZohoSprints.webhook.UPDATE%20ZohoSprints.teams.READ
 
 FE_API_URL=http://localhost:5000
 ```
@@ -40,7 +40,7 @@ FE_ZOHO_ACCESS_TYPE=offline
 FE_ZOHO_CODE_RESPONSE_TYPE=code
 FE_ZOHO_TOKEN_PATH=oauth/v2/token
 FE_ZOHO_LOGIN_URL=https://accounts.zoho.com/oauth/v2/auth
-FE_ZOHO_LOGIN_SCOPE=ZohoSprints.teams.READ+ZohoSprints.teamusers.READ+ZohoSprints.projects.READ+ZohoSprints.sprints.READ+aaaserver.profile.READ
+FE_ZOHO_LOGIN_SCOPE=aaaserver.profile.READ%20ZohoSprints.teams.READ%20ZohoSprints.projects.READ%20ZohoSprints.sprints.READ%20ZohoSprints.timesheets.READ%20ZohoSprints.items.READ%20ZohoSprints.timesheets.CREATE%20ZohoSprints.timesheets.UPDATE%20ZohoSprints.timesheets.DELETE%20ZohoSprints.items.UPDATE%20ZohoSprints.teamusers.READ%20ZohoSprints.webhook.READ%20ZohoSprints.webhook.UPDATE%20ZohoSprints.teams.READ
 
 FE_API_URL=http://0.0.0.0:80
 ```
