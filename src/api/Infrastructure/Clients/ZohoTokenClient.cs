@@ -54,6 +54,7 @@ namespace api.Infrastructure.Clients
 
         public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string displayName)
         {
+            Environment.SetEnvironmentVariable("displayName", displayName);
             var refreshToken = await FetchSecretRefreshToken(null);
             if (refreshToken == null) throw new OperationCanceledException();
             
@@ -142,6 +143,10 @@ namespace api.Infrastructure.Clients
             {
                 var zohoUser = await userClient.GetCurrentZohoUser(token.AccessToken).ConfigureAwait(false);
                 firstName = zohoUser?.FirstName?.Replace(" ","");
+            }
+            else
+            {
+                firstName = Environment.GetEnvironmentVariable("displayName");
             }
 
             var secretClient = new SecretClient(

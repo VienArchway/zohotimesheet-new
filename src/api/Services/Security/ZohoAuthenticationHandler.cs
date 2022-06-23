@@ -11,7 +11,7 @@ public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticatio
 {
     private readonly ITeamClient teamClient;
 
-    private String archwayTeamId;
+    private string archwayTeamId;
     
     public ZohoAuthenticationHandler(
         ITeamClient teamClient,
