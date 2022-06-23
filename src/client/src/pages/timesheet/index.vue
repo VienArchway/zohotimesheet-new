@@ -1,9 +1,3 @@
-<script setup>
-import {onMounted, ref} from 'vue'
-import {useI18n} from 'vue-i18n'
-const { t } = useI18n()
-</script>
-
 <template>
   <div>    
     <v-table fixed-header>
@@ -137,14 +131,17 @@ const { t } = useI18n()
 <script>
 import "./index.scss"
 import moment from "moment"
-import projectApi from '@/api/resources/project'
 import logworkApi from '@/api/resources/logwork'
-import itemApi from '@/api/resources/item'
-import adlsApi from '@/api/resources/adls'
 import appStore from '@/store/app.js'
+import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
 const app = appStore()
 
-export default {
+export default defineComponent({
+  setup() {
+    const { t } = useI18n()
+    return { t }
+  },
     data() {
         return {
             dateRanges: [
@@ -463,7 +460,7 @@ export default {
             }
         },
     }
-};
+})
 </script>
 
 <route lang="yaml">

@@ -1,10 +1,3 @@
-<script setup>
-import {onMounted, ref} from 'vue'
-import {useI18n} from 'vue-i18n'
-
-const { t } = useI18n()
-</script>
-
 <template>
   <v-container fluid>
     <v-row>
@@ -181,128 +174,129 @@ const { t } = useI18n()
 </template>
 <script>
 import "./index.scss"
-// import '@/vue-json-pretty/lib/styles.css'
 import moment from "moment"
-// import VueJsonPretty from 'vue-json-pretty'
 import adlsApi from '@/api/resources/adls'
 import projectApi from '@/api/resources/project'
 import appStore from '@/store/app.js'
+import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
+
 const app = appStore()
 
-export default {
-    data() {
-        return {
-            isShowStartDate: false,
-            isShowEndDate: false,
-            // currentLocale: this.$i18n.locale,
-            urls: {
-                projectApi: "api/project",
-                adlsApi: "api/adls"
-            },
-            values: {
-                projectData: {
-                    projectNameFilter: "",
-                    headers: [
-                        {
-                            text: this.t("project"),
-                            value: "projName"
-                        }
-                    ],
-                    items: [],
-                    filterItems: []
-                },
-                sprintData: {
-                    items: [
-                        {text: this.t("activesprint"), value: 2 },
-                        {text: this.t("allsprint"), value: 0 }
-                    ]
-                },
-                logworkData: {
-                    headers: [
-                        { text: this.t("project"), value: "projName" },
-                        { text: this.t("item"), value: "itemName" },
-                        { text: this.t("owner"), value: "OwnerName" },
-                        { text: this.t("logdate"), value: "logDate" },
-                        { text: this.t("logtime"), value: "logTime" },
-                        { text: "", value: "json", sortable: false }
-                    ],
-                    items: []
-                }
-            },
-            searchConditions: {
-                startDate: new Date().toISOString().substr(0, 10),
-                endDate: new Date().toISOString().substr(0, 10),
-                sprintTypeId: 2,
-                projects: [],
-                minDate: new Date(2019, 7, 2).toISOString().substr(0, 10),
-                maxDate: new Date().toISOString().substr(0, 10)
+export default defineComponent({
+  setup() {
+    const { t } = useI18n()
+    return { t }
+  },
+  data() {
+    return {
+      isShowStartDate: false,
+      isShowEndDate: false,
+      values: {
+        projectData: {
+          projectNameFilter: "",
+          headers: [
+            {
+              text: this.t("project"),
+              value: "projName"
             }
-        };
-    },
-    async created() {
-        try {
-            await app.load(async () => {
-                const resProject = await projectApi.getAll();
-
-                this.values.projectData.items = resProject;
-                this.values.projectData.filterItems = resProject;
-
-            })            
-        } catch (error) {
-            const resMessage = error.response?.data?.message;
-            const errorDetail = JSON.parse(resMessage);
-            if (errorDetail) {
-                app.error(errorDetail.message, 100000);
-            }
-        } 
-        // finally {
-        //     this.$store.commit("closeLoading");
-        // }
-    },
-    computed: {
-        customStartDateFormatter () {
-            return this.searchConditions.startDate ? moment(this.searchConditions.startDate).format("LL") : "";
+          ],
+          items: [],
+          filterItems: []
         },
-        customEndDateFormatter () {
-            return this.searchConditions.endDate ? moment(this.searchConditions.endDate).format("LL") : "";
-        }
-    },
-    methods: {
-        async upload() {
-            try {
-                await app.load(async () => {
-
-                    this.values.logworkData.items = [];
-
-                    const searchCondition = {
-                        startDate: new Date(this.searchConditions.startDate),
-                        endDate: new Date(this.searchConditions.endDate),
-                        sprintTypeId: this.searchConditions.sprintTypeId,
-                        projects: this.searchConditions.projects
-                    };
-
-                    const response = await adlsApi.transfer(searchCondition);
-
-                    if (response !== null && response !== undefined)
-                    {
-                        this.values.logworkData.items = response;
-                    }
-                })
-            } catch (error) {
-                const resMessage = error.response?.data?.message;
-                const errorDetail = JSON.parse(resMessage);
-                if (errorDetail) {
-                    app.error(errorDetail.message, 100000);
-                }
-            } finally {
-                app.success(this.t("dataloaded"), 5000);
-            }
+        sprintData: {
+          items: [
+            {text: this.t("activesprint"), value: 2 },
+            {text: this.t("allsprint"), value: 0 }
+          ]
         },
-        projectNameFilter() {
-            this.values.projectData.filterItems = _.filter(this.values.projectData.items, (proj) => { return proj.projName.includes(this.values.projectData.projectNameFilter)});
+        logworkData: {
+          headers: [
+            { text: this.t("project"), value: "projName" },
+            { text: this.t("item"), value: "itemName" },
+            { text: this.t("owner"), value: "OwnerName" },
+            { text: this.t("logdate"), value: "logDate" },
+            { text: this.t("logtime"), value: "logTime" },
+            { text: "", value: "json", sortable: false }
+          ],
+          items: []
         }
+      },
+      searchConditions: {
+        startDate: new Date().toISOString().substr(0, 10),
+        endDate: new Date().toISOString().substr(0, 10),
+        sprintTypeId: 2,
+        projects: [],
+        minDate: new Date(2019, 7, 2).toISOString().substr(0, 10),
+        maxDate: new Date().toISOString().substr(0, 10)
+      }
+    };
+  },
+  async created() {
+    try {
+      await app.load(async () => {
+        const resProject = await projectApi.getAll();
+
+        this.values.projectData.items = resProject;
+        this.values.projectData.filterItems = resProject;
+
+      })
+    } catch (error) {
+      const resMessage = error.response?.data?.message;
+      const errorDetail = JSON.parse(resMessage);
+      if (errorDetail) {
+        app.error(errorDetail.message, 100000);
+      }
     }
-};
+    // finally {
+    //     this.$store.commit("closeLoading");
+    // }
+  },
+  computed: {
+    customStartDateFormatter () {
+      return this.searchConditions.startDate ? moment(this.searchConditions.startDate).format("LL") : "";
+    },
+    customEndDateFormatter () {
+      return this.searchConditions.endDate ? moment(this.searchConditions.endDate).format("LL") : "";
+    }
+  },
+  methods: {
+    async upload() {
+      try {
+        await app.load(async () => {
+
+          this.values.logworkData.items = [];
+
+          const searchCondition = {
+            startDate: new Date(this.searchConditions.startDate),
+            endDate: new Date(this.searchConditions.endDate),
+            sprintTypeId: this.searchConditions.sprintTypeId,
+            projects: this.searchConditions.projects
+          };
+
+          const response = await adlsApi.transfer(searchCondition);
+
+          if (response !== null && response !== undefined)
+          {
+            this.values.logworkData.items = response;
+          }
+        })
+      } catch (error) {
+        const resMessage = error.response?.data?.message;
+        const errorDetail = JSON.parse(resMessage);
+        if (errorDetail) {
+          app.error(errorDetail.message, 100000);
+        }
+      } finally {
+        app.success(this.t("dataloaded"), 5000);
+      }
+    },
+    projectNameFilter() {
+      this.values.projectData.filterItems = _.filter(this.values.projectData.items, (proj) => { return proj.projName.includes(this.values.projectData.projectNameFilter)});
+    }
+  }
+})
+
 </script>
 
 <route lang="yaml">
