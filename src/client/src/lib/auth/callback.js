@@ -21,8 +21,9 @@ export function useHandleCallBack() {
         
         // revoke token
         if (route.query?.revoke) {
-            if (localStorage.getItem('displayName')) {
-                const { accessToken } = await getAccessTokenByRefreshTokenApi()
+            const displayName = localStorage.getItem('displayName')
+            if (displayName) {
+                const { accessToken } = await getAccessTokenByRefreshTokenApi(displayName)
                 if (accessToken) {
                     localStorage.setItem('authorized', true)
                     window.location.href = '/'
