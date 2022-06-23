@@ -35,10 +35,6 @@
   </div>
 </template>
 
-<route lang="yaml">
-meta:
-  layout: default
-</route>
 
 <script>
 import "./index.scss";
@@ -47,7 +43,6 @@ import appStore from '@/store/app.js'
 import { useI18n } from 'vue-i18n'
 import { defineComponent } from 'vue'
 
-const { t } = useI18n()
 const app = appStore()
 
 export default defineComponent({
@@ -122,3 +117,8 @@ export default defineComponent({
     }
 })
 </script>
+
+<route lang="yaml">
+meta:
+layout: default
+</route>
