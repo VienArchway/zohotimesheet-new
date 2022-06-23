@@ -1,12 +1,3 @@
-<script setup>
-import { onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import appStore from '@/store/app'
-
-const { t } = useI18n()
-onMounted(async () => {})
-</script>
-
 <template>
   <div>
     <v-card class="mx-auto" max-width="1000" outlined>
@@ -61,10 +52,19 @@ meta:
 import "./index.scss"
 import moment from "moment"
 import zohoScheduleApi from '@/api/resources/zohoschedule'
+import appStore from '@/store/app'
+import { useI18n } from 'vue-i18n'
+import { defineComponent } from 'vue'
+
+const { t } = useI18n()
 const app = appStore()
 
-export default {
+export default defineComponent({
     name: "schedule",
+    setup() {
+      const { t } = useI18n()
+      return { t }
+    },
     data() {
         return {
             urls: {
@@ -129,5 +129,5 @@ export default {
             app.success(this.t("schedulestop"), 5000);
         }
     }
-};
+})
 </script>
