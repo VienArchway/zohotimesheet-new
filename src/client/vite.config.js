@@ -21,7 +21,7 @@ export default ({ mode }) => {
       }),
       VueI18n({
         runtimeOnly: false,
-        compositionOnly: true,
+        compositionOnly: false,
         include: [path.resolve(__dirname, './i18n/**')],
       }),
       Pages({
