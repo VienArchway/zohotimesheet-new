@@ -1,9 +1,3 @@
-<script setup>
-import {onMounted, ref} from 'vue'
-import {useI18n} from 'vue-i18n'
-const { t } = useI18n()
-</script>
-
 <template>
   <div>
     <v-row>
@@ -140,10 +134,15 @@ meta:
 import "./index.scss";
 import adlsApi from '@/api/resources/adls'
 import appStore from '@/store/app.js'
+import { useI18n } from 'vue-i18n'
+import { defineComponent } from 'vue'
+
 const app = appStore()
 
-export default {
-    components: {
+export default defineComponent({
+    setup() {
+      const { t } = useI18n()
+      return { t }
     },
     data() {
         return {
@@ -225,5 +224,5 @@ export default {
             this.filterItems = _.filter(this.items, (item) => { return item.itemName?.includes(this.logItemFilter) || item.ownerName?.includes(this.logItemFilter)|| item.logDate?.includes(this.logItemFilter)|| item.projName?.includes(this.logItemFilter)});
         }
     }
-};
+})
 </script>

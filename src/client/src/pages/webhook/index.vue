@@ -1,9 +1,3 @@
-<script setup>
-import {onMounted, ref} from 'vue'
-import {useI18n} from 'vue-i18n'
-const { t } = useI18n()
-</script>
-
 <template>
   <div>
     <v-table
@@ -41,19 +35,20 @@ const { t } = useI18n()
   </div>
 </template>
 
-<route lang="yaml">
-meta:
-  layout: default
-</route>
 
 <script>
 import "./index.scss";
 import webhookApi from '@/api/resources/webhook'
 import appStore from '@/store/app.js'
+import { useI18n } from 'vue-i18n'
+import { defineComponent } from 'vue'
+
 const app = appStore()
 
-export default {
-    components: {
+export default defineComponent({
+    setup() {
+      const { t } = useI18n()
+      return { t }
     },
     data() {
         return {
@@ -120,5 +115,10 @@ export default {
             this.dialog = false;
         }
     }
-};
+})
 </script>
+
+<route lang="yaml">
+meta:
+layout: default
+</route>
