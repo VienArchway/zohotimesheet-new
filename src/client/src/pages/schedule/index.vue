@@ -56,7 +56,6 @@ import appStore from '@/store/app'
 import { useI18n } from 'vue-i18n'
 import { defineComponent } from 'vue'
 
-const { t } = useI18n()
 const app = appStore()
 
 export default defineComponent({
