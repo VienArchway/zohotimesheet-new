@@ -47,15 +47,14 @@ namespace api.Infrastructure.Clients
             var token = JsonConvert.DeserializeObject<Token>(resContent);
             if (token == null) return token ?? throw new InvalidOperationException();
             
-            await FetchSecretRefreshToken(token).ConfigureAwait(false);
+            await FetchSecretRefreshToken(token, null).ConfigureAwait(false);
 
             return token ?? throw new InvalidOperationException();
         }
 
         public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string displayName)
         {
-            Environment.SetEnvironmentVariable("displayName", displayName);
-            var refreshToken = await FetchSecretRefreshToken(null);
+            var refreshToken = await FetchSecretRefreshToken(null, displayName);
             if (refreshToken == null) throw new OperationCanceledException();
             
             var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
@@ -85,7 +84,7 @@ namespace api.Infrastructure.Clients
 
         public async Task RevokeRefreshTokenAsync()
         {
-            var refreshToken = await FetchSecretRefreshToken(null);
+            var refreshToken = await FetchSecretRefreshToken(null, null);
             if (refreshToken == null) throw new OperationCanceledException();
             
             using var clientToken = new HttpClient();
@@ -136,17 +135,13 @@ namespace api.Infrastructure.Clients
             return token ?? throw new InvalidOperationException();
         }
         
-        private async Task<string> FetchSecretRefreshToken(Token? token)
+        private async Task<string> FetchSecretRefreshToken(Token? token, string? displayName)
         {
-            var firstName = "";
+            var firstName = displayName ?? string.Empty;
             if (token is not null)
             {
                 var zohoUser = await userClient.GetCurrentZohoUser(token.AccessToken).ConfigureAwait(false);
                 firstName = zohoUser?.FirstName?.Replace(" ","");
-            }
-            else
-            {
-                firstName = Environment.GetEnvironmentVariable("displayName");
             }
 
             var secretClient = new SecretClient(
