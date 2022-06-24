@@ -31,6 +31,7 @@
                         </v-tooltip>
                     </v-row>
                 </th>
+                <th colspan="3"></th>
                 <th :colspan="totalDateColumn">
                     <v-row justify="start">
                         <v-checkbox
