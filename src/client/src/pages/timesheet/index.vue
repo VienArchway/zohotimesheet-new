@@ -15,19 +15,17 @@
                         />
                         <v-tooltip bottom>
                             <template v-slot:activator="{ props }">
-                                <v-icon style="margin-top: 30px;"
+                                <v-icon style="margin-top: 20px;"
                                     dark
                                     icon="mdi-information-outline"
-                                    v-on="on"
                                     v-bind="props"
+                                    size="35px"
                                 />
                             </template>
                             <span>
-                                <p>This week items include all items of active sprint that have been started on last week and this week and not done yet(Open items)
-                                    and all items of active sprints that have been done on this week(Closed items).
+                                <p>{{ t("thisweekinformation")}}
                                 </p>
-                                <p>Last week items include all items of active and closed sprint that have been started on lastweek and not done yet(Open items).
-                                and all items of active and closed sprints that have been done on this week or last week(Closed items).
+                                <p>{{ t("lastweekinformation")}}
                                 </p>
                             </span>
                         </v-tooltip>
@@ -44,7 +42,19 @@
                             class="ma-0 chkdate"
                             dark
                             hide-details
-                        />
+                    />
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon style="margin-top: 10px;"
+                                    dark
+                                    icon="mdi-sync"
+                                    v-bind="props"
+                                    size="35px"
+                                    @click="refreshCompleteOn"
+                                />
+                            </template>
+                            <span>{{ t("reloadData")}}</span>
+                        </v-tooltip>
                     </v-row>
                 </th>
             </tr>
@@ -156,12 +166,6 @@ export default defineComponent({
                 }
             ],
             selectDateRange: "thisweek",
-            urls: {
-                tokenApi: "api/zohotoken",
-                itemApi: "api/taskitem",
-                logWorkApi: "api/logwork",
-                userApi: "api/user"
-            },
             values: {
                 accessToken: "",
                 data: [],
@@ -459,6 +463,9 @@ export default defineComponent({
                     }
                 });
             }
+        },
+        async refreshCompleteOn() {
+            await this.changeWeek();
         },
     }
 })

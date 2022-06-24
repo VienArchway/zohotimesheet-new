@@ -66,7 +66,6 @@
                         v-model="searchConditions.startDate"
                         :label="t('startdate')"
                         prepend-icon="far fa-calendar-alt"
-                        v-on="on"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6">
@@ -74,7 +73,6 @@
                         v-model="searchConditions.endDate"
                         :label="t('enddate')"
                         prepend-icon="far fa-calendar-alt"
-                        v-on="on"
                     ></v-text-field>
                     <!-- <v-menu
                         v-model="isShowEndDate"
