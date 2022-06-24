@@ -1,6 +1,9 @@
 <template>
   <div>    
-    <v-table fixed-header>
+    <v-table
+        fixed-header
+        fixed-footer
+        height="800px">
         <thead>
             <tr>
                 <th colspan="2">

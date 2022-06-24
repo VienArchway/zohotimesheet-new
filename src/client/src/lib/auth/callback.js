@@ -20,7 +20,6 @@ export function useHandleCallBack() {
         }
         
         // revoke token
-        debugger
         if (route.query?.revoke) {
             const firstName = localStorage.getItem('firstName')
             const zpUserId = localStorage.getItem('zpUserId')
