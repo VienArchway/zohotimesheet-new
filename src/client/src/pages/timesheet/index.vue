@@ -132,6 +132,7 @@
 import "./index.scss"
 import moment from "moment"
 import logworkApi from '@/api/resources/logwork'
+import itemApi from '@/api/resources/item'
 import appStore from '@/store/app.js'
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -205,8 +206,8 @@ export default defineComponent({
                     closedTaskCondition = { sprintTypeIds, statusId : 1, completedOn : this.selectDateRange === "thisweek" ? [ "thisweek" ] : [ "thisweek", "lastweek" ] };
                 await app.load(async () => {
                     const [ resOpenTaskItems, resClosedTaskItems ]= await Promise.all([ 
-                        this.itemApi.find(openTaskCondition), // sprinttype = 2 : Active Sprint, status = 0 : open
-                        this.itemApi.find(closedTaskCondition) // sprinttype = 2 : Active Sprint, status = 1 : closed
+                        itemApi.find(openTaskCondition), // sprinttype = 2 : Active Sprint, status = 0 : open
+                        itemApi.find(closedTaskCondition) // sprinttype = 2 : Active Sprint, status = 1 : closed
                     ]);
 
                     const allTaskItems = resOpenTaskItems.concat(resClosedTaskItems);
@@ -216,7 +217,7 @@ export default defineComponent({
                         EndDate: new Date(moment(this.startdayOfWeek).add(7, "days"))
                     };
 
-                    const reslogWork = await this.logworkApi.find(logworkSearchCondition);
+                    const reslogWork = await logworkApi.find(logworkSearchCondition);
                     this.values.logWorkData = reslogWork;
 
                     if (this.selectDateRange !== "thisweek")
@@ -442,7 +443,7 @@ export default defineComponent({
                 statusId: "52523000000002619"
             };
             await app.load(async () => {
-                await this.itemApi.updateStatus(taskItemStatusParameter);
+                await itemApi.updateStatus(taskItemStatusParameter);
             })
 
             app.success(this.t("savesuccess"), 5000);

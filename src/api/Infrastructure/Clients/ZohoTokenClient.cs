@@ -52,9 +52,9 @@ namespace api.Infrastructure.Clients
             return token ?? throw new InvalidOperationException();
         }
 
-        public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string firstName)
+        public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string? firstName, string? zpUserId)
         {
-            var refreshToken = await FetchSecretRefreshToken(null, firstName);
+            var refreshToken = await FetchSecretRefreshToken(null, firstName, zpUserId);
             if (refreshToken == null) throw new OperationCanceledException();
             
             var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
@@ -84,7 +84,7 @@ namespace api.Infrastructure.Clients
 
         public async Task RevokeRefreshTokenAsync()
         {
-            var refreshToken = await FetchSecretRefreshToken(null, null);
+            var refreshToken = await FetchSecretRefreshToken();
             if (refreshToken == null) throw new OperationCanceledException();
             
             using var clientToken = new HttpClient();
@@ -135,14 +135,18 @@ namespace api.Infrastructure.Clients
             return token ?? throw new InvalidOperationException();
         }
         
-        private async Task<string> FetchSecretRefreshToken(Token? token, string? displayName)
+        private async Task<string> FetchSecretRefreshToken(Token? token = null, string? firstName = null, string? zpUserId = null)
         {
-            var firstName = displayName ?? string.Empty;
             if (token is not null)
             {
-                var teamSetting = await teamClient.GetTeamSettingAsync("signout", token.AccessToken).ConfigureAwait(false);
-                firstName = teamSetting?["firstName"]?.ToString().Replace(" ", "");
+                var settingForName =  await teamClient.GetTeamSettingAsync("signout", token?.AccessToken).ConfigureAwait(false);
+                var settingForZsUserId = await teamClient.GetTeamSettingAsync(null, token?.AccessToken).ConfigureAwait(false);
+
+                firstName = settingForName?["firstName"]?.ToString()?.Replace(" ", "");
+                zpUserId = settingForZsUserId?["zsuserId"]?.ToString();
             }
+
+            var tokenName = $"{firstName}-{zpUserId}";
 
             var secretClient = new SecretClient(
                 new Uri("https://zohotoken.vault.azure.net/"),
@@ -152,7 +156,7 @@ namespace api.Infrastructure.Clients
             try
             {
                 refreshToken = await secretClient
-                    .GetSecretAsync($"refreshtoken-{firstName}").ConfigureAwait(false);
+                    .GetSecretAsync($"refreshtoken-{tokenName}").ConfigureAwait(false);
             }
             catch (RequestFailedException e)
             {
@@ -161,7 +165,7 @@ namespace api.Infrastructure.Clients
                 {
                     refreshToken = await secretClient
                         .SetSecretAsync(
-                            $"refreshtoken-{firstName}",
+                            $"refreshtoken-{tokenName}",
                             token?.RefreshToken,
                             CancellationToken.None).ConfigureAwait(false);
                     Console.WriteLine("New secret has created");
@@ -178,8 +182,8 @@ namespace api.Infrastructure.Clients
                 {
                     var currentSecretAsync = await secretClient
                         .GetSecretAsync(
-                            $"refreshtoken-{firstName}",
-                            refreshToken.Value.Properties.Version
+                            $"refreshtoken-{tokenName}",
+                            refreshToken?.Value.Properties.Version
                         ).ConfigureAwait(false);
                     Console.WriteLine("Get current secret success");
                     
@@ -188,7 +192,7 @@ namespace api.Infrastructure.Clients
                     Console.WriteLine("Old secret has been disabled");
                     
                     refreshToken = await secretClient.SetSecretAsync(
-                        $"refreshtoken-{firstName}", token?.RefreshToken).ConfigureAwait(false);
+                        $"refreshtoken-{tokenName}", token?.RefreshToken).ConfigureAwait(false);
                     Console.WriteLine("New secret has updated");
                 }
             }
