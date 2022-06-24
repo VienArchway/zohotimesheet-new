@@ -5,6 +5,6 @@ namespace api.Infrastructure.Interfaces
 {
     public interface ITeamClient
     {
-        Task<JObject?> GetTeamSettingAsync(string action = null);
+        Task<JObject?> GetTeamSettingAsync(string action = null, string accessToken = null);
     }
 }

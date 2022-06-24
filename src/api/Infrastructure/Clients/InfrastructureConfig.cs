@@ -16,7 +16,6 @@ namespace api.Infrastructure
             services.AddScoped<ITaskItemClient, TaskItemClient>();
             services.AddScoped<IBackLogClient, BackLogClient>();
             services.AddScoped<ISprintClient, SprintClient>();
-            services.AddScoped<IUserClient, UserClient>();
             services.AddScoped<ILogWorkClient, LogWorkClient>();
             services.AddScoped<IZohoTokenClient, ZohoTokenClient>();
             services.AddScoped<IWebHookClient, WebHookClient>();

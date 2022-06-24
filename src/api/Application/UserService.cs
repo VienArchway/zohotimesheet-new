@@ -6,27 +6,23 @@ namespace api.Application
 {
     public class UserService : IUserService
     {
-        private readonly IUserClient client;
 
         private readonly ITeamClient teamClient;
 
-        public UserService(IUserClient client, ITeamClient teamClient)
+        public UserService(ITeamClient teamClient)
         {
-            this.client = client;
             this.teamClient = teamClient;
         }
 
         public async Task<User> GetCurrentUser()
         {
-            var zohoUser = await client.GetCurrentZohoUser();
+            var settingForName =  await teamClient.GetTeamSettingAsync("signout").ConfigureAwait(false);
 
-            var sprintSetting = await teamClient.GetTeamSettingAsync().ConfigureAwait(false);
+            var settingForZsUserId = await teamClient.GetTeamSettingAsync().ConfigureAwait(false);
 
             var user = new User();
-            user.DisplayName = zohoUser?.DisplayName;
-            user.EmailId = zohoUser?.Email;
-            user.FirstName = zohoUser?.FirstName;
-            user.ZSUserId = sprintSetting["zsuserId"].ToString();
+            user.FirstName = settingForName?["firstName"]?.ToString();
+            user.ZSUserId = settingForZsUserId?["zsuserId"]?.ToString();
 
             return user;
         }

@@ -20,10 +20,11 @@ export function useHandleCallBack() {
         }
         
         // revoke token
+        debugger
         if (route.query?.revoke) {
-            const displayName = localStorage.getItem('displayName')
-            if (displayName) {
-                const { accessToken } = await getAccessTokenByRefreshTokenApi(displayName)
+            const firstName = localStorage.getItem('firstName')
+            if (firstName) {
+                const { accessToken } = await getAccessTokenByRefreshTokenApi(firstName)
                 if (accessToken) {
                     localStorage.setItem('authorized', true)
                     window.location.href = '/'
@@ -49,7 +50,7 @@ export function useHandleCallBack() {
 
             localStorage.setItem('authorized', true)
             var user = await getCurrentUser()
-            localStorage.setItem('displayName', user.displayName)
+            localStorage.setItem('firstName', user.firstName)
             localStorage.setItem('zsUserId', user.zsUserId)
             
             window.location.href = '/'

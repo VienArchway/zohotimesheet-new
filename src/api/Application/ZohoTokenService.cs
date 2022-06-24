@@ -18,9 +18,9 @@ namespace api.Application
             return client.GetAccessTokenAsync(code);
         }
 
-        public Task<Token> GetAccessTokenFromRefreshTokenAsync(string displayName)
+        public Task<Token> GetAccessTokenFromRefreshTokenAsync(string firstName)
         {
-            return client.GetAccessTokenFromRefreshTokenAsync(displayName);
+            return client.GetAccessTokenFromRefreshTokenAsync(firstName);
         }
 
         public Task<Token> GetAdminAccessTokenAsync()

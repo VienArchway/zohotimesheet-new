@@ -6,7 +6,7 @@ const { t } = useI18n()
 const userName = ref(null)
 
 onMounted(() => {
-  userName.value = localStorage.getItem('displayName')
+  userName.value = localStorage.getItem('firstName')
 })
 
 </script>

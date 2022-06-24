@@ -12,12 +12,12 @@ namespace api.Infrastructure.Clients
 {
     public class ZohoTokenClient: ZohoServiceClient, IZohoTokenClient
     {
-        private IUserClient userClient;
+        private ITeamClient teamClient;
 
-        public ZohoTokenClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider,IUserClient userClient)
+        public ZohoTokenClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider, ITeamClient teamClient)
             : base(client, configuration, svcProvider)
         {
-            this.userClient = userClient;
+            this.teamClient = teamClient;
         }
 
         public async Task<Token> GetAccessTokenAsync(string code)
@@ -52,9 +52,9 @@ namespace api.Infrastructure.Clients
             return token ?? throw new InvalidOperationException();
         }
 
-        public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string displayName)
+        public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string firstName)
         {
-            var refreshToken = await FetchSecretRefreshToken(null, displayName);
+            var refreshToken = await FetchSecretRefreshToken(null, firstName);
             if (refreshToken == null) throw new OperationCanceledException();
             
             var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
@@ -140,8 +140,8 @@ namespace api.Infrastructure.Clients
             var firstName = displayName ?? string.Empty;
             if (token is not null)
             {
-                var zohoUser = await userClient.GetCurrentZohoUser(token.AccessToken).ConfigureAwait(false);
-                firstName = zohoUser?.FirstName?.Replace(" ","");
+                var teamSetting = await teamClient.GetTeamSettingAsync("signout", token.AccessToken).ConfigureAwait(false);
+                firstName = teamSetting?["firstName"]?.ToString().Replace(" ", "");
             }
 
             var secretClient = new SecretClient(
