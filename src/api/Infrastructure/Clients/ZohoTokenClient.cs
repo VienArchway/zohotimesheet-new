@@ -52,9 +52,9 @@ namespace api.Infrastructure.Clients
             return token ?? throw new InvalidOperationException();
         }
 
-        public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string? firstName, string? zpUserId)
+        public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string? firstName, string? zsUserId)
         {
-            var refreshToken = await FetchSecretRefreshToken(null, firstName, zpUserId);
+            var refreshToken = await FetchSecretRefreshToken(null, firstName, zsUserId);
             if (refreshToken == null) throw new OperationCanceledException();
             
             var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
@@ -135,7 +135,7 @@ namespace api.Infrastructure.Clients
             return token ?? throw new InvalidOperationException();
         }
         
-        private async Task<string> FetchSecretRefreshToken(Token? token = null, string? firstName = null, string? zpUserId = null)
+        private async Task<string> FetchSecretRefreshToken(Token? token = null, string? firstName = null, string? zsUserId = null)
         {
             if (token is not null)
             {
@@ -143,10 +143,10 @@ namespace api.Infrastructure.Clients
                 var settingForZsUserId = await teamClient.GetTeamSettingAsync(null, token?.AccessToken).ConfigureAwait(false);
 
                 firstName = settingForName?["firstName"]?.ToString()?.Replace(" ", "");
-                zpUserId = settingForZsUserId?["zsuserId"]?.ToString();
+                zsUserId = settingForZsUserId?["zsuserId"]?.ToString();
             }
 
-            var tokenName = $"{firstName}-{zpUserId}";
+            var tokenName = $"{firstName}-{zsUserId}";
 
             var secretClient = new SecretClient(
                 new Uri("https://zohotoken.vault.azure.net/"),

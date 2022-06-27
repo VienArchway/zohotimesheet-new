@@ -38,9 +38,9 @@ public class ZohoTokenController : ControllerBase
     
     [HttpGet("refresh-access-token")]
     [ProducesResponseType(typeof(Token), 200)]
-    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync([FromQuery] string firstName, [FromQuery] string zpUserId)
+    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync([FromQuery] string firstName, [FromQuery] string zsUserId)
     {
-        var result = await service.GetAccessTokenFromRefreshTokenAsync(firstName, zpUserId).ConfigureAwait(false);
+        var result = await service.GetAccessTokenFromRefreshTokenAsync(firstName, zsUserId).ConfigureAwait(false);
         var cookieOptions = new CookieOptions
         {
             // Secure = true,

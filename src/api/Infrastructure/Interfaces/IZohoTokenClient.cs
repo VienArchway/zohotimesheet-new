@@ -8,7 +8,7 @@ namespace api.Infrastructure.Interfaces
     {
         Task<Token> GetAccessTokenAsync(string code);
 
-        Task<Token> GetAccessTokenFromRefreshTokenAsync(string? firstName, string? zpUserId);
+        Task<Token> GetAccessTokenFromRefreshTokenAsync(string? firstName, string? zsUserId);
 
         Task<Token> GetAdminAccessTokenAsync();
 

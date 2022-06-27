@@ -22,9 +22,9 @@ export function useHandleCallBack() {
         // revoke token
         if (route.query?.revoke) {
             const firstName = localStorage.getItem('firstName')
-            const zpUserId = localStorage.getItem('zpUserId')
-            if (firstName && zpUserId) {
-                const { accessToken } = await getAccessTokenByRefreshTokenApi(firstName, zpUserId)
+            const zsUserId = localStorage.getItem('zsUserId')
+            if (firstName && zsUserId) {
+                const { accessToken } = await getAccessTokenByRefreshTokenApi(firstName, zsUserId)
                 if (accessToken) {
                     localStorage.setItem('authorized', true)
                     window.location.href = '/'
