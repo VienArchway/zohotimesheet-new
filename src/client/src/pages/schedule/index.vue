@@ -44,7 +44,6 @@
 </template>
 
 <script>
-import "./index.scss"
 import moment from "moment"
 import zohoScheduleApi from '@/api/resources/zohoschedule'
 import appStore from '@/store/app.js'

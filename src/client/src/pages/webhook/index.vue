@@ -37,7 +37,6 @@
 
 
 <script>
-import "./index.scss";
 import webhookApi from '@/api/resources/webhook'
 import appStore from '@/store/app.js'
 import { defineComponent } from 'vue'

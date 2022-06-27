@@ -171,7 +171,6 @@
   </v-container>
 </template>
 <script>
-import "./index.scss"
 import moment from "moment"
 import adlsApi from '@/api/resources/adls'
 import projectApi from '@/api/resources/project'

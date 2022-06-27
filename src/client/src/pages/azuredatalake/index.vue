@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="adls-table">
     <v-row>
         <v-col cols="9">
             <v-text-field
@@ -126,7 +126,6 @@
 </template>
 
 <script>
-import "./index.scss";
 import adlsApi from '@/api/resources/adls'
 import appStore from '@/store/app.js'
 import { defineComponent } from 'vue'

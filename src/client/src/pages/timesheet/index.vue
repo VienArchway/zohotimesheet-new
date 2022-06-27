@@ -1,5 +1,5 @@
 <template>
-  <div>    
+  <div class="time-sheet">    
     <v-table
         fixed-header
         fixed-footer
