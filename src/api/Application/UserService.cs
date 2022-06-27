@@ -21,7 +21,7 @@ namespace api.Application
             var settingForZsUserId = await teamClient.GetTeamSettingAsync().ConfigureAwait(false);
 
             var user = new User();
-            user.FirstName = settingForName?["firstName"]?.ToString();
+            user.FirstName = settingForName?["firstName"]?.ToString().Replace(" ","");
             user.ZSUserId = settingForZsUserId?["zsuserId"]?.ToString();
 
             return user;
