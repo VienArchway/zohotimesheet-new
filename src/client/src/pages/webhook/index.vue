@@ -40,8 +40,8 @@
 import "./index.scss";
 import webhookApi from '@/api/resources/webhook'
 import appStore from '@/store/app.js'
-import { useI18n } from 'vue-i18n'
 import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const app = appStore()
 
@@ -52,7 +52,6 @@ export default defineComponent({
     },
     data() {
         return {
-            // currentLocale: this.$i18n.locale,
             logItemFilter: "",
             webhookStatus: {
                 disable: 1,
@@ -81,8 +80,7 @@ export default defineComponent({
     async created() {
         try {
             await app.load(async () => {
-                const resWebHook = await webhookApi.getAll();
-                this.items = resWebHook;
+              this.items = await webhookApi.getAll();
             })
         }
         catch (error) {
@@ -98,10 +96,9 @@ export default defineComponent({
         async updateStatus(item) {
             try {
                 await app.load(async () => {
-                    const resWebHook = await webhookApi.update({ WebHookId: item.webHookId, HookStatus: this.webhookStatus.enable}); 
-                    this.items = resWebHook;
+                  this.items = await webhookApi.update({ WebHookId: item.webHookId, HookStatus: this.webhookStatus.enable}); 
                 })
-            }catch (error) {
+            } catch (error) {
                 const resMessage = error.response?.data?.message;
                 const errorDetail = JSON.parse(resMessage);
                 if (errorDetail) {
@@ -117,8 +114,3 @@ export default defineComponent({
     }
 })
 </script>
-
-<route lang="yaml">
-meta:
-layout: default
-</route>

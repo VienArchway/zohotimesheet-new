@@ -125,17 +125,12 @@
   </div>
 </template>
 
-<route lang="yaml">
-meta:
-  layout: default
-</route>
-
 <script>
 import "./index.scss";
 import adlsApi from '@/api/resources/adls'
 import appStore from '@/store/app.js'
-import { useI18n } from 'vue-i18n'
 import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const app = appStore()
 
@@ -146,7 +141,6 @@ export default defineComponent({
     },
     data() {
         return {
-            // currentLocale: this.$i18n.locale,
             logItemFilter: "",
             adlsStatus: {
                 disable: 1,

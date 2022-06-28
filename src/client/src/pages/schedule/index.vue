@@ -43,32 +43,23 @@
   </div>
 </template>
 
-<route lang="yaml">
-meta:
-  layout: default
-</route>
-
 <script>
 import "./index.scss"
 import moment from "moment"
 import zohoScheduleApi from '@/api/resources/zohoschedule'
-import appStore from '@/store/app'
-import { useI18n } from 'vue-i18n'
+import appStore from '@/store/app.js'
 import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const app = appStore()
 
 export default defineComponent({
-    name: "schedule",
     setup() {
       const { t } = useI18n()
       return { t }
     },
     data() {
         return {
-            urls: {
-                zohoScheduleApi: "api/zohoschedule"
-            },
             time: null,
             isShowTime: false,
             types: [
@@ -86,9 +77,8 @@ export default defineComponent({
     },
     async created() {
         await app.load(async () => {
-            const response = await zohoScheduleApi.get();
-            this.values.schedule = response;
-            this.convertLastRunToLocalTime();
+          this.values.schedule = await zohoScheduleApi.get();
+          this.convertLastRunToLocalTime();
         })
     },
     methods: {
@@ -107,16 +97,14 @@ export default defineComponent({
                 schedule.Time = time;
                 schedule.Type = type;
                 
-                const response = await zohoScheduleApi.start(schedule);
-                this.values.schedule = response;
+                this.values.schedule = await zohoScheduleApi.start(schedule);
                 this.convertLastRunToLocalTime();
             })
             app.success(this.t("schedulesave"), 5000);
         },
         async stopSchedule() {
             await app.load(async () => {
-                const response = await zohoScheduleApi.stop();
-                this.values.schedule = response;
+                this.values.schedule = await zohoScheduleApi.stop();
                 this.convertLastRunToLocalTime();
                 if (!this.values.schedule.type) {
                     this.values.schedule.type = "TIME";

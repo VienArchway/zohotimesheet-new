@@ -150,6 +150,7 @@ import itemApi from '@/api/resources/item'
 import appStore from '@/store/app.js'
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
+
 const app = appStore()
 
 export default defineComponent({
@@ -225,9 +226,7 @@ export default defineComponent({
                         EndDate: new Date(moment(this.startdayOfWeek).add(7, "days"))
                     };
 
-                    const reslogWork = await logworkApi.find(logworkSearchCondition);
-                    this.values.logWorkData = reslogWork;
-
+                    this.values.logWorkData = await logworkApi.find(logworkSearchCondition);
                     if (this.selectDateRange !== "thisweek")
                     {
                         const extraTaskData = _.filter(this.values.logWorkData, (logWorkitem) => { return !_.find(allTaskItems, (task) => { return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0; }); });
@@ -474,8 +473,3 @@ export default defineComponent({
     }
 })
 </script>
-
-<route lang="yaml">
-meta:
-  layout: default
-</route>

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using api.Infrastructure.Interfaces;
@@ -10,8 +11,6 @@ namespace api.Services.Security;
 public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticationSchema>
 {
     private readonly ITeamClient teamClient;
-
-    private string archwayTeamId;
     
     public ZohoAuthenticationHandler(
         ITeamClient teamClient,
@@ -23,28 +22,27 @@ public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticatio
         : base(options, logger, encoder, clock)
     {
         this.teamClient = teamClient;
-        this.archwayTeamId = configuration.GetValue<string>("Zoho:TeamId");
     }
 
-    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+    protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var endpoint = Context.GetEndpoint();
         
         // handle if controller have not required authorized annotation
         if (endpoint?.Metadata?.GetMetadata<IAuthorizeData>() == null)
         {
-            return Task.FromResult(AuthenticateResult.NoResult());
+            return AuthenticateResult.NoResult();
         }
 
         var fetchTeam = teamClient.GetTeamSettingAsync("signout").GetAwaiter().GetResult();
         if (fetchTeam == null)
         {
-            return Task.FromResult(AuthenticateResult.Fail($"Wrong access token"));
+            return AuthenticateResult.Fail($"Wrong access token");
         }
         
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, fetchTeam?["firstName"].ToString()),
+            // new Claim(ClaimTypes.NameIdentifier, fetchTeam?["firstName"].ToString()),
             new Claim(ClaimTypes.Name, "Name"),
         };
 
@@ -52,6 +50,6 @@ public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticatio
         var principal = new ClaimsPrincipal(id);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-        return Task.FromResult(AuthenticateResult.Success(ticket));
+        return AuthenticateResult.Success(ticket);
     }
 }
