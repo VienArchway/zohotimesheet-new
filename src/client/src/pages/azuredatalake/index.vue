@@ -125,11 +125,6 @@
   </div>
 </template>
 
-<route lang="yaml">
-meta:
-  layout: default
-</route>
-
 <script>
 import "./index.scss";
 import adlsApi from '@/api/resources/adls'
@@ -146,7 +141,6 @@ export default defineComponent({
     },
     data() {
         return {
-            // currentLocale: this.$i18n.locale,
             logItemFilter: "",
             adlsStatus: {
                 disable: 1,
