@@ -24,32 +24,32 @@ public class ZohoAuthenticationHandler : AuthenticationHandler<ZohoAuthenticatio
         this.teamClient = teamClient;
     }
 
-    protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var endpoint = Context.GetEndpoint();
         
         // handle if controller have not required authorized annotation
         if (endpoint?.Metadata?.GetMetadata<IAuthorizeData>() == null)
         {
-            return AuthenticateResult.NoResult();
-        }
-
-        var fetchTeam = teamClient.GetTeamSettingAsync("signout").GetAwaiter().GetResult();
-        if (fetchTeam == null)
-        {
-            return AuthenticateResult.Fail($"Wrong access token");
+            return Task.FromResult(AuthenticateResult.NoResult());
         }
         
         var claims = new[]
         {
-            // new Claim(ClaimTypes.NameIdentifier, fetchTeam?["firstName"].ToString()),
             new Claim(ClaimTypes.Name, "Name"),
         };
 
         var id = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(id);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
-
-        return AuthenticateResult.Success(ticket);
+        
+        // var sessionToken = Request.Cookies.FirstOrDefault(t => t.Key.Contains("accessToken"));
+        // if (!string.IsNullOrEmpty(sessionToken.Value))
+        // {
+        //     return Task.FromResult(AuthenticateResult.Success(ticket));
+        // }
+        
+        var fetchTeam = teamClient.GetTeamSettingAsync("signout").GetAwaiter().GetResult();
+        return Task.FromResult(fetchTeam == null ? AuthenticateResult.Fail($"Wrong access token") : AuthenticateResult.Success(ticket));
     }
 }
