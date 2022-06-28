@@ -7,12 +7,13 @@ using System.Security.Authentication;
 using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using StringWithQualityHeaderValue = System.Net.Http.Headers.StringWithQualityHeaderValue;
 
 namespace api.Infrastructure.Clients
 {
     public class ZohoTokenClient: ZohoServiceClient, IZohoTokenClient
     {
-        private ITeamClient teamClient;
+        private readonly ITeamClient teamClient;
 
         public ZohoTokenClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider, ITeamClient teamClient)
             : base(client, configuration, svcProvider)
@@ -54,7 +55,7 @@ namespace api.Infrastructure.Clients
 
         public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string? firstName, string? zsUserId)
         {
-            var refreshToken = await FetchSecretRefreshToken(null, firstName, zsUserId);
+            var refreshToken = await FetchSecretRefreshToken(null, firstName, zsUserId).ConfigureAwait(false);
             if (refreshToken == null) throw new OperationCanceledException();
             
             var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
@@ -139,13 +140,13 @@ namespace api.Infrastructure.Clients
         {
             if (token is not null)
             {
-                var settingForName =  await teamClient.GetTeamSettingAsync("signout", token?.AccessToken).ConfigureAwait(false);
-                var settingForZsUserId = await teamClient.GetTeamSettingAsync(null, token?.AccessToken).ConfigureAwait(false);
+                var settingForName =  teamClient.GetTeamSettingAsync("signout", token?.AccessToken);
+                var settingForZsUserId = teamClient.GetTeamSettingAsync(null, token?.AccessToken);
+                await Task.WhenAll(settingForName, settingForZsUserId).ConfigureAwait(false);
 
-                firstName = settingForName?["firstName"]?.ToString()?.Replace(" ", "");
-                zsUserId = settingForZsUserId?["zsuserId"]?.ToString();
+                firstName = settingForName.Result?["firstName"]?.ToString()?.Replace(" ", "");
+                zsUserId = settingForZsUserId.Result?["zsuserId"]?.ToString();
             }
-
             var tokenName = $"{firstName}-{zsUserId}";
 
             var secretClient = new SecretClient(
