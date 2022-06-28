@@ -47,9 +47,9 @@
 import "./index.scss"
 import moment from "moment"
 import zohoScheduleApi from '@/api/resources/zohoschedule'
-import appStore from '@/store/app'
-import {useI18n} from 'vue-i18n'
-import {defineComponent} from 'vue'
+import appStore from '@/store/app.js'
+import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const app = appStore()
 
