@@ -1,149 +1,155 @@
 <template>
-  <div class="time-sheet">    
+  <div class="time-sheet">
+    <v-toolbar style="background-color: #009688;">
+      <div class="d-flex align-center justify-space-around">
+        <v-select
+            v-model="selectDateRange"
+            :items="dateRanges"
+            :label="t('completeon')"
+            @update:modelValue="changeWeek"
+            item-title="text"
+            item-value="value"
+            class="mt-10"
+        />
+        <v-tooltip location="end">
+          <template v-slot:activator="{ props }">
+            <v-btn
+                v-bind="props"
+                icon="mdi-information-outline"
+                variant="text"
+                size="20px"
+                class="ma-2"
+            />
+          </template>
+          <span color="black">
+              <p>{{ t("thisweekinformation")}}</p>
+              <p>{{ t("lastweekinformation")}}</p>
+            </span>
+        </v-tooltip>
+        <v-tooltip location="end">
+          <template v-slot:activator="{ props }">
+            <v-btn
+                class="ma-2"
+                v-bind="props"
+                @click="refreshCompleteOn"
+            >
+              <v-icon start icon="mdi-sync" />
+              {{ t("button.refresh") }}
+            </v-btn>
+          </template>
+          <span>{{ t("reloadData")}}</span>
+        </v-tooltip>
+      </div>
+      <v-spacer></v-spacer>
+      <div class="d-flex justify-space-around">
+        <v-menu location="start">
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-dots-vertical" />
+          </template>
+          <v-list nav dense>
+            <v-list-title>Select date</v-list-title>
+            <v-list-item v-for="(date) in daysOfWeek">
+              <v-checkbox
+                  v-model="selecteddayOfWeek"
+                  :key="`chk-${date.dayOfWeek}`"
+                  :label="date.dayOfWeek"
+                  :value="date.dayOfWeek"
+                  class="my-n4"
+                  dark
+                  hide-details
+              />
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </div>
+    </v-toolbar>
     <v-table
         fixed-header
         fixed-footer
-        height="800px">
-        <thead>
-            <tr>
-                <th colspan="2">
-                    <v-row justify="start">
-                        <v-select
-                            v-model="selectDateRange"
-                            :items="dateRanges"
-                            :label="t('completeon')"
-                            @update:modelValue="changeWeek"
-                            item-title="text"
-                            item-value="value"
-                        />
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ props }">
-                                <v-icon style="margin-top: 20px;"
-                                    dark
-                                    icon="mdi-information-outline"
-                                    v-bind="props"
-                                    size="35px"
-                                />
-                            </template>
-                            <span>
-                                <p>{{ t("thisweekinformation")}}
-                                </p>
-                                <p>{{ t("lastweekinformation")}}
-                                </p>
-                            </span>
-                        </v-tooltip>
-                    </v-row>
-                </th>
-                <th colspan="3"></th>
-                <th :colspan="totalDateColumn">
-                    <v-row justify="start">
-                        <v-checkbox
-                            v-for="(date) in daysOfWeek"
-                            v-model="selecteddayOfWeek"
-                            :key="`chk-${date.dayOfWeek}`"
-                            :label="date.dayOfWeek"
-                            :value="date.dayOfWeek"
-                            class="ma-0 chkdate"
-                            dark
-                            hide-details
-                    />
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ props }">
-                                <v-icon style="margin-top: 10px;"
-                                    dark
-                                    icon="mdi-sync"
-                                    v-bind="props"
-                                    size="35px"
-                                    @click="refreshCompleteOn"
-                                />
-                            </template>
-                            <span>{{ t("reloadData")}}</span>
-                        </v-tooltip>
-                    </v-row>
-                </th>
-            </tr>
-            <tr>
-                <th width="20%">{{ t("project") }}</th>
-                <th width="25%">{{ t("item") }}</th>
-                <th width="5%">{{ t("status") }}</th>
-                <th width="5%">{{ t("done") }}</th>
-                <th>{{ t("estimatepoints") }}</th>
-                <th 
-                    v-for="(date, dateIndex) in daysOfWeek"
-                    :key="`date-${dateIndex}`"
-                    v-show="selecteddayOfWeek.includes(date.dayOfWeek)">
-                    {{ date.dayOfWeek }}
-                    <br/> {{ date.shortdate }}
-                </th>
-            </tr>
-        </thead>
-        <tbody v-for="(proj, index) in values.data" :key="`project-${index}`">
-                <tr >
-                <td :rowspan="proj.tasks.length ? (proj.tasks.length + 1) : 1">
-                    <a :href="`${zohoSprintLink}#board/P${proj.projNo}`" target="_blank">{{ proj.name }}</a>
-                </td>
-            </tr>
-            <tr v-for="(task, taskIndex) in proj.tasks" :key="`task-${index}-${taskIndex}`">
-                <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
-                    <v-icon v-if="task.projItemName === 'Task'" color="blue" small icon="mdi-file"></v-icon>
-                    <v-icon v-else-if="task.projItemName === 'Bug'" color="pink" small icon="mdi-bug"></v-icon>
-                    <v-icon v-else-if="task.projItemName === 'Story'" color="green" small icon="mdi-flag"></v-icon>
-                    <a :href="`${zohoSprintLink}#itemdetails/P${proj.projNo}/I${task.itemNo}`" target="_blank" class="pl-2">
-                        {{ task.itemName }}
-                    </a>
-                </td>
-                <td>
-                    <v-chip v-show="!['To do', 'In progress', 'Done'].includes(task.statusName)" color="yellow darken-4" text-color="white">Unknown</v-chip>
-                    <v-chip v-show="task.statusName === 'To do'" color="pink" text-color="white">To do</v-chip>
-                    <v-chip v-show="task.statusName === 'In progress'" color="blue darken-4" text-color="white">In progress</v-chip>
-                    <v-chip v-show="task.statusName === 'Done'" color="teal" text-color="white">Done</v-chip>
-                </td>
-                <td class="text-center">
-                    <v-icon
-                        v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done'"
-                        color="light-blue darken-4" @click="updateStatus(task)"
-                        dark fab x-small
-                        icon="mdi-check-outline"
-                        start
-                    >
-                    </v-icon>
-                </td>
-                <td>{{ task.estimatePoint }}</td>
-                <td v-for="(logWork, logWorkIndex) in task.logWorks" :key="`logwork-${logWorkIndex}`" v-show="selecteddayOfWeek.includes(logWork.dayOfWeek)">
-                    <div v-for="log in logWork.logs" :key="`log-${log.id}`" class="logWork-logs d-flex">
-                        <v-text-field
-                            type="number"
-                            v-model="log.logTime" 
-                            :disabled="logWork.isDisabled"
-                            :class="`input-${logWork.dayOfWeek}`" 
-                            hide-details
-                            dense
-                            outlined
-                            @focus='saveOldLogTime(log.logTime)'
-                            @blur='save($event, task, logWork, log)'>
-                        </v-text-field>
-                        <v-progress-circular indeterminate class="ml-2 d-none"/>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="5" class="has-background-info">{{ t("total") }}</td>
-                <td class="has-background-info"
-                    v-for="(date, dateIndex) in daysOfWeek"
-                    v-show="selecteddayOfWeek.includes(date.dayOfWeek)"
-                    :ref="`total-${date.dayOfWeek}`"
-                    :key="`total-${dateIndex}`">
-                    {{ date.total }}
-                </td>
-            </tr>
-        </tfoot>
+        height="750">
+      <thead>
+      <tr>
+        <th width="20%">{{ t("project") }}</th>
+        <th width="25%">{{ t("item") }}</th>
+        <th width="5%">{{ t("status") }}</th>
+        <th width="5%">{{ t("done") }}</th>
+        <th>{{ t("estimatepoints") }}</th>
+        <th
+            v-for="(date, dateIndex) in daysOfWeek"
+            :key="`date-${dateIndex}`"
+            v-show="selecteddayOfWeek.includes(date.dayOfWeek)">
+          {{ date.dayOfWeek }}
+          <br/> {{ date.shortdate }}
+        </th>
+      </tr>
+      </thead>
+      <tbody v-for="(proj, index) in values.data" :key="`project-${index}`">
+      <tr >
+        <td :rowspan="proj.tasks.length ? (proj.tasks.length + 1) : 1">
+          <a :href="`${zohoSprintLink}#board/P${proj.projNo}`" target="_blank">{{ proj.name }}</a>
+        </td>
+      </tr>
+      <tr v-for="(task, taskIndex) in proj.tasks" :key="`task-${index}-${taskIndex}`">
+        <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
+          <v-icon v-if="task.projItemName === 'Task'" color="blue" small icon="mdi-file"></v-icon>
+          <v-icon v-else-if="task.projItemName === 'Bug'" color="pink" small icon="mdi-bug"></v-icon>
+          <v-icon v-else-if="task.projItemName === 'Story'" color="green" small icon="mdi-flag"></v-icon>
+          <a :href="`${zohoSprintLink}#itemdetails/P${proj.projNo}/I${task.itemNo}`" target="_blank" class="pl-2">
+            {{ task.itemName }}
+          </a>
+        </td>
+        <td>
+          <v-chip v-show="!['To do', 'In progress', 'Done'].includes(task.statusName)" color="yellow darken-4" text-color="white">Unknown</v-chip>
+          <v-chip v-show="task.statusName === 'To do'" color="pink" text-color="white">To do</v-chip>
+          <v-chip v-show="task.statusName === 'In progress'" color="blue darken-4" text-color="white">In progress</v-chip>
+          <v-chip v-show="task.statusName === 'Done'" color="teal" text-color="white">Done</v-chip>
+        </td>
+        <td class="text-center">
+          <v-icon
+              v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done'"
+              color="light-blue darken-4" @click="updateStatus(task)"
+              dark fab x-small
+              icon="mdi-check-outline"
+              start
+          >
+          </v-icon>
+        </td>
+        <td>{{ task.estimatePoint }}</td>
+        <td v-for="(logWork, logWorkIndex) in task.logWorks" :key="`logwork-${logWorkIndex}`" v-show="selecteddayOfWeek.includes(logWork.dayOfWeek)">
+          <div v-for="log in logWork.logs" :key="`log-${log.id}`" class="logWork-logs d-flex">
+            <v-text-field
+                type="number"
+                v-model="log.logTime"
+                :disabled="logWork.isDisabled"
+                :class="`input-${logWork.dayOfWeek}`"
+                hide-details
+                dense
+                outlined
+                @focus='saveOldLogTime(log.logTime)'
+                @blur='save($event, task, logWork, log)'>
+            </v-text-field>
+            <v-progress-circular indeterminate class="ml-2 d-none"/>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+      <tfoot>
+      <tr>
+        <td colspan="5" class="has-background-info">{{ t("total") }}</td>
+        <td class="has-background-info"
+            v-for="(date, dateIndex) in daysOfWeek"
+            v-show="selecteddayOfWeek.includes(date.dayOfWeek)"
+            :ref="`total-${date.dayOfWeek}`"
+            :key="`total-${dateIndex}`">
+          {{ date.total }}
+        </td>
+      </tr>
+      </tfoot>
     </v-table>
   </div>
 </template>
 <script>
-import "./index.scss"
+import './index.scss'
 import moment from "moment"
 import logworkApi from '@/api/resources/logwork'
 import itemApi from '@/api/resources/item'
@@ -474,5 +480,31 @@ export default defineComponent({
 })
 </script>
 <style scoped>
-@import "./index.scss";
+.view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+}
+
+.card-top {
+  padding: 20px;
+}
+
+.table-container {
+  display: flex;
+  margin-top: 20px;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.flex-table {
+  display: flex;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.flex-table > div {
+  width: 100%;
+}
 </style>

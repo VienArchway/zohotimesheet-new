@@ -44,6 +44,13 @@
       color: #ffffff !important;
     }
 
+    thead tr {
+      bottom: 0;
+      position: -webkit-sticky;
+      position: sticky;
+      z-index: 4;
+    }
+
     /* Chrome, Safari, Edge, Opera */
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
