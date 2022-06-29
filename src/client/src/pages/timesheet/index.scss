@@ -18,8 +18,8 @@
 
     thead tr {
       th {
-        background-color: #009688 !important;
-        color: #ffffff !important;
+        background-color: #f6f6f6 !important;
+        color: #009688 !important;
       }
 
       :first-child {
@@ -40,8 +40,9 @@
       position: -webkit-sticky;
       position: sticky;
       z-index: 4;
-      background-color: #2196F3 !important;
-      color: #ffffff !important;
+      background-color: #f6f6f6 !important;
+      color: #009688 !important;
+      font-weight: bold;
     }
 
     thead tr {

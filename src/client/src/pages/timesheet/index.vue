@@ -1,6 +1,6 @@
 <template>
   <div class="time-sheet">
-    <v-toolbar style="background-color: #009688;">
+    <v-toolbar style="background-color: #f6f6f6; color: #009688">
       <div class="d-flex align-center justify-space-around">
         <v-select
             v-model="selectDateRange"
