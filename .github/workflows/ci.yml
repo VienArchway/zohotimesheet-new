@@ -56,6 +56,7 @@ jobs:
 
       - name: Upload build dist
         uses: actions/upload-artifact@v3
+        if: github.event.pull_request.merged == true
         with:
           name: dist
           path: ${{ github.workspace }}/src/client/dist
@@ -97,14 +98,22 @@ jobs:
 
       - name: Upload publish 
         uses: actions/upload-artifact@v3
+        if: github.event.pull_request.merged == true
         with:
           name: publish
           path: ${{ github.workspace }}/src/api/bin/Release/net6.0/publish/
   
   
-  create-and-copy-dist-to-prod:
-    name: Copy to prod
-    if: ${{ always() }}
+  validate-branch-deploy:
+    name: validate branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: print current branch name
+        run: echo ${{ github.head_ref || github.ref_name }}
+  
+  initialize-deploy-to-ACR:
+    if: github.event.pull_request.merged == true
+    name: create prod and prepare to deploy
     needs: [client-build, api-build]
     runs-on: ubuntu-latest
     steps:
@@ -135,11 +144,11 @@ jobs:
           name: prod
           path: ${{ github.workspace }}/prod
 
-  build-and-deploy:
+  validate-principle-auth-and-deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     name: Create image and push to ACR
-    needs: create-and-copy-dist-to-prod
+    needs: initialize-deploy-to-ACR
     steps:
       - uses: actions/checkout@main
       - name: create prod dir

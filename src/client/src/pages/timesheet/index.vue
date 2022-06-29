@@ -1,479 +1,858 @@
 <template>
-  <div class="time-sheet">    
+  <div class="time-sheet" ref="refTimeSheet">
+    <v-toolbar
+        class="px-0"
+        style="background-color: #f6f6f6; color: #009688">
+      <div class="d-flex align-center justify-space-around">
+        <v-select
+            v-model="selectDateRange"
+            :items="dateRanges"
+            :label="t('completeon')"
+            @update:modelValue="changeWeek"
+            item-title="text"
+            item-value="value"
+            class="mt-10"
+        />
+        <v-tooltip location="end">
+          <template v-slot:activator="{ props }">
+            <v-btn
+                v-bind="props"
+                icon="mdi-information-outline"
+                variant="text"
+                size="20px"
+                class="ma-2"
+            />
+          </template>
+          <span color="black">
+              <p>{{ t("thisweekinformation")}}</p>
+              <p>{{ t("lastweekinformation")}}</p>
+            </span>
+        </v-tooltip>
+      </div>
+      <v-spacer></v-spacer>
+      <div class="d-flex justify-space-around mr-1">
+        <v-tooltip location="top">
+          <template v-slot:activator="{ props }">
+            <v-btn
+                class="ma-2 text-capitalize"
+                v-bind="props"
+                @click="refreshCompleteOn"
+            >
+              <v-icon start icon="mdi-sync" />
+              {{ t("button.refresh") }}
+            </v-btn>
+          </template>
+          <span>{{ t("reloadData")}}</span>
+        </v-tooltip>
+        <v-menu
+            location="start"
+            :close-on-content-click="false"
+        >
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-dots-vertical" />
+          </template>
+          <v-card min-width="130">
+            <v-list nav dense>
+              <h5 class="text-blue">{{ t('dayOfWeeks') }}</h5>
+              <v-list-item v-for="(date) in daysOfWeek">
+                <v-checkbox
+                    v-model="selecteddayOfWeek"
+                    :key="`chk-${date.dayOfWeek}`"
+                    :label="date.dayOfWeek"
+                    :value="date.dayOfWeek"
+                    class="my-n4"
+                    dark
+                    hide-details
+                />
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </v-menu>
+      </div>
+    </v-toolbar>
     <v-table
         fixed-header
         fixed-footer
-        height="800px">
-        <thead>
-            <tr>
-                <th colspan="2">
-                    <v-row justify="start">
-                        <v-select
-                            v-model="selectDateRange"
-                            :items="dateRanges"
-                            :label="t('completeon')"
-                            @update:modelValue="changeWeek"
-                            item-title="text"
-                            item-value="value"
-                        />
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ props }">
-                                <v-icon style="margin-top: 20px;"
-                                    dark
-                                    icon="mdi-information-outline"
-                                    v-bind="props"
-                                    size="35px"
-                                />
-                            </template>
-                            <span>
-                                <p>{{ t("thisweekinformation")}}
-                                </p>
-                                <p>{{ t("lastweekinformation")}}
-                                </p>
-                            </span>
-                        </v-tooltip>
-                    </v-row>
-                </th>
-                <th colspan="3"></th>
-                <th :colspan="totalDateColumn">
-                    <v-row justify="start">
-                        <v-checkbox
-                            v-for="(date) in daysOfWeek"
-                            v-model="selecteddayOfWeek"
-                            :key="`chk-${date.dayOfWeek}`"
-                            :label="date.dayOfWeek"
-                            :value="date.dayOfWeek"
-                            class="ma-0 chkdate"
-                            dark
-                            hide-details
-                    />
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ props }">
-                                <v-icon style="margin-top: 10px;"
-                                    dark
-                                    icon="mdi-sync"
-                                    v-bind="props"
-                                    size="35px"
-                                    @click="refreshCompleteOn"
-                                />
-                            </template>
-                            <span>{{ t("reloadData")}}</span>
-                        </v-tooltip>
-                    </v-row>
-                </th>
-            </tr>
-            <tr>
-                <th width="20%">{{ t("project") }}</th>
-                <th width="25%">{{ t("item") }}</th>
-                <th width="5%">{{ t("status") }}</th>
-                <th width="5%">{{ t("done") }}</th>
-                <th>{{ t("estimatepoints") }}</th>
-                <th 
-                    v-for="(date, dateIndex) in daysOfWeek"
-                    :key="`date-${dateIndex}`"
-                    v-show="selecteddayOfWeek.includes(date.dayOfWeek)">
-                    {{ date.dayOfWeek }}
-                    <br/> {{ date.shortdate }}
-                </th>
-            </tr>
-        </thead>
-        <tbody v-for="(proj, index) in values.data" :key="`project-${index}`">
-                <tr >
-                <td :rowspan="proj.tasks.length ? (proj.tasks.length + 1) : 1">
-                    <a :href="`${zohoSprintLink}#board/P${proj.projNo}`" target="_blank">{{ proj.name }}</a>
-                </td>
-            </tr>
-            <tr v-for="(task, taskIndex) in proj.tasks" :key="`task-${index}-${taskIndex}`">
-                <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
-                    <v-icon v-if="task.projItemName === 'Task'" color="blue" small icon="mdi-file"></v-icon>
-                    <v-icon v-else-if="task.projItemName === 'Bug'" color="pink" small icon="mdi-bug"></v-icon>
-                    <v-icon v-else-if="task.projItemName === 'Story'" color="green" small icon="mdi-flag"></v-icon>
-                    <a :href="`${zohoSprintLink}#itemdetails/P${proj.projNo}/I${task.itemNo}`" target="_blank" class="pl-2">
-                        {{ task.itemName }}
-                    </a>
-                </td>
-                <td>
-                    <v-chip v-show="!['To do', 'In progress', 'Done'].includes(task.statusName)" color="yellow darken-4" text-color="white">Unknown</v-chip>
-                    <v-chip v-show="task.statusName === 'To do'" color="pink" text-color="white">To do</v-chip>
-                    <v-chip v-show="task.statusName === 'In progress'" color="blue darken-4" text-color="white">In progress</v-chip>
-                    <v-chip v-show="task.statusName === 'Done'" color="teal" text-color="white">Done</v-chip>
-                </td>
-                <td class="text-center">
-                    <v-icon
-                        v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done'"
-                        color="light-blue darken-4" @click="updateStatus(task)"
-                        dark fab x-small
-                        icon="mdi-check-outline"
-                        start
-                    >
-                    </v-icon>
-                </td>
-                <td>{{ task.estimatePoint }}</td>
-                <td v-for="(logWork, logWorkIndex) in task.logWorks" :key="`logwork-${logWorkIndex}`" v-show="selecteddayOfWeek.includes(logWork.dayOfWeek)">
-                    <div v-for="log in logWork.logs" :key="`log-${log.id}`" class="logWork-logs d-flex">
-                        <v-text-field
-                            type="number"
-                            v-model="log.logTime" 
-                            :disabled="logWork.isDisabled"
-                            :class="`input-${logWork.dayOfWeek}`" 
-                            hide-details
-                            dense
-                            outlined
-                            @focus='saveOldLogTime(log.logTime)'
-                            @blur='save($event, task, logWork, log)'>
-                        </v-text-field>
-                        <v-progress-circular indeterminate class="ml-2 d-none"/>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="5" class="has-background-info">{{ t("total") }}</td>
-                <td class="has-background-info"
-                    v-for="(date, dateIndex) in daysOfWeek"
-                    v-show="selecteddayOfWeek.includes(date.dayOfWeek)"
-                    :ref="`total-${date.dayOfWeek}`"
-                    :key="`total-${dateIndex}`">
-                    {{ date.total }}
-                </td>
-            </tr>
-        </tfoot>
+        height="calc(100vh - 170px)"
+    >
+      <thead>
+        <tr class="elevation-5">
+          <th width="20%">{{ t("project") }}</th>
+          <th width="25%">{{ t("item") }}</th>
+          <th width="5%">{{ t("status") }}</th>
+          <th width="5%">{{ t("done") }}</th>
+          <th>{{ t("estimatepoints") }}</th>
+          <th
+              v-for="(date, dateIndex) in daysOfWeek"
+              :key="`date-${dateIndex}`"
+              v-show="selecteddayOfWeek.includes(date.dayOfWeek)">
+            {{ date.dayOfWeek }}
+            <br/> {{ date.shortdate }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-for="(proj, index) in values.data" :key="`project-${index}`">
+          <tr>
+            <td :rowspan="proj.tasks.length ? (proj.tasks.length + 1) : 1">
+              <a :href="`${zohoSprintLink}#board/P${proj.projNo}`" target="_blank">{{ proj.name }}</a>
+            </td>
+          </tr>
+          <tr v-for="(task, taskIndex) in proj.tasks" :key="`task-${index}-${taskIndex}`">
+            <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
+              <v-icon v-if="task.projItemName === 'Task'" color="blue" small icon="mdi-file"></v-icon>
+              <v-icon v-else-if="task.projItemName === 'Bug'" color="pink" small icon="mdi-bug"></v-icon>
+              <v-icon v-else-if="task.projItemName === 'Story'" color="green" small icon="mdi-flag"></v-icon>
+              <a :href="`${zohoSprintLink}#itemdetails/P${proj.projNo}/I${task.itemNo}`" target="_blank" class="pl-2">
+                {{ task.itemName }}
+              </a>
+            </td>
+            <td>
+              <v-chip v-show="!['To do', 'In progress', 'Done'].includes(task.statusName)" color="yellow darken-4" text-color="white">Unknown</v-chip>
+              <v-chip v-show="task.statusName === 'To do'" color="pink" text-color="white">To do</v-chip>
+              <v-chip v-show="task.statusName === 'In progress'" color="blue darken-4" text-color="white">In progress</v-chip>
+              <v-chip v-show="task.statusName === 'Done'" color="teal" text-color="white">Done</v-chip>
+            </td>
+            <td class="text-center">
+              <v-icon
+                  v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done'"
+                  color="light-blue darken-4" @click="updateStatus(task)"
+                  dark fab x-small
+                  icon="mdi-check-outline"
+                  start
+              >
+              </v-icon>
+            </td>
+            <td>{{ task.estimatePoint }}</td>
+            <td v-for="(logWork, logWorkIndex) in task.logWorks" :key="`logwork-${logWorkIndex}`" v-show="selecteddayOfWeek.includes(logWork.dayOfWeek)">
+              <div v-for="log in logWork.logs" :key="`log-${log.id}`" class="logWork-logs d-flex">
+                <v-text-field
+                    type="number"
+                    v-model="log.logTime"
+                    :disabled="logWork.isDisabled"
+                    :class="`input-${logWork.dayOfWeek}`"
+                    hide-details
+                    dense
+                    outlined
+                    @focus='saveOldLogTime(log.logTime)'
+                    @blur='save($event, task, logWork, log)'>
+                </v-text-field>
+                <v-progress-circular indeterminate class="ml-2 d-none"/>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+      <tfoot>
+        <tr class="elevation-5">
+          <td colspan="5" class="has-background-info">{{ t("total") }}</td>
+          <td class="has-background-info"
+              v-for="(date, dateIndex) in daysOfWeek"
+              v-show="selecteddayOfWeek.includes(date.dayOfWeek)"
+              :ref="`total-${date.dayOfWeek}`"
+              :key="`total-${dateIndex}`">
+            {{ date.total }}
+          </td>
+        </tr>
+      </tfoot>
     </v-table>
   </div>
 </template>
-<script>
-import "./index.scss"
-import moment from "moment"
-import logworkApi from '@/api/resources/logwork'
-import itemApi from '@/api/resources/item'
-import appStore from '@/store/app.js'
-import { defineComponent } from 'vue'
+
+<script setup>
+import './index.scss'
+import moment from 'moment'
+
+import { ref, reactive, computed, onBeforeMount, onMounted } from 'vue'
+import appStore from '@/store/app'
 import { useI18n } from 'vue-i18n'
 
+import logworkApi from '@/api/resources/logwork'
+import itemApi from '@/api/resources/item'
+
+const { t } = useI18n()
 const app = appStore()
 
-export default defineComponent({
-  setup() {
-    const { t } = useI18n()
-    return { t }
+const dateRanges = reactive([
+  {
+    text: t('thisweek'),
+    value: 'thisweek'
   },
-    data() {
-        return {
-            dateRanges: [
-                {
-                    text: this.t("thisweek"),
-                    value: "thisweek"
-                },
-                {
-                    text: this.t("lastweek"),
-                    value: "lastweek"
-                }
-            ],
-            selectDateRange: "thisweek",
-            values: {
-                accessToken: "",
-                data: [],
-                usersData: [],
-                sortTaskItems: [],
-                oldLogTime: ""
-            },
-            daysOfWeek: [],
-            startdayOfWeek:  moment().startOf("week"),
-            selecteddayOfWeek: [ this.t("mon"), this.t("tue"), this.t("wed"), this.t("thu"), this.t("fri") ],
-            dayOfWeek: [],
-            estimatedPointVals : [ 0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48 ],
-            zohoSprintLink: "https://sprints.zoho.com/team/archwaybeats"
-        };
-    },
-    computed: {
-        totalDateColumn() {
-            return this.selecteddayOfWeek.length;
-        }
-    },
-    async created() {
-        await this.search();
-    },
-    methods: {
-        async search() {
-            this.getWeekDateData();
-
-            this.values.data = [];
-            this.values.logWorkData = [];
-            this.values.sortTaskItems = [];
-
-            try 
-            {
-                const sprintTypeIds = this.selectDateRange === "thisweek" ? [ "2" ] :[ "2", "3" ],
-                    openTaskCondition = {
-                        sprintTypeIds,
-                        statusId : 0,
-                        startDateFrom: this.selectDateRange === "thisweek" ? null: new Date(moment(this.startdayOfWeek).add(0, "days")),
-                        startDateTo: this.selectDateRange === "thisweek" ? null : new Date(moment(this.startdayOfWeek).add(6, "days")),
-                        completedOn : []
-                    },
-                    closedTaskCondition = { sprintTypeIds, statusId : 1, completedOn : this.selectDateRange === "thisweek" ? [ "thisweek" ] : [ "thisweek", "lastweek" ] };
-                await app.load(async () => {
-                    const [ resOpenTaskItems, resClosedTaskItems ]= await Promise.all([ 
-                        itemApi.find(openTaskCondition), // sprinttype = 2 : Active Sprint, status = 0 : open
-                        itemApi.find(closedTaskCondition) // sprinttype = 2 : Active Sprint, status = 1 : closed
-                    ]);
-
-                    const allTaskItems = resOpenTaskItems.concat(resClosedTaskItems);
-
-                    const logworkSearchCondition = {
-                        OwnerIds: [app.zsUserId],
-                        StartDate: new Date(moment(this.startdayOfWeek).add(1, "days")),
-                        EndDate: new Date(moment(this.startdayOfWeek).add(7, "days"))
-                    };
-
-                    this.values.logWorkData = await logworkApi.find(logworkSearchCondition);
-                    if (this.selectDateRange !== "thisweek")
-                    {
-                        const extraTaskData = _.filter(this.values.logWorkData, (logWorkitem) => { return !_.find(allTaskItems, (task) => { return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0; }); });
-                        extraTaskData.forEach((taskitem) => {
-                            allTaskItems.push({
-                                id: taskitem.itemId,
-                                itemNo: taskitem.itemNo,
-                                itemName: taskitem.itemName,
-                                projName: taskitem.projName,
-                                projNo: taskitem.projNo
-                            });
-                        });
-                    }
-
-                    if (this.selectDateRange !== "thisweek")
-                    {
-                        const extraTaskData = _.filter(this.values.logWorkData, (logWorkitem) => { return !_.find(allTaskItems, (task) => { return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0; }); });
-                        extraTaskData.forEach((taskitem) => {
-                            allTaskItems.push({
-                                id: taskitem.itemId,
-                                itemNo: taskitem.itemNo,
-                                itemName: taskitem.itemName,
-                                projName: taskitem.projName,
-                                projNo: taskitem.projNo
-                            });
-                        });
-                    }
-
-                    const sortTaskItemsbyId = _.sortBy(allTaskItems, [ "id" ]);
-                    let subItemids = [];
-                    _.forEach(allTaskItems, (item) => {
-                        if (item.subItemIds && item.subItemIds.length > 0) {
-                            subItemids = subItemids.concat(item.subItemIds);
-                        }
-                    });
-
-                    //sort items by subitems
-                    sortTaskItemsbyId.forEach(item => {
-                        item.estimatePoint = this.estimatedPointVals[item.points];
-                        const exist = _.find(this.values.sortTaskItems, { id: item.id });
-                        const isSubItems = _.includes(subItemids, item.id);
-                        if (!exist && !isSubItems) {
-                            item.indent = 0;
-                            this.values.sortTaskItems.push(item);
-                            if (item.isParent) {
-                                this.getSubItemsOfItem(item, item.subItemIds, allTaskItems);
-                            }
-                        }
-                    });
-
-                    const projectsData = _(this.values.sortTaskItems)
-                        .groupBy("projName")
-                        .map((items, projName) => {
-                            let defaultItem = _.find(items, (item) => { return item.id && item.projNo; });
-                            if (!defaultItem) {
-                                defaultItem = items[0];
-                            }
-
-                            return {
-                                id: defaultItem.id,
-                                name: projName,
-                                tasks: items,
-                                projNo: defaultItem.projNo
-                            };
-                        })
-                        .value();
-
-                    projectsData.forEach(proj => {
-                        proj.tasks.forEach(task => {
-                            task.logWorks = [];
-                            this.daysOfWeek.forEach(date => {
-                                let logWorkByDate = _.filter(this.values.logWorkData, (log)=>{
-                                    return log.itemId === task.id && _.startsWith(log.logDate, date.date);
-                                });
-                                
-                                if (logWorkByDate === null || logWorkByDate.length === 0)
-                                {
-                                    logWorkByDate = [
-                                        {
-                                            itemName: task.itemName,
-                                            itemNo: task.itemNo,
-                                            logDate: date.date,
-                                            projItemTypeId: task.projItemTypeId,
-                                            logTime: null
-                                        }
-                                    ];
-                                }
-                                else
-                                {
-                                    _.forEach(logWorkByDate, (item) => {
-                                        date.total += item.logTime;
-                                    });
-                                }
-
-                                task.logWorks.push({ dayOfWeek: date.dayOfWeek, date: date.date, logs: logWorkByDate, isDisabled : date.isDisabled});
-                            });
-                        });
-                    });
-                    this.values.data = _.orderBy(projectsData, ["name"], ["asc"]);
-                    this.$forceUpdate();
-                })
-            } catch (error) {
-                console.log(error);
-            } finally {
-                // // this.$store.commit("closeLoading");
-            }
-        },
-        getSubItemsOfItem(rootItem, subItemIds, allTaskItems) {
-            subItemIds.forEach(itemid => {
-                const exist = _.find(this.values.sortTaskItems, { id: itemid.id });
-                if (!exist) {
-                    const task = _.find(allTaskItems, { id : itemid });
-                    if (task && (task.depth - 1) === rootItem.depth) {
-                        task.indent = rootItem.indent + 1;
-                        this.values.sortTaskItems.push(task);
-                        if (task.isParent) {
-                            this.getSubItemsOfItem(task, task.subItemIds, allTaskItems);
-                        }
-                    }
-                }
-                
-            });
-        },
-        getWeekDateData() {
-            this.daysOfWeek = [
-                { dayOfWeek: this.t("sun"), shortdate: this.startdayOfWeek.format("MM/DD"), date: this.startdayOfWeek.format("MM/DD/YYYY"), total: 0, isDisabled: this.startdayOfWeek.isAfter(moment()) },
-                { dayOfWeek: this.t("mon"), shortdate: moment(this.startdayOfWeek).add(1, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(1, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(1, "days").isAfter(moment()) },
-                { dayOfWeek: this.t("tue"), shortdate: moment(this.startdayOfWeek).add(2, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(2, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(2, "days").isAfter(moment()) },
-                { dayOfWeek: this.t("wed"), shortdate: moment(this.startdayOfWeek).add(3, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(3, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(3, "days").isAfter(moment()) },
-                { dayOfWeek: this.t("thu"), shortdate: moment(this.startdayOfWeek).add(4, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(4, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(4, "days").isAfter(moment()) },
-                { dayOfWeek: this.t("fri"), shortdate: moment(this.startdayOfWeek).add(5, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(5, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(5, "days").isAfter(moment()) },
-                { dayOfWeek: this.t("sat"), shortdate: moment(this.startdayOfWeek).add(6, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(6, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(6, "days").isAfter(moment()) }
-            ];
-        },
-        async changeWeek() {
-            this.startdayOfWeek = this.selectDateRange === "thisweek" ? moment().startOf("week") : moment().startOf("week").add(-7, "days");
-
-            this.getWeekDateData();
-
-            await this.search();
-        },
-        saveOldLogTime(logTime) {
-            if(logTime === null || logTime === ""){
-                return;
-            }
-            this.values.oldLogTime = logTime;
-        },
-        async save($event, task, logWork, log) {
-            const target = $event.target,
-                vInput = target.closest(".v-input"),
-                processEle = vInput.nextElementSibling;
-
-            if(log.logTime){
-                if (log.logTime.toString() !== this.values.oldLogTime.toString()) {
-                    vInput.classList.toggle("v-input--is-disabled");
-                    processEle.classList.toggle("d-none");
-                    target.toggleAttribute("disabled");
-                    log.isloading = true;
-
-                    const duration = parseFloat(log.logTime),
-                        decimal = duration % 1;
-
-                    const parameter = {
-                        logTimeId: log.logTimeId,
-                        projid : task.projId,
-                        sprintid : task.sprintId,
-                        itemid: task.id,
-                        duration: decimal === 0 ? `${duration}` : `${Math.floor(duration)}:${decimal * 60}`,
-                        users: app.zsUserId,
-                        date: moment(logWork.date).format("YYYY-MM-DDTHH:mm:ssZ"),
-                        isbillable: 1,
-                        actionField: null
-                    };
-                    try {
-                        const isUpdate = log.logTimeId ? true : false;
-                        const response = !log.logTimeId ? await logworkApi.create(parameter) : await logworkApi.update(parameter);
-
-                        if ((response !== null && response !== undefined ) || isUpdate)
-                        {
-                            if (!log.logTimeId)
-                            {
-                                log.logTimeId = response.logTimeId;
-                            }
-
-                            app.success(this.t("savesuccess"), 5000);
-
-                            let total = 0;
-                            const inputs = this.$el.querySelectorAll(`.v-input.input-${logWork.dayOfWeek} input`);
-                            _.forEach(inputs, (input) => {
-                                if (input.value)
-                                {
-                                    total += parseFloat(input.value);
-                                }
-                            });
-
-                            this.$refs[`total-${logWork.dayOfWeek}`][0].innerHTML = total; 
-                        }
-
-                        vInput.classList.toggle("v-input--is-disabled");
-                        vInput.classList.remove("error");
-                        target.toggleAttribute("disabled");
-                    }
-                    catch (error) {
-                        const resMessage = error.response?.data?.message;
-                        const errorDetail = JSON.parse(resMessage);
-                        if (errorDetail && errorDetail.message === "Can add loghours only for active, upcoming and backlog sprint") {
-                            vInput.classList.add("error");
-                        }
-                    } finally {
-                        processEle.classList.toggle("d-none");
-                    }
-                }
-            }
-        },
-        async updateStatus(task) {
-            const currentStatus = task.statusName;
-            const taskItemStatusParameter = {
-                taskItemId: task.id,
-                projId: task.projId,
-                sprintId: task.sprintId,
-                statusId: "52523000000002619"
-            };
-            await app.load(async () => {
-                await itemApi.updateStatus(taskItemStatusParameter);
-            })
-
-            app.success(this.t("savesuccess"), 5000);
-            
-            task.statusName = "Done";
-            if (task.isParent)
-            {
-                _.forEach(task.subItemIds, item => {
-                    const subItem = _.find(this.values.data[0].tasks, { id: item});
-                    if (subItem.statusName === currentStatus)
-                    {
-                        subItem.statusName = "Done";
-                    }
-                });
-            }
-        },
-        async refreshCompleteOn() {
-            await this.changeWeek();
-        },
-    }
+  {
+    text: t('lastweek'),
+    value: 'lastweek'
+  }
+])
+const selectDateRange = ref('thisweek')
+const values = reactive({
+  accessToken: '',
+  data: [],
+  usersData: [],
+  sortTaskItems: [],
+  oldLogTime: ''
 })
+const daysOfWeek = ref([])
+const selecteddayOfWeek = ref([
+  t("mon"), t("tue"), t("wed"), t("thu"), t("fri")
+])
+const estimatedPointVals = reactive([
+  0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48
+])
+
+const refTimeSheet = ref(null)
+const startdayOfWeek = ref(moment().startOf('week'))
+const zohoSprintLink = 'https://sprints.zoho.com/team/archwaybeats'
+
+// a computed selecteddayOfWeek
+const totalDateColumn = computed(() => {
+  return selecteddayOfWeek.value.length
+})
+
+// handle a methods
+function getWeekDateData() {
+  daysOfWeek.value = [
+    { dayOfWeek: t('sun'), shortdate: startdayOfWeek.value.format('MM/DD'), date: startdayOfWeek.value.format('MM/DD/YYYY'), total: 0, isDisabled: startdayOfWeek.value.isAfter(moment()) },
+    { dayOfWeek: t('mon'), shortdate: moment(startdayOfWeek.value).add(1, 'days').format('MM/DD'), date: moment(startdayOfWeek.value).add(1, 'days').format('MM/DD/YYYY'), total: 0, isDisabled: moment(startdayOfWeek.value).add(1, 'days').isAfter(moment()) },
+    { dayOfWeek: t('tue'), shortdate: moment(startdayOfWeek.value).add(2, 'days').format('MM/DD'), date: moment(startdayOfWeek.value).add(2, 'days').format('MM/DD/YYYY'), total: 0, isDisabled: moment(startdayOfWeek.value).add(2, 'days').isAfter(moment()) },
+    { dayOfWeek: t('wed'), shortdate: moment(startdayOfWeek.value).add(3, 'days').format('MM/DD'), date: moment(startdayOfWeek.value).add(3, 'days').format('MM/DD/YYYY'), total: 0, isDisabled: moment(startdayOfWeek.value).add(3, 'days').isAfter(moment()) },
+    { dayOfWeek: t('thu'), shortdate: moment(startdayOfWeek.value).add(4, 'days').format('MM/DD'), date: moment(startdayOfWeek.value).add(4, 'days').format('MM/DD/YYYY'), total: 0, isDisabled: moment(startdayOfWeek.value).add(4, 'days').isAfter(moment()) },
+    { dayOfWeek: t('fri'), shortdate: moment(startdayOfWeek.value).add(5, 'days').format('MM/DD'), date: moment(startdayOfWeek.value).add(5, 'days').format('MM/DD/YYYY'), total: 0, isDisabled: moment(startdayOfWeek.value).add(5, 'days').isAfter(moment()) },
+    { dayOfWeek: t('sat'), shortdate: moment(startdayOfWeek.value).add(6, 'days').format('MM/DD'), date: moment(startdayOfWeek.value).add(6, 'days').format('MM/DD/YYYY'), total: 0, isDisabled: moment(startdayOfWeek.value).add(6, 'days').isAfter(moment()) }
+  ];
+}
+
+function getSubItemsOfItem(rootItem, subItemIds, allTaskItems) {
+  subItemIds.forEach(itemid => {
+    const exist = _.find(values.sortTaskItems, { id: itemid.id });
+    if (!exist) {
+      const task = _.find(allTaskItems, { id : itemid });
+      if (task && (task.depth - 1) === rootItem.depth) {
+        task.indent = rootItem.indent + 1;
+        values.sortTaskItems.push(task);
+        if (task.isParent) {
+          getSubItemsOfItem(task, task.subItemIds, allTaskItems);
+        }
+      }
+    }
+
+  });
+}
+
+async function search() {
+  values.data = [];
+  values.logWorkData = [];
+  values.sortTaskItems = [];
+
+  try
+  {
+    const sprintTypeIds = selectDateRange.value === 'thisweek' ? [ '2' ] :[ '2', '3' ],
+        openTaskCondition = {
+          sprintTypeIds,
+          statusId : 0,
+          startDateFrom: selectDateRange.value === 'thisweek' ? null: new Date(moment(startdayOfWeek.value).add(0, 'days')),
+          startDateTo: selectDateRange.value === 'thisweek' ? null : new Date(moment(startdayOfWeek.value).add(6, 'days')),
+          completedOn : []
+        },
+        closedTaskCondition = { sprintTypeIds, statusId : 1, completedOn : selectDateRange.value === 'thisweek' ? [ 'thisweek' ] : [ 'thisweek', 'lastweek' ] };
+    await app.load(async () => {
+      const [ resOpenTaskItems, resClosedTaskItems ]= await Promise.all([
+        itemApi.find(openTaskCondition), // sprinttype = 2 : Active Sprint, status = 0 : open
+        itemApi.find(closedTaskCondition) // sprinttype = 2 : Active Sprint, status = 1 : closed
+      ]);
+
+      const allTaskItems = resOpenTaskItems.concat(resClosedTaskItems);
+
+      const logworkSearchCondition = {
+        StartDate: new Date(moment(startdayOfWeek.value).add(1, 'days')),
+        EndDate: new Date(moment(startdayOfWeek.value).add(7, 'days'))
+      };
+
+      values.logWorkData = await logworkApi.find(logworkSearchCondition);
+      if (selectDateRange.value !== 'thisweek')
+      {
+        const extraTaskData = _.filter(values.logWorkData, (logWorkitem) => { return !_.find(allTaskItems, (task) => { return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0; }); });
+        extraTaskData.forEach((taskitem) => {
+          allTaskItems.push({
+            id: taskitem.itemId,
+            itemNo: taskitem.itemNo,
+            itemName: taskitem.itemName,
+            projName: taskitem.projName,
+            projNo: taskitem.projNo
+          });
+        });
+      }
+
+      if (selectDateRange.value !== 'thisweek')
+      {
+        const extraTaskData = _.filter(values.logWorkData, (logWorkitem) => { return !_.find(allTaskItems, (task) => { return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0; }); });
+        extraTaskData.forEach((taskitem) => {
+          allTaskItems.push({
+            id: taskitem.itemId,
+            itemNo: taskitem.itemNo,
+            itemName: taskitem.itemName,
+            projName: taskitem.projName,
+            projNo: taskitem.projNo
+          });
+        });
+      }
+
+      const sortTaskItemsbyId = _.sortBy(allTaskItems, [ 'id' ]);
+      let subItemids = [];
+      _.forEach(allTaskItems, (item) => {
+        if (item.subItemIds && item.subItemIds.length > 0) {
+          subItemids = subItemids.concat(item.subItemIds);
+        }
+      });
+
+      //sort items by subitems
+      sortTaskItemsbyId.forEach(item => {
+        item.estimatePoint = estimatedPointVals[item.points];
+        const exist = _.find(values.sortTaskItems, { id: item.id });
+        const isSubItems = _.includes(subItemids, item.id);
+        if (!exist && !isSubItems) {
+          item.indent = 0;
+          values.sortTaskItems.push(item);
+          if (item.isParent) {
+            getSubItemsOfItem(item, item.subItemIds, allTaskItems);
+          }
+        }
+      });
+
+      const projectsData = _(values.sortTaskItems)
+          .groupBy('projName')
+          .map((items, projName) => {
+            let defaultItem = _.find(items, (item) => { return item.id && item.projNo; });
+            if (!defaultItem) {
+              defaultItem = items[0];
+            }
+
+            return {
+              id: defaultItem.id,
+              name: projName,
+              tasks: items,
+              projNo: defaultItem.projNo
+            };
+          })
+          .value();
+
+      projectsData.forEach(proj => {
+        proj.tasks.forEach(task => {
+          task.logWorks = [];
+          daysOfWeek.value.forEach(date => {
+            let logWorkByDate = _.filter(values.logWorkData, (log)=>{
+              return log.itemId === task.id && _.startsWith(log.logDate, date.date);
+            });
+
+            if (logWorkByDate === null || logWorkByDate.length === 0)
+            {
+              logWorkByDate = [
+                {
+                  itemName: task.itemName,
+                  itemNo: task.itemNo,
+                  logDate: date.date,
+                  projItemTypeId: task.projItemTypeId,
+                  logTime: null
+                }
+              ];
+            }
+            else
+            {
+              _.forEach(logWorkByDate, (item) => {
+                date.total += item.logTime;
+              });
+            }
+
+            task.logWorks.push({ dayOfWeek: date.dayOfWeek, date: date.date, logs: logWorkByDate, isDisabled : date.isDisabled});
+          });
+        });
+      });
+      values.data = _.orderBy(projectsData, ['name'], ['asc']);
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function changeWeek() {
+  startdayOfWeek.value = selectDateRange.value === 'thisweek' ? moment().startOf('week') : moment().startOf('week').add(-7, 'days')
+
+  getWeekDateData();
+  await search();
+}
+
+async function refreshCompleteOn() {
+  await changeWeek();
+}
+
+async function save($event, task, logWork, log) {
+  const target = $event.target,
+      vInput = target.closest('.v-input'),
+      processEle = vInput.nextElementSibling;
+
+  if(log.logTime){
+    if (log.logTime.toString() !== values.oldLogTime.toString()) {
+      vInput.classList.toggle('v-input--is-disabled');
+      processEle.classList.toggle('d-none');
+      target.toggleAttribute('disabled');
+      log.isloading = true;
+
+      const duration = parseFloat(log.logTime),
+          decimal = duration % 1;
+
+      const parameter = {
+        logTimeId: log.logTimeId,
+        projid : task.projId,
+        sprintid : task.sprintId,
+        itemid: task.id,
+        duration: decimal === 0 ? `${duration}` : `${Math.floor(duration)}:${decimal * 60}`,
+        users: app.zsUserId,
+        date: moment(logWork.date).format('YYYY-MM-DDTHH:mm:ssZ'),
+        isbillable: 1,
+        actionField: null
+      };
+      try {
+        const isUpdate = log.logTimeId ? true : false;
+        const response = !log.logTimeId ? await logworkApi.create(parameter) : await logworkApi.update(parameter);
+
+        if ((response !== null && response !== undefined ) || isUpdate)
+        {
+          if (!log.logTimeId)
+          {
+            log.logTimeId = response.logTimeId;
+          }
+
+          app.success(t('savesuccess'), 5000);
+
+          let total = 0;
+          const inputs = refTimeSheet.value.querySelectorAll(`.v-input.input-${logWork.dayOfWeek} input`);
+          _.forEach(inputs, (input) => {
+            if (input.value)
+            {
+              total += parseFloat(input.value);
+            }
+          });
+
+          refTimeSheet.value[`total-${logWork.dayOfWeek}`][0].innerHTML = total;
+        }
+
+        vInput.classList.toggle('v-input--is-disabled');
+        vInput.classList.remove('error');
+        target.toggleAttribute('disabled');
+      }
+      catch (error) {
+        const resMessage = error.response?.data?.message;
+        const errorDetail = JSON.parse(resMessage);
+        if (errorDetail && errorDetail.message === 'Can add loghours only for active, upcoming and backlog sprint') {
+          vInput.classList.add('error');
+        }
+      } finally {
+        processEle.classList.toggle('d-none');
+      }
+    }
+  }
+}
+
+async function updateStatus(task) {
+  const currentStatus = task.statusName;
+  const taskItemStatusParameter = {
+    taskItemId: task.id,
+    projId: task.projId,
+    sprintId: task.sprintId,
+    statusId: '52523000000002619'
+  };
+  await app.load(async () => {
+    await itemApi.updateStatus(taskItemStatusParameter);
+  })
+
+  app.success(t('savesuccess'), 5000);
+
+  task.statusName = 'Done';
+  if (task.isParent)
+  {
+    _.forEach(task.subItemIds, item => {
+      const subItem = _.find(values.data[0].tasks, { id: item});
+      if (subItem.statusName === currentStatus)
+      {
+        subItem.statusName = 'Done';
+      }
+    });
+  }
+}
+
+function saveOldLogTime(logTime) {
+  if(logTime === null || logTime === ''){
+    return
+  }
+  values.oldLogTime = logTime;
+}
+
+// bind data
+onBeforeMount(async () => {
+  getWeekDateData()
+  await search()
+})
+onMounted(() => {})
+
+
 </script>
+
+
+<!--<script>-->
+<!--import './index.scss'-->
+<!--import moment from "moment"-->
+<!--import logworkApi from '@/api/resources/logwork'-->
+<!--import itemApi from '@/api/resources/item'-->
+<!--import appStore from '@/store/app.js'-->
+<!--import { defineComponent } from 'vue'-->
+<!--import { useI18n } from 'vue-i18n'-->
+
+<!--const app = appStore()-->
+
+<!--export default defineComponent({-->
+<!--    setup() {-->
+<!--      const { t } = useI18n()-->
+<!--      return { t }-->
+<!--    },-->
+<!--    data() {-->
+<!--        return {-->
+<!--            dateRanges: [-->
+<!--                {-->
+<!--                    text: this.t("thisweek"),-->
+<!--                    value: "thisweek"-->
+<!--                },-->
+<!--                {-->
+<!--                    text: this.t("lastweek"),-->
+<!--                    value: "lastweek"-->
+<!--                }-->
+<!--            ],-->
+<!--            selectDateRange: "thisweek",-->
+<!--            values: {-->
+<!--                accessToken: "",-->
+<!--                data: [],-->
+<!--                usersData: [],-->
+<!--                sortTaskItems: [],-->
+<!--                oldLogTime: ""-->
+<!--            },-->
+<!--            daysOfWeek: [],-->
+<!--            startdayOfWeek:  moment().startOf("week"),-->
+<!--            selecteddayOfWeek: [ this.t("mon"), this.t("tue"), this.t("wed"), this.t("thu"), this.t("fri") ],-->
+<!--            dayOfWeek: [],-->
+<!--            estimatedPointVals : [ 0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48 ],-->
+<!--            zohoSprintLink: "https://sprints.zoho.com/team/archwaybeats"-->
+<!--        };-->
+<!--    },-->
+<!--    computed: {-->
+<!--        totalDateColumn() {-->
+<!--            return this.selecteddayOfWeek.length;-->
+<!--        }-->
+<!--    },-->
+<!--    async created() {-->
+<!--      this.getWeekDateData();-->
+<!--      await this.search();-->
+<!--    },-->
+<!--    methods: {-->
+<!--        async search() {-->
+<!--            this.values.data = [];-->
+<!--            this.values.logWorkData = [];-->
+<!--            this.values.sortTaskItems = [];-->
+
+<!--            try -->
+<!--            {-->
+<!--                const sprintTypeIds = this.selectDateRange === "thisweek" ? [ "2" ] :[ "2", "3" ],-->
+<!--                    openTaskCondition = {-->
+<!--                        sprintTypeIds,-->
+<!--                        statusId : 0,-->
+<!--                        startDateFrom: this.selectDateRange === "thisweek" ? null: new Date(moment(this.startdayOfWeek).add(0, "days")),-->
+<!--                        startDateTo: this.selectDateRange === "thisweek" ? null : new Date(moment(this.startdayOfWeek).add(6, "days")),-->
+<!--                        completedOn : []-->
+<!--                    },-->
+<!--                    closedTaskCondition = { sprintTypeIds, statusId : 1, completedOn : this.selectDateRange === "thisweek" ? [ "thisweek" ] : [ "thisweek", "lastweek" ] };-->
+<!--                await app.load(async () => {-->
+<!--                    const [ resOpenTaskItems, resClosedTaskItems ]= await Promise.all([ -->
+<!--                        itemApi.find(openTaskCondition), // sprinttype = 2 : Active Sprint, status = 0 : open-->
+<!--                        itemApi.find(closedTaskCondition) // sprinttype = 2 : Active Sprint, status = 1 : closed-->
+<!--                    ]);-->
+
+<!--                    const allTaskItems = resOpenTaskItems.concat(resClosedTaskItems);-->
+
+<!--                    const logworkSearchCondition = {-->
+<!--                        StartDate: new Date(moment(this.startdayOfWeek).add(1, "days")),-->
+<!--                        EndDate: new Date(moment(this.startdayOfWeek).add(7, "days"))-->
+<!--                    };-->
+
+<!--                    this.values.logWorkData = await logworkApi.find(logworkSearchCondition);-->
+<!--                    if (this.selectDateRange !== "thisweek")-->
+<!--                    {-->
+<!--                        const extraTaskData = _.filter(this.values.logWorkData, (logWorkitem) => { return !_.find(allTaskItems, (task) => { return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0; }); });-->
+<!--                        extraTaskData.forEach((taskitem) => {-->
+<!--                            allTaskItems.push({-->
+<!--                                id: taskitem.itemId,-->
+<!--                                itemNo: taskitem.itemNo,-->
+<!--                                itemName: taskitem.itemName,-->
+<!--                                projName: taskitem.projName,-->
+<!--                                projNo: taskitem.projNo-->
+<!--                            });-->
+<!--                        });-->
+<!--                    }-->
+
+<!--                    if (this.selectDateRange !== "thisweek")-->
+<!--                    {-->
+<!--                        const extraTaskData = _.filter(this.values.logWorkData, (logWorkitem) => { return !_.find(allTaskItems, (task) => { return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0; }); });-->
+<!--                        extraTaskData.forEach((taskitem) => {-->
+<!--                            allTaskItems.push({-->
+<!--                                id: taskitem.itemId,-->
+<!--                                itemNo: taskitem.itemNo,-->
+<!--                                itemName: taskitem.itemName,-->
+<!--                                projName: taskitem.projName,-->
+<!--                                projNo: taskitem.projNo-->
+<!--                            });-->
+<!--                        });-->
+<!--                    }-->
+
+<!--                    const sortTaskItemsbyId = _.sortBy(allTaskItems, [ "id" ]);-->
+<!--                    let subItemids = [];-->
+<!--                    _.forEach(allTaskItems, (item) => {-->
+<!--                        if (item.subItemIds && item.subItemIds.length > 0) {-->
+<!--                            subItemids = subItemids.concat(item.subItemIds);-->
+<!--                        }-->
+<!--                    });-->
+
+<!--                    //sort items by subitems-->
+<!--                    sortTaskItemsbyId.forEach(item => {-->
+<!--                        item.estimatePoint = this.estimatedPointVals[item.points];-->
+<!--                        const exist = _.find(this.values.sortTaskItems, { id: item.id });-->
+<!--                        const isSubItems = _.includes(subItemids, item.id);-->
+<!--                        if (!exist && !isSubItems) {-->
+<!--                            item.indent = 0;-->
+<!--                            this.values.sortTaskItems.push(item);-->
+<!--                            if (item.isParent) {-->
+<!--                                this.getSubItemsOfItem(item, item.subItemIds, allTaskItems);-->
+<!--                            }-->
+<!--                        }-->
+<!--                    });-->
+
+<!--                    const projectsData = _(this.values.sortTaskItems)-->
+<!--                        .groupBy("projName")-->
+<!--                        .map((items, projName) => {-->
+<!--                            let defaultItem = _.find(items, (item) => { return item.id && item.projNo; });-->
+<!--                            if (!defaultItem) {-->
+<!--                                defaultItem = items[0];-->
+<!--                            }-->
+
+<!--                            return {-->
+<!--                                id: defaultItem.id,-->
+<!--                                name: projName,-->
+<!--                                tasks: items,-->
+<!--                                projNo: defaultItem.projNo-->
+<!--                            };-->
+<!--                        })-->
+<!--                        .value();-->
+
+<!--                    projectsData.forEach(proj => {-->
+<!--                        proj.tasks.forEach(task => {-->
+<!--                            task.logWorks = [];-->
+<!--                            this.daysOfWeek.forEach(date => {-->
+<!--                                let logWorkByDate = _.filter(this.values.logWorkData, (log)=>{-->
+<!--                                    return log.itemId === task.id && _.startsWith(log.logDate, date.date);-->
+<!--                                });-->
+<!--                                -->
+<!--                                if (logWorkByDate === null || logWorkByDate.length === 0)-->
+<!--                                {-->
+<!--                                    logWorkByDate = [-->
+<!--                                        {-->
+<!--                                            itemName: task.itemName,-->
+<!--                                            itemNo: task.itemNo,-->
+<!--                                            logDate: date.date,-->
+<!--                                            projItemTypeId: task.projItemTypeId,-->
+<!--                                            logTime: null-->
+<!--                                        }-->
+<!--                                    ];-->
+<!--                                }-->
+<!--                                else-->
+<!--                                {-->
+<!--                                    _.forEach(logWorkByDate, (item) => {-->
+<!--                                        date.total += item.logTime;-->
+<!--                                    });-->
+<!--                                }-->
+
+<!--                                task.logWorks.push({ dayOfWeek: date.dayOfWeek, date: date.date, logs: logWorkByDate, isDisabled : date.isDisabled});-->
+<!--                            });-->
+<!--                        });-->
+<!--                    });-->
+<!--                    this.values.data = _.orderBy(projectsData, ["name"], ["asc"]);-->
+<!--                    this.$forceUpdate();-->
+<!--                })-->
+<!--            } catch (error) {-->
+<!--                console.log(error);-->
+<!--            } finally {-->
+<!--                // // this.$store.commit("closeLoading");-->
+<!--            }-->
+<!--        },-->
+<!--        getSubItemsOfItem(rootItem, subItemIds, allTaskItems) {-->
+<!--            subItemIds.forEach(itemid => {-->
+<!--                const exist = _.find(this.values.sortTaskItems, { id: itemid.id });-->
+<!--                if (!exist) {-->
+<!--                    const task = _.find(allTaskItems, { id : itemid });-->
+<!--                    if (task && (task.depth - 1) === rootItem.depth) {-->
+<!--                        task.indent = rootItem.indent + 1;-->
+<!--                        this.values.sortTaskItems.push(task);-->
+<!--                        if (task.isParent) {-->
+<!--                            this.getSubItemsOfItem(task, task.subItemIds, allTaskItems);-->
+<!--                        }-->
+<!--                    }-->
+<!--                }-->
+<!--                -->
+<!--            });-->
+<!--        },-->
+<!--        getWeekDateData() {-->
+<!--            this.daysOfWeek = [-->
+<!--                { dayOfWeek: this.t("sun"), shortdate: this.startdayOfWeek.format("MM/DD"), date: this.startdayOfWeek.format("MM/DD/YYYY"), total: 0, isDisabled: this.startdayOfWeek.isAfter(moment()) },-->
+<!--                { dayOfWeek: this.t("mon"), shortdate: moment(this.startdayOfWeek).add(1, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(1, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(1, "days").isAfter(moment()) },-->
+<!--                { dayOfWeek: this.t("tue"), shortdate: moment(this.startdayOfWeek).add(2, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(2, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(2, "days").isAfter(moment()) },-->
+<!--                { dayOfWeek: this.t("wed"), shortdate: moment(this.startdayOfWeek).add(3, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(3, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(3, "days").isAfter(moment()) },-->
+<!--                { dayOfWeek: this.t("thu"), shortdate: moment(this.startdayOfWeek).add(4, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(4, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(4, "days").isAfter(moment()) },-->
+<!--                { dayOfWeek: this.t("fri"), shortdate: moment(this.startdayOfWeek).add(5, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(5, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(5, "days").isAfter(moment()) },-->
+<!--                { dayOfWeek: this.t("sat"), shortdate: moment(this.startdayOfWeek).add(6, "days").format("MM/DD"), date: moment(this.startdayOfWeek).add(6, "days").format("MM/DD/YYYY"), total: 0, isDisabled: moment(this.startdayOfWeek).add(6, "days").isAfter(moment()) }-->
+<!--            ];-->
+<!--        },-->
+<!--        async changeWeek() {-->
+<!--            this.startdayOfWeek = this.selectDateRange === "thisweek" ? moment().startOf("week") : moment().startOf("week").add(-7, "days");-->
+
+<!--            this.getWeekDateData();-->
+
+<!--            await this.search();-->
+<!--        },-->
+<!--        saveOldLogTime(logTime) {-->
+<!--            if(logTime === null || logTime === ""){-->
+<!--                return;-->
+<!--            }-->
+<!--            this.values.oldLogTime = logTime;-->
+<!--        },-->
+<!--        async save($event, task, logWork, log) {-->
+<!--            const target = $event.target,-->
+<!--                vInput = target.closest(".v-input"),-->
+<!--                processEle = vInput.nextElementSibling;-->
+
+<!--            if(log.logTime){-->
+<!--                if (log.logTime.toString() !== this.values.oldLogTime.toString()) {-->
+<!--                    vInput.classList.toggle("v-input&#45;&#45;is-disabled");-->
+<!--                    processEle.classList.toggle("d-none");-->
+<!--                    target.toggleAttribute("disabled");-->
+<!--                    log.isloading = true;-->
+
+<!--                    const duration = parseFloat(log.logTime),-->
+<!--                        decimal = duration % 1;-->
+
+<!--                    const parameter = {-->
+<!--                        logTimeId: log.logTimeId,-->
+<!--                        projid : task.projId,-->
+<!--                        sprintid : task.sprintId,-->
+<!--                        itemid: task.id,-->
+<!--                        duration: decimal === 0 ? `${duration}` : `${Math.floor(duration)}:${decimal * 60}`,-->
+<!--                        users: app.zsUserId,-->
+<!--                        date: moment(logWork.date).format("YYYY-MM-DDTHH:mm:ssZ"),-->
+<!--                        isbillable: 1,-->
+<!--                        actionField: null-->
+<!--                    };-->
+<!--                    try {-->
+<!--                        const isUpdate = log.logTimeId ? true : false;-->
+<!--                        const response = !log.logTimeId ? await logworkApi.create(parameter) : await logworkApi.update(parameter);-->
+
+<!--                        if ((response !== null && response !== undefined ) || isUpdate)-->
+<!--                        {-->
+<!--                            if (!log.logTimeId)-->
+<!--                            {-->
+<!--                                log.logTimeId = response.logTimeId;-->
+<!--                            }-->
+
+<!--                            app.success(this.t("savesuccess"), 5000);-->
+
+<!--                            let total = 0;-->
+<!--                            const inputs = this.$el.querySelectorAll(`.v-input.input-${logWork.dayOfWeek} input`);-->
+<!--                            _.forEach(inputs, (input) => {-->
+<!--                                if (input.value)-->
+<!--                                {-->
+<!--                                    total += parseFloat(input.value);-->
+<!--                                }-->
+<!--                            });-->
+
+<!--                            this.$refs[`total-${logWork.dayOfWeek}`][0].innerHTML = total; -->
+<!--                        }-->
+
+<!--                        vInput.classList.toggle("v-input&#45;&#45;is-disabled");-->
+<!--                        vInput.classList.remove("error");-->
+<!--                        target.toggleAttribute("disabled");-->
+<!--                    }-->
+<!--                    catch (error) {-->
+<!--                        const resMessage = error.response?.data?.message;-->
+<!--                        const errorDetail = JSON.parse(resMessage);-->
+<!--                        if (errorDetail && errorDetail.message === "Can add loghours only for active, upcoming and backlog sprint") {-->
+<!--                            vInput.classList.add("error");-->
+<!--                        }-->
+<!--                    } finally {-->
+<!--                        processEle.classList.toggle("d-none");-->
+<!--                    }-->
+<!--                }-->
+<!--            }-->
+<!--        },-->
+<!--        async updateStatus(task) {-->
+<!--            const currentStatus = task.statusName;-->
+<!--            const taskItemStatusParameter = {-->
+<!--                taskItemId: task.id,-->
+<!--                projId: task.projId,-->
+<!--                sprintId: task.sprintId,-->
+<!--                statusId: "52523000000002619"-->
+<!--            };-->
+<!--            await app.load(async () => {-->
+<!--                await itemApi.updateStatus(taskItemStatusParameter);-->
+<!--            })-->
+
+<!--            app.success(this.t("savesuccess"), 5000);-->
+<!--            -->
+<!--            task.statusName = "Done";-->
+<!--            if (task.isParent)-->
+<!--            {-->
+<!--                _.forEach(task.subItemIds, item => {-->
+<!--                    const subItem = _.find(this.values.data[0].tasks, { id: item});-->
+<!--                    if (subItem.statusName === currentStatus)-->
+<!--                    {-->
+<!--                        subItem.statusName = "Done";-->
+<!--                    }-->
+<!--                });-->
+<!--            }-->
+<!--        },-->
+<!--        async refreshCompleteOn() {-->
+<!--            await this.changeWeek();-->
+<!--        },-->
+<!--    }-->
+<!--})-->
+<!--</script>-->
 <style scoped>
-@import "./index.scss";
+.view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+}
+
+.card-top {
+  padding: 20px;
+}
+
+.table-container {
+  display: flex;
+  margin-top: 20px;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.flex-table {
+  display: flex;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.flex-table > div {
+  width: 100%;
+}
 </style>

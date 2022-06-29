@@ -1,10 +1,10 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-onMounted(() => {
+onBeforeMount(() => {
   router.replace({ path: '/transfer' })
 })
 </script>

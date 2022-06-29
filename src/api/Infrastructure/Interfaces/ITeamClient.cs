@@ -1,10 +1,10 @@
-using api.Models;
-using Newtonsoft.Json.Linq;
+using TeamClient = api.Infrastructure.Clients.TeamClient;
 
 namespace api.Infrastructure.Interfaces
 {
     public interface ITeamClient
     {
-        Task<JObject?> GetTeamSettingAsync(string? action = null, string? accessToken = null);
+        Task<TeamClient.TeamSetting?> GetTeamSettingAsync(string? action = null, string? accessToken = null);
+        Task<string?> FetchTeamsAsync();
     }
 }

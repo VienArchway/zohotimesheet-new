@@ -16,7 +16,12 @@ const props = defineProps({
     <h1>Error page</h1>
     <AppContainer>
       <h1>{{ props.errorStatus }}</h1>
-      <p style="color: red">{{ props.errorMessage }}</p>
+      <p v-if="props.errorStatus === '401'" style="color: red">
+        Authorize token has expired or not valid. Please try again.
+      </p>
+      <p v-else>
+        {{ props.errorMessage }}. Please contact admin.
+      </p>
       
       <router-view />
 

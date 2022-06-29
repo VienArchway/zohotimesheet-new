@@ -1,8 +1,7 @@
 import { ApiHeaderSettings } from '@/api/config'
-import { useRouter } from 'vue-router'
+import router from '@/lib/router'
 
 export const fetchApi = async (methodName, pathUrl, requestParam ,requestBody) => {
-    const router = useRouter()
     try {
         const searchParam = new URLSearchParams(requestParam)
         if (searchParam.has('param')) {

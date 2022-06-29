@@ -7,6 +7,7 @@ using System.Security.Authentication;
 using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 using StringWithQualityHeaderValue = System.Net.Http.Headers.StringWithQualityHeaderValue;
 
 namespace api.Infrastructure.Clients
@@ -19,35 +20,32 @@ namespace api.Infrastructure.Clients
             : base(client, configuration, svcProvider)
         {
             this.teamClient = teamClient;
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+            client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
         }
 
         public async Task<Token> GetAccessTokenAsync(string code)
         {
-            var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
-            var clientId = configuration.GetValue<string>("Zoho:ClientId");
-            var clientSecret = configuration.GetValue<string>("Zoho:ClientSecret");
-            var redirectUri = configuration.GetValue<string>("Zoho:Redirect_uri");
-
-            using var clientToken = new HttpClient();
             var parameter = new List<KeyValuePair<string, string>>
             {
                 new("code", code),
-                new("client_id", clientId),
-                new("client_secret", clientSecret),
-                new("redirect_uri", redirectUri),
+                new("client_id", configuration["Zoho:ClientId"]),
+                new("client_secret", configuration["Zoho:ClientSecret"]),
+                new("redirect_uri", configuration["Zoho:Redirect_uri"]),
                 new("grant_type", "authorization_code"),
                 new("prompt", "consent")
             };
-            var content = new FormUrlEncodedContent(parameter);
-            clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-            var response = await clientToken.PostAsync($"{tokenHost}", content);
-            var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            var token = JsonConvert.DeserializeObject<Token>(resContent);
-            if (token == null) return token ?? throw new InvalidOperationException();
+            var request = new HttpRequestMessage(HttpMethod.Post, configuration["Zoho:TokenHost"]);
+            request.Content = new FormUrlEncodedContent(parameter);
             
+            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseContentRead).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            
+            var resContent = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var token = await JsonSerializer.DeserializeAsync<Token>(resContent);
+            
+            if (token == null) throw new InvalidOperationException();
             await FetchSecretRefreshToken(token, null).ConfigureAwait(false);
 
             return token ?? throw new InvalidOperationException();
@@ -58,26 +56,21 @@ namespace api.Infrastructure.Clients
             var refreshToken = await FetchSecretRefreshToken(null, firstName, zsUserId).ConfigureAwait(false);
             if (refreshToken == null) throw new OperationCanceledException();
             
-            var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
-            var clientId = configuration.GetValue<string>("Zoho:ClientId");
-            var clientSecret = configuration.GetValue<string>("Zoho:ClientSecret");
-
-            using var clientToken = new HttpClient();
             var parameter = new List<KeyValuePair<string, string>>
             {
                 new("refresh_token", refreshToken),
-                new("client_id", clientId),
-                new("client_secret", clientSecret),
+                new("client_id", configuration["Zoho:ClientId"]),
+                new("client_secret", configuration["Zoho:ClientSecret"]),
                 new("grant_type", "refresh_token")
             };
-            var content = new FormUrlEncodedContent(parameter);
-            clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-            var response = await clientToken.PostAsync($"{tokenHost}", content);
-            var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            var token = JsonConvert.DeserializeObject<Token>(resContent);
+            var request = new HttpRequestMessage(HttpMethod.Post, configuration["Zoho:TokenHost"]);
+            request.Content = new FormUrlEncodedContent(parameter);
+            
+            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseContentRead).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            
+            var resContent = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var token = await JsonSerializer.DeserializeAsync<Token>(resContent);
 
             if (token?.AccessToken == null) throw new AuthenticationException("Access token null");
             return token ?? throw new InvalidOperationException();
@@ -88,16 +81,12 @@ namespace api.Infrastructure.Clients
             var refreshToken = await FetchSecretRefreshToken();
             if (refreshToken == null) throw new OperationCanceledException();
             
-            using var clientToken = new HttpClient();
             var parameter = new List<KeyValuePair<string, string>>
             {
                 new("token", refreshToken)
             };
             var content = new FormUrlEncodedContent(parameter);
-            clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-            var response = await clientToken.PostAsync($"{configuration["Zoho:TokenHost"]}/revoke", content);
+            var response = await client.PostAsync($"{configuration["Zoho:TokenHost"]}/revoke", content);
  
             var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var srcJObj = JsonConvert.DeserializeObject<JObject>(resContent);
@@ -116,7 +105,6 @@ namespace api.Infrastructure.Clients
             var clientSecret = configuration.GetValue<string>("Zoho:ClientSecret");
             var refreshToken = configuration.GetValue<string>("Zoho:RefreshToken");
 
-            using var clientToken = new HttpClient();
             var parameter = new List<KeyValuePair<string, string>>
             {
                 new("refresh_token", refreshToken),
@@ -125,10 +113,8 @@ namespace api.Infrastructure.Clients
                 new("grant_type", "refresh_token")
             };
             var content = new FormUrlEncodedContent(parameter);
-            clientToken.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-            clientToken.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-            var response = await clientToken.PostAsync($"{tokenHost}", content);
+
+            using var response = await client.PostAsync($"{tokenHost}", content);
             var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             var token = JsonConvert.DeserializeObject<Token>(resContent);
@@ -144,8 +130,8 @@ namespace api.Infrastructure.Clients
                 var settingForZsUserId = teamClient.GetTeamSettingAsync(null, token?.AccessToken);
                 await Task.WhenAll(settingForName, settingForZsUserId).ConfigureAwait(false);
 
-                firstName = settingForName.Result?["firstName"]?.ToString()?.Replace(" ", "");
-                zsUserId = settingForZsUserId.Result?["zsuserId"]?.ToString();
+                firstName = settingForName.Result?.FirstName?.Replace(" ", "");
+                zsUserId = settingForZsUserId.Result?.ZsUserId;
             }
             var tokenName = $"{firstName}-{zsUserId}";
 
