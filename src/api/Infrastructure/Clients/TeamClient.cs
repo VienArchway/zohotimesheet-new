@@ -1,10 +1,6 @@
-using System.Collections.Generic;
-using System.Net;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using api.Infrastructure.Interfaces;
-using api.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace api.Infrastructure.Clients
 {
@@ -15,18 +11,40 @@ namespace api.Infrastructure.Clients
         {
         }
 
-        public async Task<JObject?> GetTeamSettingAsync(string? action = null, string? accessToken = null)
+        public record TeamSetting
+        {
+            public string? FirstName { get; set; }
+            public string? ZsUserId { get; set; }
+        }
+
+        public async Task<TeamSetting?> GetTeamSettingAsync(string? action = null, string? accessToken = null)
         {
             if (!string.IsNullOrEmpty(accessToken)) {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken);
             }
-
-            var response = await client.GetAsync($"team/{teamId}/settings/?action=" + action).ConfigureAwait(false);
+            
+            using var response = await client.GetAsync($"team/{teamId}/settings/?action=" + action, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode) return null;
+            try
+            {
+                if (response.Content != null)
+                {
+                    var contentStream = await response.Content.ReadAsStreamAsync();
+                    return await JsonSerializer.DeserializeAsync<TeamSetting?>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                }
+            }
+            finally
+            {
+                response.Dispose();
+            }
 
-            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var result = JsonConvert.DeserializeObject<JObject>(responseContent);
-            return result;
+            return null;
+        }
+
+        public async Task<string?> FetchTeamsAsync()
+        {
+            using var response = await client.GetAsync($"teams/", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            return !response.IsSuccessStatusCode ? null : "success";
         }
     }
 }

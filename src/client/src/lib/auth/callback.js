@@ -14,8 +14,8 @@ export function useHandleCallBack() {
     const handleRedirectFromCallBack = async () => {
         // logout
         if (route.query?.logout) {
+            localStorage.clear()
             await logout()
-            localStorage.setItem('authorized', false)
             window.location.href = '/'
         }
         
@@ -24,8 +24,8 @@ export function useHandleCallBack() {
             const firstName = localStorage.getItem('firstName')
             const zsUserId = localStorage.getItem('zsUserId')
             if (firstName && zsUserId) {
-                const { accessToken } = await getAccessTokenByRefreshTokenApi(firstName, zsUserId)
-                if (accessToken) {
+                const { access_token } = await getAccessTokenByRefreshTokenApi(firstName, zsUserId)
+                if (access_token) {
                     localStorage.setItem('authorized', true)
                     window.location.href = '/'
                 } else {
@@ -38,8 +38,8 @@ export function useHandleCallBack() {
 
         // login
         if (route.query?.code) {
-            const { accessToken } = await getAccessTokenFromCode(route.query.code)
-            if (!accessToken) {
+            const { access_token } = await getAccessTokenFromCode(route.query.code)
+            if (!access_token) {
                 console.error('invalid code')
                 return router.push({ name: 'error', params: {
                         errorMessage: 'Invalid code. Please contact admin',
