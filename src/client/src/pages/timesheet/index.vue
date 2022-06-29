@@ -473,3 +473,6 @@ export default defineComponent({
     }
 })
 </script>
+<style scoped>
+@import "./index.scss";
+</style>
