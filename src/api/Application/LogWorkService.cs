@@ -28,7 +28,10 @@ namespace api.Application
 
         public async Task<IEnumerable<LogWork>> SearchAsync(LogWorkSearchParameter parameter)
         {
-            var result = await client.SearchAsync(parameter.StartDate, parameter.EndDate, parameter.ProjectIds, parameter.SprintTypes, parameter.OwnerIds).ConfigureAwait(false);
+            var projects = parameter.Projects;
+            var delaySeconds = projects != null && projects.Count() > 6 ? 10 : 0;
+            var projectIds = projects != null ? projects.Select(x => x.ProjId) : null;
+            var result = await client.SearchAsync(parameter.StartDate, parameter.EndDate, projectIds, parameter.SprintTypes, parameter.OwnerIds).ConfigureAwait(false);
 
             return result;
         }

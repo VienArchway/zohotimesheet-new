@@ -230,24 +230,13 @@ export default defineComponent({
     };
   },
   async created() {
-    try {
-      await app.load(async () => {
-        const resProject = await projectApi.getAll();
+    await app.load(async () => {
+      const resProject = await projectApi.getAll();
 
-        this.values.projectData.items = resProject;
-        this.values.projectData.filterItems = resProject;
+      this.values.projectData.items = resProject;
+      this.values.projectData.filterItems = resProject;
 
-      })
-    } catch (error) {
-      const resMessage = error.response?.data?.message;
-      const errorDetail = JSON.parse(resMessage);
-      if (errorDetail) {
-        app.error(errorDetail.message, 100000);
-      }
-    }
-    // finally {
-    //     this.$store.commit("closeLoading");
-    // }
+    })
   },
   computed: {
     customStartDateFormatter () {
@@ -259,15 +248,14 @@ export default defineComponent({
   },
   methods: {
     async upload() {
-      try {
-        await app.load(async () => {
+      await app.load(async () => {
 
           this.values.logworkData.items = [];
 
           const searchCondition = {
             startDate: new Date(this.searchConditions.startDate),
             endDate: new Date(this.searchConditions.endDate),
-            sprintTypeId: this.searchConditions.sprintTypeId,
+            sprintTypes: this.sprintTypeId === "2" ? [ "2" ] :[ "0"],
             projects: this.searchConditions.projects
           };
 
@@ -277,16 +265,8 @@ export default defineComponent({
           {
             this.values.logworkData.items = response;
           }
-        })
-      } catch (error) {
-        const resMessage = error.response?.data?.message;
-        const errorDetail = JSON.parse(resMessage);
-        if (errorDetail) {
-          app.error(errorDetail.message, 100000);
-        }
-      } finally {
         app.success(this.t("dataloaded"), 5000);
-      }
+      })
     },
     projectNameFilter() {
       this.values.projectData.filterItems = _.filter(this.values.projectData.items, (proj) => { return proj.projName.includes(this.values.projectData.projectNameFilter)});
