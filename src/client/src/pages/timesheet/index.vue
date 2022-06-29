@@ -1,6 +1,8 @@
 <template>
   <div class="time-sheet">
-    <v-toolbar style="background-color: #f6f6f6; color: #009688">
+    <v-toolbar
+        class="px-0"
+        style="background-color: #f6f6f6; color: #009688">
       <div class="d-flex align-center justify-space-around">
         <v-select
             v-model="selectDateRange"
@@ -26,7 +28,10 @@
               <p>{{ t("lastweekinformation")}}</p>
             </span>
         </v-tooltip>
-        <v-tooltip location="end">
+      </div>
+      <v-spacer></v-spacer>
+      <div class="d-flex justify-space-around mr-1">
+        <v-tooltip location="top">
           <template v-slot:activator="{ props }">
             <v-btn
                 class="ma-2"
@@ -39,9 +44,6 @@
           </template>
           <span>{{ t("reloadData")}}</span>
         </v-tooltip>
-      </div>
-      <v-spacer></v-spacer>
-      <div class="d-flex justify-space-around">
         <v-menu location="start">
           <template v-slot:activator="{ props }">
             <v-btn v-bind="props" icon="mdi-dots-vertical" />
@@ -67,21 +69,21 @@
         fixed-header
         fixed-footer
         height="750">
-      <thead>
-      <tr>
-        <th width="20%">{{ t("project") }}</th>
-        <th width="25%">{{ t("item") }}</th>
-        <th width="5%">{{ t("status") }}</th>
-        <th width="5%">{{ t("done") }}</th>
-        <th>{{ t("estimatepoints") }}</th>
-        <th
-            v-for="(date, dateIndex) in daysOfWeek"
-            :key="`date-${dateIndex}`"
-            v-show="selecteddayOfWeek.includes(date.dayOfWeek)">
-          {{ date.dayOfWeek }}
-          <br/> {{ date.shortdate }}
-        </th>
-      </tr>
+      <thead class="elevation-5">
+        <tr>
+          <th width="20%">{{ t("project") }}</th>
+          <th width="25%">{{ t("item") }}</th>
+          <th width="5%">{{ t("status") }}</th>
+          <th width="5%">{{ t("done") }}</th>
+          <th>{{ t("estimatepoints") }}</th>
+          <th
+              v-for="(date, dateIndex) in daysOfWeek"
+              :key="`date-${dateIndex}`"
+              v-show="selecteddayOfWeek.includes(date.dayOfWeek)">
+            {{ date.dayOfWeek }}
+            <br/> {{ date.shortdate }}
+          </th>
+        </tr>
       </thead>
       <tbody v-for="(proj, index) in values.data" :key="`project-${index}`">
       <tr >
@@ -133,17 +135,17 @@
         </td>
       </tr>
       </tbody>
-      <tfoot>
-      <tr>
-        <td colspan="5" class="has-background-info">{{ t("total") }}</td>
-        <td class="has-background-info"
-            v-for="(date, dateIndex) in daysOfWeek"
-            v-show="selecteddayOfWeek.includes(date.dayOfWeek)"
-            :ref="`total-${date.dayOfWeek}`"
-            :key="`total-${dateIndex}`">
-          {{ date.total }}
-        </td>
-      </tr>
+      <tfoot class="elevation-10">
+        <tr>
+          <td colspan="5" class="has-background-info">{{ t("total") }}</td>
+          <td class="has-background-info"
+              v-for="(date, dateIndex) in daysOfWeek"
+              v-show="selecteddayOfWeek.includes(date.dayOfWeek)"
+              :ref="`total-${date.dayOfWeek}`"
+              :key="`total-${dateIndex}`">
+            {{ date.total }}
+          </td>
+        </tr>
       </tfoot>
     </v-table>
   </div>
