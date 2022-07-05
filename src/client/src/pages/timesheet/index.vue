@@ -34,7 +34,7 @@
         <v-tooltip location="top">
           <template v-slot:activator="{ props }">
             <v-btn
-                class="ma-2"
+                class="ma-2 text-capitalize"
                 v-bind="props"
                 @click="refreshCompleteOn"
             >
@@ -44,31 +44,37 @@
           </template>
           <span>{{ t("reloadData")}}</span>
         </v-tooltip>
-        <v-menu location="start">
+        <v-menu
+            location="start"
+            :close-on-content-click="false"
+        >
           <template v-slot:activator="{ props }">
             <v-btn v-bind="props" icon="mdi-dots-vertical" />
           </template>
-          <v-list nav dense>
-            <v-list-title>Select date</v-list-title>
-            <v-list-item v-for="(date) in daysOfWeek">
-              <v-checkbox
-                  v-model="selecteddayOfWeek"
-                  :key="`chk-${date.dayOfWeek}`"
-                  :label="date.dayOfWeek"
-                  :value="date.dayOfWeek"
-                  class="my-n4"
-                  dark
-                  hide-details
-              />
-            </v-list-item>
-          </v-list>
+          <v-card min-width="130">
+            <v-list nav dense>
+              <v-list-title>Select date</v-list-title>
+              <v-list-item v-for="(date) in daysOfWeek">
+                <v-checkbox
+                    v-model="selecteddayOfWeek"
+                    :key="`chk-${date.dayOfWeek}`"
+                    :label="date.dayOfWeek"
+                    :value="date.dayOfWeek"
+                    class="my-n4"
+                    dark
+                    hide-details
+                />
+              </v-list-item>
+            </v-list>
+          </v-card>
         </v-menu>
       </div>
     </v-toolbar>
     <v-table
         fixed-header
         fixed-footer
-        height="750">
+        height="750"
+    >
       <thead class="elevation-5">
         <tr>
           <th width="20%">{{ t("project") }}</th>
@@ -85,57 +91,59 @@
           </th>
         </tr>
       </thead>
-      <tbody v-for="(proj, index) in values.data" :key="`project-${index}`">
-      <tr >
-        <td :rowspan="proj.tasks.length ? (proj.tasks.length + 1) : 1">
-          <a :href="`${zohoSprintLink}#board/P${proj.projNo}`" target="_blank">{{ proj.name }}</a>
-        </td>
-      </tr>
-      <tr v-for="(task, taskIndex) in proj.tasks" :key="`task-${index}-${taskIndex}`">
-        <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
-          <v-icon v-if="task.projItemName === 'Task'" color="blue" small icon="mdi-file"></v-icon>
-          <v-icon v-else-if="task.projItemName === 'Bug'" color="pink" small icon="mdi-bug"></v-icon>
-          <v-icon v-else-if="task.projItemName === 'Story'" color="green" small icon="mdi-flag"></v-icon>
-          <a :href="`${zohoSprintLink}#itemdetails/P${proj.projNo}/I${task.itemNo}`" target="_blank" class="pl-2">
-            {{ task.itemName }}
-          </a>
-        </td>
-        <td>
-          <v-chip v-show="!['To do', 'In progress', 'Done'].includes(task.statusName)" color="yellow darken-4" text-color="white">Unknown</v-chip>
-          <v-chip v-show="task.statusName === 'To do'" color="pink" text-color="white">To do</v-chip>
-          <v-chip v-show="task.statusName === 'In progress'" color="blue darken-4" text-color="white">In progress</v-chip>
-          <v-chip v-show="task.statusName === 'Done'" color="teal" text-color="white">Done</v-chip>
-        </td>
-        <td class="text-center">
-          <v-icon
-              v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done'"
-              color="light-blue darken-4" @click="updateStatus(task)"
-              dark fab x-small
-              icon="mdi-check-outline"
-              start
-          >
-          </v-icon>
-        </td>
-        <td>{{ task.estimatePoint }}</td>
-        <td v-for="(logWork, logWorkIndex) in task.logWorks" :key="`logwork-${logWorkIndex}`" v-show="selecteddayOfWeek.includes(logWork.dayOfWeek)">
-          <div v-for="log in logWork.logs" :key="`log-${log.id}`" class="logWork-logs d-flex">
-            <v-text-field
-                type="number"
-                v-model="log.logTime"
-                :disabled="logWork.isDisabled"
-                :class="`input-${logWork.dayOfWeek}`"
-                hide-details
-                dense
-                outlined
-                @focus='saveOldLogTime(log.logTime)'
-                @blur='save($event, task, logWork, log)'>
-            </v-text-field>
-            <v-progress-circular indeterminate class="ml-2 d-none"/>
-          </div>
-        </td>
-      </tr>
+      <tbody>
+        <template v-for="(proj, index) in values.data" :key="`project-${index}`">
+          <tr>
+            <td :rowspan="proj.tasks.length ? (proj.tasks.length + 1) : 1">
+              <a :href="`${zohoSprintLink}#board/P${proj.projNo}`" target="_blank">{{ proj.name }}</a>
+            </td>
+          </tr>
+          <tr v-for="(task, taskIndex) in proj.tasks" :key="`task-${index}-${taskIndex}`">
+            <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
+              <v-icon v-if="task.projItemName === 'Task'" color="blue" small icon="mdi-file"></v-icon>
+              <v-icon v-else-if="task.projItemName === 'Bug'" color="pink" small icon="mdi-bug"></v-icon>
+              <v-icon v-else-if="task.projItemName === 'Story'" color="green" small icon="mdi-flag"></v-icon>
+              <a :href="`${zohoSprintLink}#itemdetails/P${proj.projNo}/I${task.itemNo}`" target="_blank" class="pl-2">
+                {{ task.itemName }}
+              </a>
+            </td>
+            <td>
+              <v-chip v-show="!['To do', 'In progress', 'Done'].includes(task.statusName)" color="yellow darken-4" text-color="white">Unknown</v-chip>
+              <v-chip v-show="task.statusName === 'To do'" color="pink" text-color="white">To do</v-chip>
+              <v-chip v-show="task.statusName === 'In progress'" color="blue darken-4" text-color="white">In progress</v-chip>
+              <v-chip v-show="task.statusName === 'Done'" color="teal" text-color="white">Done</v-chip>
+            </td>
+            <td class="text-center">
+              <v-icon
+                  v-show="['To do', 'In progress', 'Done'].includes(task.statusName) && task.statusName !== 'Done'"
+                  color="light-blue darken-4" @click="updateStatus(task)"
+                  dark fab x-small
+                  icon="mdi-check-outline"
+                  start
+              >
+              </v-icon>
+            </td>
+            <td>{{ task.estimatePoint }}</td>
+            <td v-for="(logWork, logWorkIndex) in task.logWorks" :key="`logwork-${logWorkIndex}`" v-show="selecteddayOfWeek.includes(logWork.dayOfWeek)">
+              <div v-for="log in logWork.logs" :key="`log-${log.id}`" class="logWork-logs d-flex">
+                <v-text-field
+                    type="number"
+                    v-model="log.logTime"
+                    :disabled="logWork.isDisabled"
+                    :class="`input-${logWork.dayOfWeek}`"
+                    hide-details
+                    dense
+                    outlined
+                    @focus='saveOldLogTime(log.logTime)'
+                    @blur='save($event, task, logWork, log)'>
+                </v-text-field>
+                <v-progress-circular indeterminate class="ml-2 d-none"/>
+              </div>
+            </td>
+          </tr>
+        </template>
       </tbody>
-      <tfoot class="elevation-10">
+      <tfoot>
         <tr>
           <td colspan="5" class="has-background-info">{{ t("total") }}</td>
           <td class="has-background-info"
@@ -200,12 +208,11 @@ export default defineComponent({
         }
     },
     async created() {
-        await this.search();
+      this.getWeekDateData();
+      await this.search();
     },
     methods: {
         async search() {
-            this.getWeekDateData();
-
             this.values.data = [];
             this.values.logWorkData = [];
             this.values.sortTaskItems = [];
