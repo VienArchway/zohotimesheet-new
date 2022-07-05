@@ -1,7 +1,7 @@
 name: Build to prod and deploy to Azure container registry
 
 on:
-  push:
+  pull_request:
     branches:
       - 'feature/**'
       - 'bug/**'
