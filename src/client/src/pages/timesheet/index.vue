@@ -73,10 +73,10 @@
     <v-table
         fixed-header
         fixed-footer
-        height="750"
+        height="580"
     >
-      <thead class="elevation-5">
-        <tr>
+      <thead>
+        <tr class="elevation-5">
           <th width="20%">{{ t("project") }}</th>
           <th width="25%">{{ t("item") }}</th>
           <th width="5%">{{ t("status") }}</th>
@@ -144,7 +144,7 @@
         </template>
       </tbody>
       <tfoot>
-        <tr>
+        <tr class="elevation-5">
           <td colspan="5" class="has-background-info">{{ t("total") }}</td>
           <td class="has-background-info"
               v-for="(date, dateIndex) in daysOfWeek"
