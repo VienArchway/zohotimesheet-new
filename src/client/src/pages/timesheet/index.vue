@@ -53,7 +53,7 @@
           </template>
           <v-card min-width="130">
             <v-list nav dense>
-              <v-list-title>Select date</v-list-title>
+              <h4>Select date</h4>
               <v-list-item v-for="(date) in daysOfWeek">
                 <v-checkbox
                     v-model="selecteddayOfWeek"
