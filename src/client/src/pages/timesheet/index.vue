@@ -222,6 +222,7 @@ export default defineComponent({
                     const allTaskItems = resOpenTaskItems.concat(resClosedTaskItems);
 
                     const logworkSearchCondition = {
+                        OwnerIds: [app.zsUserId],
                         StartDate: new Date(moment(this.startdayOfWeek).add(1, "days")),
                         EndDate: new Date(moment(this.startdayOfWeek).add(7, "days"))
                     };

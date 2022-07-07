@@ -10,14 +10,19 @@ using api.Models;
 using api.Infrastructure.Interfaces;
 using System.Web;
 using System.Net;
+using System.Net.Http.Headers;
 
 namespace api.Infrastructure.Clients
 {
     public class LogWorkClient : ZohoServiceClient, ILogWorkClient
     {
-        public LogWorkClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider)
+        
+        private readonly IZohoTokenClient zohoTokenClient;
+
+        public LogWorkClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider, IZohoTokenClient zohoTokenClient)
             : base(client, configuration, svcProvider)
         {
+            this.zohoTokenClient = zohoTokenClient;
         }
 
         public async Task<IEnumerable<LogWork>> SearchAsync(
@@ -75,12 +80,16 @@ namespace api.Infrastructure.Clients
 
                     var filterEncode = HttpUtility.UrlEncode(JsonConvert.SerializeObject(filter));
 
-                    var url = $"team/{teamId}/timesheet/?action=orglogs&viewtype=1&index={index}&range={range}&logtype=0";
+                    var url = $"team/{teamId}/timesheet/?action=orglogs&viewtype=0&index={index}&range={range}&logtype=0";
 
 
                     if (!string.IsNullOrEmpty(filterEncode))
                     {
                         url += $"&filter={filterEncode}";
+                    }
+                    if(client.DefaultRequestHeaders.Authorization.Parameter == null) {
+                        var accessToken = await zohoTokenClient.GetAdminAccessTokenAsync().ConfigureAwait(false);
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken.AccessToken);
                     }
 
                     var response = await client.GetAsync(url).ConfigureAwait(false);

@@ -255,7 +255,7 @@ export default defineComponent({
           const searchCondition = {
             startDate: new Date(this.searchConditions.startDate),
             endDate: new Date(this.searchConditions.endDate),
-            sprintTypes: this.sprintTypeId === "2" ? [ "2" ] :[ "0"],
+            sprintTypes: this.sprintTypeId === "2" ? [ "2" ] :["2", "3"],
             projects: this.searchConditions.projects
           };
 

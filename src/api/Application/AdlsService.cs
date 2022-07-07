@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using api.Application.Interfaces;
 using api.Application.Resolver;
 using api.Infrastructure.Interfaces;
@@ -12,7 +13,7 @@ namespace api.Application
     {
         private readonly ILogWorkService logWorkService;
 
-        private readonly IAdlsClient AdlsClient;
+        private readonly IAdlsClient adlsClient;
 
         private readonly ISlackWebHookClient slackClient;
 
@@ -32,7 +33,7 @@ namespace api.Application
 
         public AdlsService(
             ILogWorkService logWorkService,
-            IAdlsClient AdlsClient,
+            IAdlsClient adlsClient,
             IConfiguration configuration,
             IBackgroundTaskQueue queueTaskService,
             IServiceScopeFactory serviceScopeFactory,
@@ -40,7 +41,7 @@ namespace api.Application
             PowerBIClient powerBIClient)
         {            
             this.logWorkService = logWorkService;
-            this.AdlsClient = AdlsClient;
+            this.adlsClient = adlsClient;
             this.slackClient = slackClient;
             this.serviceScopeFactory = serviceScopeFactory;
             this.queueTaskService = queueTaskService;
@@ -53,23 +54,23 @@ namespace api.Application
 
         public async Task<IEnumerable<LogWork>> GetFromAdlsAsync()
         {
-            var isExist = AdlsClient.CheckExist(logWorkFilePath);
+            var isExist = adlsClient.CheckExist(logWorkFilePath);
             if (!isExist)
             {
                 throw new FileNotFoundException();
             }
 
-            var content = await AdlsClient.DownloadAsync(logWorkFilePath).ConfigureAwait(false);
+            var content = await adlsClient.DownloadAsync(logWorkFilePath).ConfigureAwait(false);
             return !string.IsNullOrEmpty(content) ? JsonConvert.DeserializeObject<LogWorkFileContent>(content).Logs : Enumerable.Empty<LogWork>();
         }
 
         public async Task DeleteFromAdlsAsync(string[] AdlsIds)
         {
-            var isExist = AdlsClient.CheckExist(logWorkFilePath);
+            var isExist = adlsClient.CheckExist(logWorkFilePath);
 
             if (!isExist)
             {
-                await AdlsClient.CreateFileAsync(logWorkFilePath).ConfigureAwait(false);
+                await adlsClient.CreateFileAsync(logWorkFilePath).ConfigureAwait(false);
             }
 
             if (queueTaskService.Status)
@@ -77,29 +78,29 @@ namespace api.Application
                 throw new InvalidOperationException("Can not upload data because data file is using, please try later!");
             }
 
-            var currentAdlsContent = await AdlsClient.DownloadAsync(logWorkFilePath).ConfigureAwait(false);
+            var currentAdlsContent = await adlsClient.DownloadAsync(logWorkFilePath).ConfigureAwait(false);
             var currentAdlsData = JsonConvert.DeserializeObject<LogWorkFileContent>(currentAdlsContent);
             var newData = currentAdlsData == null ? Enumerable.Empty<LogWork>() : currentAdlsData.Logs.Where(x => !AdlsIds.Contains(x.LogTimeId)).ToList();
 
             var content = JsonConvert.SerializeObject(new LogWorkFileContent() { Logs = newData });
-            await AdlsClient.UploadAsync(content, logWorkFilePath).ConfigureAwait(false);
+            await adlsClient.UploadAsync(content, logWorkFilePath).ConfigureAwait(false);
             await RefreshPowerBIDataAsync().ConfigureAwait(false);
         }
 
         public async Task<IEnumerable<LogWork>> TransferAdlsAsync(LogWorkSearchParameter parameter, string userTransfer = null)
         {
             var data = await logWorkService.SearchAsync(parameter).ConfigureAwait(false);
-            var isExist = AdlsClient.CheckExist(logWorkFilePath);
-            var isBackUpExist = AdlsClient.CheckExist(logWorkFilePathBackUp);
+            var isExist = adlsClient.CheckExist(logWorkFilePath);
+            var isBackUpExist = adlsClient.CheckExist(logWorkFilePathBackUp);
 
             if (!isExist)
             {
-                await AdlsClient.CreateFileAsync(logWorkFilePath).ConfigureAwait(false);
+                await adlsClient.CreateFileAsync(logWorkFilePath).ConfigureAwait(false);
             }
 
             if (!isBackUpExist)
             {
-                await AdlsClient.CreateFileAsync(logWorkFilePathBackUp).ConfigureAwait(false);
+                await adlsClient.CreateFileAsync(logWorkFilePathBackUp).ConfigureAwait(false);
             }
 
             if (queueTaskService.Status)
@@ -107,14 +108,14 @@ namespace api.Application
                 throw new InvalidOperationException("Can not upload data because data file is using, please try later!");
             }
 
-            var currentAdlsContent = await AdlsClient.DownloadAsync(logWorkFilePath).ConfigureAwait(false);
+            var currentAdlsContent = await adlsClient.DownloadAsync(logWorkFilePath).ConfigureAwait(false);
 
             // to back up before process new data
-            var fileInfo = await AdlsClient.GetPropertiesAsync(logWorkFilePath).ConfigureAwait(false);
-            var fileBackUpInfo = await AdlsClient.GetPropertiesAsync(logWorkFilePathBackUp).ConfigureAwait(false);
+            var fileInfo = await adlsClient.GetPropertiesAsync(logWorkFilePath).ConfigureAwait(false);
+            var fileBackUpInfo = await adlsClient.GetPropertiesAsync(logWorkFilePathBackUp).ConfigureAwait(false);
             if (fileInfo.ContentLength > fileBackUpInfo.ContentLength)
             {
-                await AdlsClient.UploadAsync(currentAdlsContent, logWorkFilePathBackUp).ConfigureAwait(false);
+                await adlsClient.UploadAsync(currentAdlsContent, logWorkFilePathBackUp).ConfigureAwait(false);
             }
 
             // remove data duplicate and upload
@@ -125,8 +126,8 @@ namespace api.Application
                 ContractResolver = new LogWorkIgnorePropertiesResolver(new[] { "projNo" })
             });
 
-            await AdlsClient.UploadAsync(content, logWorkFilePath).ConfigureAwait(false);
-            var fileInfoAfterTranfer = await AdlsClient.GetPropertiesAsync(logWorkFilePath).ConfigureAwait(false);
+            await adlsClient.UploadAsync(content, logWorkFilePath).ConfigureAwait(false);
+            var fileInfoAfterTranfer = await adlsClient.GetPropertiesAsync(logWorkFilePath).ConfigureAwait(false);
 
             if (fileInfo.ContentLength > fileInfoAfterTranfer.ContentLength)
             {
@@ -159,13 +160,13 @@ namespace api.Application
                     StartDate = logDate,
                     EndDate = logDate
             };
-            var AdlsItems = await logWorkService.SearchAsync(param).ConfigureAwait(false);
-            var data = AdlsItems.Where(x => x.LogTimeId == logId);
-            var isExist = AdlsClient.CheckExist(logWorkFilePath);
+            var adlsItems = await logWorkService.SearchAsync(param).ConfigureAwait(false);
+            var data = adlsItems.Where(x => x.LogTimeId == logId);
+            var isExist = adlsClient.CheckExist(logWorkFilePath);
 
             if (!isExist)
             {
-                await AdlsClient.CreateFileAsync(logWorkFilePath).ConfigureAwait(false);
+                await adlsClient.CreateFileAsync(logWorkFilePath).ConfigureAwait(false);
             }
 
             queueTaskService.QueueBackgroundWorkItem(async token =>
@@ -221,14 +222,14 @@ namespace api.Application
 
         public async Task RestoreFromAdlsAsync()
         {
-            var isBackUpExist = AdlsClient.CheckExist(logWorkFilePathBackUp);
+            var isBackUpExist = adlsClient.CheckExist(logWorkFilePathBackUp);
             if (!isBackUpExist)
             {
                 throw new FileNotFoundException();
             }
 
-            var backedUpAdlsContent = await AdlsClient.DownloadAsync(logWorkFilePathBackUp).ConfigureAwait(false);
-            await AdlsClient.UploadAsync(backedUpAdlsContent, logWorkFilePath).ConfigureAwait(false);
+            var backedUpAdlsContent = await adlsClient.DownloadAsync(logWorkFilePathBackUp).ConfigureAwait(false);
+            await adlsClient.UploadAsync(backedUpAdlsContent, logWorkFilePath).ConfigureAwait(false);
         }
 
         public async Task RefreshPowerBIDataAsync()
