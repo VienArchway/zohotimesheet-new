@@ -18,8 +18,8 @@
 
     thead tr {
       th {
-        background-color: #009688 !important;
-        color: #ffffff !important;
+        background-color: #f6f6f6 !important;
+        color: #009688 !important;
       }
 
       :first-child {
@@ -35,13 +35,21 @@
       border: thin solid rgba(0, 0, 0, 0.12);
     }
 
-    tfoot td {
+    tfoot tr {
       bottom: 0;
       position: -webkit-sticky;
       position: sticky;
       z-index: 4;
-      background-color: #2196F3 !important;
-      color: #ffffff !important;
+      background-color: #f6f6f6 !important;
+      color: #009688 !important;
+      font-weight: bold;
+    }
+
+    thead tr {
+      bottom: 0;
+      position: -webkit-sticky;
+      position: sticky;
+      z-index: 4;
     }
 
     /* Chrome, Safari, Edge, Opera */

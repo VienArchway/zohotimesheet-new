@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export default defineStore('app', {
+const appStore = defineStore('app', {
     state: () => ({
         zsUserId: localStorage.getItem('zsUserId'),
         isLoading: false,
@@ -37,3 +37,5 @@ export default defineStore('app', {
         }
     }
 })
+
+export default appStore

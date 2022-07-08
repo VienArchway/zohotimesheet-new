@@ -1,5 +1,5 @@
 {
-  "hello": "こんにちは",
+  "dayOfWeeks": "曜日",
   "transfer": "トランスファー",
   "manually": "手動",
   "schedule": "スケジュール",
@@ -65,7 +65,8 @@
   },
   "button": {
     "back": "戻る",
-    "try-again": "もう一度やり直してください"
+    "try-again": "もう一度やり直してください",
+    "refresh": "リフレッシュ"
   },
   "pages": {
     "not-found": "見つかりません"

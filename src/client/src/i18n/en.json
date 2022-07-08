@@ -1,5 +1,5 @@
 {
-  "hello": "hello",
+  "dayOfWeeks": "Date of weeks",
   "transfer": "Transfer",
     "manually": "Manually",
     "schedule": "Schedule",
@@ -67,7 +67,8 @@
     "webhook": "WebHook",
   "button": {
     "back": "Back",
-    "try-again": "Try again"
+    "try-again": "Try again",
+    "refresh": "Refresh"
   },
   "pages": {
     "not-found": "Not found"

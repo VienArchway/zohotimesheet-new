@@ -170,108 +170,211 @@
     </v-row>
   </v-container>
 </template>
-<script>
-import moment from "moment"
+
+<script setup>
+import { ref, reactive, computed, onBeforeMount, onMounted } from 'vue'
+import moment from 'moment'
 import adlsApi from '@/api/resources/adls'
 import projectApi from '@/api/resources/project'
-import appStore from '@/store/app.js'
-import { defineComponent } from 'vue'
+import appStore from '@/store/app'
 import { useI18n } from 'vue-i18n'
 
 const app = appStore()
+const { t } = useI18n()
 
-export default defineComponent({
-  setup() {
-    const { t } = useI18n()
-    return { t }
-  },
-  data() {
-    return {
-      isShowStartDate: false,
-      isShowEndDate: false,
-      values: {
-        projectData: {
-          projectNameFilter: "",
-          headers: [
-            {
-              text: this.t("project"),
-              value: "projName"
-            }
-          ],
-          items: [],
-          filterItems: []
-        },
-        sprintData: {
-          items: [
-            {text: this.t("activesprint"), value: 2 },
-            {text: this.t("allsprint"), value: 0 }
-          ]
-        },
-        logworkData: {
-          headers: [
-            { text: this.t("project"), value: "projName" },
-            { text: this.t("item"), value: "itemName" },
-            { text: this.t("owner"), value: "OwnerName" },
-            { text: this.t("logdate"), value: "logDate" },
-            { text: this.t("logtime"), value: "logTime" },
-            { text: "", value: "json", sortable: false }
-          ],
-          items: []
-        }
-      },
-      searchConditions: {
-        startDate: new Date().toISOString().substr(0, 10),
-        endDate: new Date().toISOString().substr(0, 10),
-        sprintTypeId: 2,
-        projects: [],
-        minDate: new Date(2019, 7, 2).toISOString().substr(0, 10),
-        maxDate: new Date().toISOString().substr(0, 10)
+const isShowStartDate = ref(false)
+const isShowEndDate = ref(false)
+const values = reactive({
+  projectData: {
+    projectNameFilter: "",
+    headers: [
+      {
+        text: t("project"),
+        value: "projName"
       }
-    };
+    ],
+    items: [],
+    filterItems: []
   },
-  async created() {
-    await app.load(async () => {
-      const resProject = await projectApi.getAll();
-
-      this.values.projectData.items = resProject;
-      this.values.projectData.filterItems = resProject;
-
-    })
+  sprintData: {
+    items: [
+      {text: t("activesprint"), value: 2 },
+      {text: t("allsprint"), value: 0 }
+    ]
   },
-  computed: {
-    customStartDateFormatter () {
-      return this.searchConditions.startDate ? moment(this.searchConditions.startDate).format("LL") : "";
-    },
-    customEndDateFormatter () {
-      return this.searchConditions.endDate ? moment(this.searchConditions.endDate).format("LL") : "";
-    }
-  },
-  methods: {
-    async upload() {
-      await app.load(async () => {
-
-          this.values.logworkData.items = [];
-
-          const searchCondition = {
-            startDate: new Date(this.searchConditions.startDate),
-            endDate: new Date(this.searchConditions.endDate),
-            sprintTypes: this.sprintTypeId === "2" ? [ "2" ] :["2", "3"],
-            projects: this.searchConditions.projects
-          };
-
-          const response = await adlsApi.transfer(searchCondition);
-
-          if (response !== null && response !== undefined)
-          {
-            this.values.logworkData.items = response;
-          }
-        app.success(this.t("dataloaded"), 5000);
-      })
-    },
-    projectNameFilter() {
-      this.values.projectData.filterItems = _.filter(this.values.projectData.items, (proj) => { return proj.projName.includes(this.values.projectData.projectNameFilter)});
-    }
+  logworkData: {
+    headers: [
+      {text: t("project"), value: "projName"},
+      {text: t("item"), value: "itemName"},
+      {text: t("owner"), value: "OwnerName"},
+      {text: t("logdate"), value: "logDate"},
+      {text: t("logtime"), value: "logTime"},
+      {text: "", value: "json", sortable: false}
+    ],
+    items: []
   }
 })
+const searchConditions = reactive({
+  startDate: new Date().toISOString().substr(0, 10),
+  endDate: new Date().toISOString().substr(0, 10),
+  sprintTypeId: 2,
+  projects: [],
+  minDate: new Date(2019, 7, 2).toISOString().substr(0, 10),
+  maxDate: new Date().toISOString().substr(0, 10)
+})
+
+// computed
+const customStartDateFormatter = computed(() => {
+  return searchConditions.startDate ? moment(searchConditions.startDate).format("LL") : "";
+})
+const customEndDateFormatter = computed(() => {
+  return searchConditions.endDate ? moment(this.searchConditions.endDate).format("LL") : "";
+})
+
+// handle a methods
+async function upload() {
+  await app.load(async () => {
+
+    values.logworkData.items = [];
+
+    const searchCondition = {
+      startDate: new Date(searchConditions.startDate),
+      endDate: new Date(searchConditions.endDate),
+      sprintTypes: searchConditions.sprintTypeId === "2" ? ["2"] :["2", "3"],
+      projects: searchConditions.projects
+    };
+
+    const response = await adlsApi.transfer(searchCondition);
+    debugger
+    if (response !== null && response !== undefined)
+    {
+      values.logworkData.items = response;
+    }
+    app.success(t("dataloaded"), 5000);
+  })
+}
+
+const projectNameFilter = () => {
+  values.projectData.filterItems = _.filter(values.projectData.items, (proj) => {
+    return proj.projName.includes(values.projectData.projectNameFilter)
+  });
+}
+
+// bind data
+onBeforeMount(async () => {
+  await app.load(async () => {
+    const resProject = await projectApi.getAll();
+
+    values.projectData.items = resProject;
+    values.projectData.filterItems = resProject;
+  })
+})
+onMounted(() => {})
 
 </script>
+
+<!--<script>-->
+<!--import moment from "moment"-->
+<!--import adlsApi from '@/api/resources/adls'-->
+<!--import projectApi from '@/api/resources/project'-->
+<!--import appStore from '@/store/app.js'-->
+<!--import { defineComponent } from 'vue'-->
+<!--import { useI18n } from 'vue-i18n'-->
+
+<!--const app = appStore()-->
+
+<!--export default defineComponent({-->
+<!--  setup() {-->
+<!--    const { t } = useI18n()-->
+<!--    return { t }-->
+<!--  },-->
+<!--  data() {-->
+<!--    return {-->
+<!--      isShowStartDate: false,-->
+<!--      isShowEndDate: false,-->
+<!--      values: {-->
+<!--        projectData: {-->
+<!--          projectNameFilter: "",-->
+<!--          headers: [-->
+<!--            {-->
+<!--              text: this.t("project"),-->
+<!--              value: "projName"-->
+<!--            }-->
+<!--          ],-->
+<!--          items: [],-->
+<!--          filterItems: []-->
+<!--        },-->
+<!--        sprintData: {-->
+<!--          items: [-->
+<!--            {text: this.t("activesprint"), value: 2 },-->
+<!--            {text: this.t("allsprint"), value: 0 }-->
+<!--          ]-->
+<!--        },-->
+<!--        logworkData: {-->
+<!--          headers: [-->
+<!--            { text: this.t("project"), value: "projName" },-->
+<!--            { text: this.t("item"), value: "itemName" },-->
+<!--            { text: this.t("owner"), value: "OwnerName" },-->
+<!--            { text: this.t("logdate"), value: "logDate" },-->
+<!--            { text: this.t("logtime"), value: "logTime" },-->
+<!--            { text: "", value: "json", sortable: false }-->
+<!--          ],-->
+<!--          items: []-->
+<!--        }-->
+<!--      },-->
+<!--      searchConditions: {-->
+<!--        startDate: new Date().toISOString().substr(0, 10),-->
+<!--        endDate: new Date().toISOString().substr(0, 10),-->
+<!--        sprintTypeId: 2,-->
+<!--        projects: [],-->
+<!--        minDate: new Date(2019, 7, 2).toISOString().substr(0, 10),-->
+<!--        maxDate: new Date().toISOString().substr(0, 10)-->
+<!--      }-->
+<!--    };-->
+<!--  },-->
+<!--  async created() {-->
+<!--    await app.load(async () => {-->
+<!--      const resProject = await projectApi.getAll();-->
+
+<!--      this.values.projectData.items = resProject;-->
+<!--      this.values.projectData.filterItems = resProject;-->
+
+<!--    })-->
+<!--  },-->
+<!--  computed: {-->
+<!--    customStartDateFormatter () {-->
+<!--      return this.searchConditions.startDate ? moment(this.searchConditions.startDate).format("LL") : "";-->
+<!--    },-->
+<!--    customEndDateFormatter () {-->
+<!--      return this.searchConditions.endDate ? moment(this.searchConditions.endDate).format("LL") : "";-->
+<!--    }-->
+<!--  },-->
+<!--  methods: {-->
+<!--    async upload() {-->
+<!--      await app.load(async () => {-->
+
+<!--          this.values.logworkData.items = [];-->
+
+<!--          const searchCondition = {-->
+<!--            startDate: new Date(this.searchConditions.startDate),-->
+<!--            endDate: new Date(this.searchConditions.endDate),-->
+<!--            sprintTypes: this.sprintTypeId === "2" ? [ "2" ] :[ "0"],-->
+<!--            projects: this.searchConditions.projects-->
+<!--          };-->
+
+<!--          const response = await adlsApi.transfer(searchCondition);-->
+
+<!--          if (response !== null && response !== undefined)-->
+<!--          {-->
+<!--            this.values.logworkData.items = response;-->
+<!--          }-->
+<!--          app.success(this.t("dataloaded"), 5000);-->
+<!--      })-->
+<!--    },-->
+<!--    projectNameFilter() {-->
+<!--      this.values.projectData.filterItems = _.filter(this.values.projectData.items, (proj) => { return proj.projName.includes(this.values.projectData.projectNameFilter)});-->
+<!--    }-->
+<!--  }-->
+<!--})-->
+
+<!--</script>-->

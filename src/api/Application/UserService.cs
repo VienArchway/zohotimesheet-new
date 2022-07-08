@@ -16,13 +16,15 @@ namespace api.Application
 
         public async Task<User> GetCurrentUser()
         {
-            var settingForName =  await teamClient.GetTeamSettingAsync("signout").ConfigureAwait(false);
+            var settingForName =  teamClient.GetTeamSettingAsync("signout");
+            var settingForZsUserId = teamClient.GetTeamSettingAsync();
+            await Task.WhenAll(settingForName, settingForZsUserId).ConfigureAwait(false);
 
-            var settingForZsUserId = await teamClient.GetTeamSettingAsync().ConfigureAwait(false);
-
-            var user = new User();
-            user.FirstName = settingForName?["firstName"]?.ToString().Replace(" ","");
-            user.ZSUserId = settingForZsUserId?["zsuserId"]?.ToString();
+            var user = new User
+            {
+                FirstName = settingForName.Result?.FirstName?.Replace(" ",""),
+                ZSUserId = settingForZsUserId.Result?.ZsUserId
+            };
 
             return user;
         }
