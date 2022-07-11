@@ -32,8 +32,9 @@
     </v-row>
     <v-table
         fixed-header
-        height="700px" >
-        <thead>
+        height="calc(100vh - 170px)"
+    >
+        <thead style="position: sticky; z-index: 2">
             <tr>
                 <th class="text-left">
                 </th>

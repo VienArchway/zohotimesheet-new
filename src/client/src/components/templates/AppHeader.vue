@@ -9,31 +9,44 @@ onMounted(() => {
   userName.value = localStorage.getItem('firstName')
 })
 
+function setActive(event) {
+  return event.currentTarget.classList.add('v-btn--active')
+}
+
 </script>
 
 <template>
   <v-app-bar app color="teal" dark>
-    <v-btn href="/">
+    <v-btn
+      href="/"
+    >
       <img src="@/assets/images/zohoImage.png" alt="logo" width="48" height="36" />
     </v-btn>
     <v-menu>
       <template v-slot:activator="{ props }">
-        <v-btn color="primary" v-bind="props">
+        <v-btn
+          v-bind="props"
+          color="white"
+        >
           {{ t("transfer") }}
         </v-btn>
       </template>
 
       <v-list>
         <v-list-item to="/">{{ t("manually") }}</v-list-item>
+        <v-list-item to="/transfer/quasar-transfer">{{ t('Quasar transfer') }}</v-list-item>
         <v-list-item to="schedule">{{ t("schedule") }}</v-list-item>
       </v-list>
     </v-menu>
-    <v-btn to="timesheet">
+    <v-btn
+      color="white"
+      to="timesheet"
+    >
       {{ t("timeSheet") }}
     </v-btn>
     <v-menu>
       <template v-slot:activator="{ props }">
-        <v-btn v-bind="props">
+        <v-btn color="white" v-bind="props">
           {{ t("powerBI") }}
         </v-btn>
       </template>
@@ -44,10 +57,17 @@ onMounted(() => {
         </v-list-item>
       </v-list>
     </v-menu>
-    <v-btn href="https://projectmanagementstrage.z11.web.core.windows.net/" target="_blank">
+    <v-btn
+      href="https://projectmanagementstrage.z11.web.core.windows.net/"
+      target="_blank"
+      color="white"
+    >
       {{ t("projectmanagement") }}
     </v-btn>
-    <v-btn to="/webhook">
+    <v-btn
+      to="/webhook"
+      color="white"
+    >
       {{ t("webhook") }}
     </v-btn>
     <v-spacer></v-spacer>
@@ -55,8 +75,11 @@ onMounted(() => {
     <v-avatar size="36">
       <img src="https://contacts.zoho.com/file?fs=thumb&exp=600" alt="user-avatar"/>
     </v-avatar>
-    <div class="ml-2 mr-2">{{ userName }}</div>
-    <v-btn to="/auth/callback?logout=true">
+    <div class="ml-2 mr-2 text-white">{{ userName }}</div>
+    <v-btn
+      to="/auth/callback?logout=true"
+      color="white"
+    >
       {{ t("signOut") }}
     </v-btn>
   </v-app-bar>

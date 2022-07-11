@@ -4,45 +4,44 @@
         <v-col cols="12" md="4">
             <v-card class="pa-2" outlined tile>
                 <v-card-title>
-                {{ t('project') }}
-                <v-spacer></v-spacer>
-                <v-text-field
-                    v-model="values.projectData.projectNameFilter"
-                    append-icon="mdi-magnify"
-                    :label="t('search')"
-                    @update:modelValue="projectNameFilter"
-                    single-line
-                    hide-details
-                ></v-text-field>
+                    {{ t('project') }}
+                    <v-spacer></v-spacer>
+                    <v-text-field
+                        v-model="values.projectData.projectNameFilter"
+                        append-icon="mdi-magnify"
+                        :label="t('search')"
+                        @update:modelValue="projectNameFilter"
+                        single-line
+                        hide-details
+                    />
                 </v-card-title>
-                    <v-table 
-                        fixed-header
-                        height="300px"
-                    >
-                        <thead>
-                            <tr>
-                                <th class="text-left">
-                                </th>
-                                <th class="text-left">
-                                    {{ t('project') }}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="item in values.projectData.filterItems"
-                                :key="item.projId"
-                            >
-                                <td>
-                                    <v-checkbox
-                                        v-model="searchConditions.projects"
-                                        :value="item"
-                                        hide-details
-                                    ></v-checkbox>
-                                </td>
-                                <td>{{ item.projName }}</td>
-                            </tr>
-                        </tbody>
+                <v-table
+                    fixed-header
+                    height="300px"
+                >
+                    <thead style="position: sticky; z-index: 2">
+                        <tr>
+                            <th />
+                            <th class="text-left">
+                               {{ t('project') }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="item in values.projectData.filterItems"
+                            :key="item.projId"
+                        >
+                            <td>
+                                <v-checkbox
+                                    v-model="searchConditions.projects"
+                                    :value="item"
+                                    hide-details
+                                />
+                            </td>
+                            <td>{{ item.projName }}</td>
+                        </tr>
+                    </tbody>
                 </v-table>
             </v-card>
         </v-col>
@@ -114,8 +113,9 @@
         <v-col cols="12" md="12">
             <v-table v-show="values.logworkData.length > 0 || values.logworkData !== undefined || values.logworkData !== null"
                 fixed-header
-                height="400px" >
-                <thead>
+                height="calc(100vh - 170px)"
+            >
+                <thead style="position: sticky; z-index: 2">
                     <tr>
                         <th class="text-left">
                             {{ t("project") }}
@@ -245,7 +245,6 @@ async function upload() {
     };
 
     const response = await adlsApi.transfer(searchCondition);
-    debugger
     if (response !== null && response !== undefined)
     {
       values.logworkData.items = response;
