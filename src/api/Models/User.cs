@@ -24,5 +24,6 @@ namespace api.Models
 
         [JsonProperty(PropertyName = "userRole")]
         public int UserRole { get; set; }
+        
     }
 }

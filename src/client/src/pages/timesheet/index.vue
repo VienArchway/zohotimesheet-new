@@ -169,6 +169,7 @@ import { useI18n } from 'vue-i18n'
 
 import logworkApi from '@/api/resources/logwork'
 import itemApi from '@/api/resources/item'
+import { getAllUser} from '@/api/resources/user'
 
 const { t } = useI18n()
 const app = appStore()
@@ -198,6 +199,9 @@ const selecteddayOfWeek = ref([
 const estimatedPointVals = reactive([
   0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48
 ])
+
+const assignees = reactive([])
+const assignee = ref(null)
 
 const refTimeSheet = ref(null)
 const startdayOfWeek = ref(moment().startOf('week'))
@@ -236,6 +240,10 @@ function getSubItemsOfItem(rootItem, subItemIds, allTaskItems) {
     }
 
   });
+}
+
+async function loadUsers() {
+  assignees = await getAllUser();
 }
 
 async function search() {
@@ -489,6 +497,7 @@ function saveOldLogTime(logTime) {
 
 // bind data
 onBeforeMount(async () => {
+  await getAllUser()
   getWeekDateData()
   await search()
 })

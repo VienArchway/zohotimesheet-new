@@ -8,3 +8,9 @@ export async function getCurrentUser() {
         return await res.json()
     }
 }
+export async function getAllUser() {
+    const res = await fetchApi('GET', API_PATH_NAME + '/all')
+    if (res) {
+        return await res.json()
+    }
+}

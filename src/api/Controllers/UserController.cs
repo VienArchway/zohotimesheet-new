@@ -24,4 +24,12 @@ public class UserController : ControllerBase
         var result = await service.GetCurrentUser().ConfigureAwait(false);
         return Ok(result);
     }
+
+    [HttpGet("all")]
+    [ProducesResponseType(typeof(string), 200)]
+    public async Task<IActionResult> GetAllAsync()
+    {
+        var result = await service.GetAllAsync().ConfigureAwait(false);
+        return Ok(result);
+    }
 }

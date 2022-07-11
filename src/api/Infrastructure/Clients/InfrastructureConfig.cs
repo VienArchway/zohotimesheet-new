@@ -13,6 +13,7 @@ namespace api.Infrastructure
             
             services.AddScoped<IProjectClient, ProjectClient>();
             services.AddScoped<ITeamClient, TeamClient>();
+            services.AddScoped<IUserClient, UserClient>();
             services.AddScoped<ITaskItemClient, TaskItemClient>();
             services.AddScoped<IBackLogClient, BackLogClient>();
             services.AddScoped<ISprintClient, SprintClient>();
