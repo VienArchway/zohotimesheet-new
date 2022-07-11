@@ -4,45 +4,44 @@
         <v-col cols="12" md="4">
             <v-card class="pa-2" outlined tile>
                 <v-card-title>
-                {{ t('project') }}
-                <v-spacer></v-spacer>
-                <v-text-field
-                    v-model="values.projectData.projectNameFilter"
-                    append-icon="mdi-magnify"
-                    :label="t('search')"
-                    @update:modelValue="projectNameFilter"
-                    single-line
-                    hide-details
-                ></v-text-field>
+                    {{ t('project') }}
+                    <v-spacer></v-spacer>
+                    <v-text-field
+                        v-model="values.projectData.projectNameFilter"
+                        append-icon="mdi-magnify"
+                        :label="t('search')"
+                        @update:modelValue="projectNameFilter"
+                        single-line
+                        hide-details
+                    />
                 </v-card-title>
-                    <v-table 
-                        fixed-header
-                        height="300px"
-                    >
-                        <thead>
-                            <tr>
-                                <th class="text-left">
-                                </th>
-                                <th class="text-left">
-                                    {{ t('project') }}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="item in values.projectData.filterItems"
-                                :key="item.projId"
-                            >
-                                <td>
-                                    <v-checkbox
-                                        v-model="searchConditions.projects"
-                                        :value="item"
-                                        hide-details
-                                    ></v-checkbox>
-                                </td>
-                                <td>{{ item.projName }}</td>
-                            </tr>
-                        </tbody>
+                <v-table
+                    fixed-header
+                    height="300px"
+                >
+                    <thead style="position: sticky; z-index: 2">
+                        <tr>
+                            <th />
+                            <th class="text-left">
+                               {{ t('project') }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="item in values.projectData.filterItems"
+                            :key="item.projId"
+                        >
+                            <td>
+                                <v-checkbox
+                                    v-model="searchConditions.projects"
+                                    :value="item"
+                                    hide-details
+                                />
+                            </td>
+                            <td>{{ item.projName }}</td>
+                        </tr>
+                    </tbody>
                 </v-table>
             </v-card>
         </v-col>
@@ -114,8 +113,9 @@
         <v-col cols="12" md="12">
             <v-table v-show="values.logworkData.length > 0 || values.logworkData !== undefined || values.logworkData !== null"
                 fixed-header
-                height="400px" >
-                <thead>
+                height="calc(100vh - 170px)"
+            >
+                <thead style="position: sticky; z-index: 2">
                     <tr>
                         <th class="text-left">
                             {{ t("project") }}
@@ -181,6 +181,51 @@ import { useI18n } from 'vue-i18n'
 
 const app = appStore()
 const { t } = useI18n()
+
+
+const  desserts = ref([
+    {
+      name: 'Frozen Yogurt',
+      calories: 159,
+    },
+    {
+      name: 'Ice cream sandwich',
+      calories: 237,
+    },
+    {
+      name: 'Eclair',
+      calories: 262,
+    },
+    {
+      name: 'Cupcake',
+      calories: 305,
+    },
+    {
+      name: 'Gingerbread',
+      calories: 356,
+    },
+    {
+      name: 'Jelly bean',
+      calories: 375,
+    },
+    {
+      name: 'Lollipop',
+      calories: 392,
+    },
+    {
+      name: 'Honeycomb',
+      calories: 408,
+    },
+    {
+      name: 'Donut',
+      calories: 452,
+    },
+    {
+      name: 'KitKat',
+      calories: 518,
+    },
+])
+
 
 const isShowStartDate = ref(false)
 const isShowEndDate = ref(false)

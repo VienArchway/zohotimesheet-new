@@ -13,27 +13,32 @@ const props = defineProps({
 
 <template>
   <main>
-    <h1>Error page</h1>
     <AppContainer>
-      <h1>{{ props.errorStatus }}</h1>
-      <p v-if="props.errorStatus === '401'" style="color: red">
-        Authorize token has expired or not valid. Please try again.
-      </p>
-      <p v-else>
-        {{ props.errorMessage }}. Please contact admin.
-      </p>
+      <div class="text-center">
+        <h1>Whoops, {{ props.errorStatus }}</h1>
+        <p v-if="props.errorStatus === '401'" style="color: red">
+          Authorize token has expired or not valid.
+        </p>
+        <p v-else>
+          The operation has been error. Please contact admin.
+        </p>
+      </div>
       
       <router-view />
-
-      <v-btn href="/">
-        {{ t('button.back') }}
-      </v-btn>
-      <v-btn
-        v-if="props.errorStatus === '401'"
-        @click="router.push('/auth/callback?revoke=true')"
-      >
-        {{ t('button.try-again') }}
-      </v-btn>
+      
+      <div class="text-center mt-4">
+        <v-btn
+          v-if="props.errorStatus === '401'"
+          class="uppercase"
+          @click="router.push('/auth/callback?revoke=true')"
+        >
+          {{ t('button.try-again') }}
+        </v-btn>
+        <v-btn v-else href="/">
+          {{ t('button.back') }}
+        </v-btn>
+      </div>
+      
     </AppContainer>
   </main>
 </template>
