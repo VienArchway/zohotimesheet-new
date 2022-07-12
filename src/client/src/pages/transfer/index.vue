@@ -245,7 +245,7 @@ async function upload() {
     };
 
     const response = await adlsApi.transfer(searchCondition);
-    debugger
+    
     if (response !== null && response !== undefined)
     {
       values.logworkData.items = response;

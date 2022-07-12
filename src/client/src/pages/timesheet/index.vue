@@ -29,6 +29,17 @@
             </span>
         </v-tooltip>
       </div>
+      <div>
+        <v-select
+          v-model="assignee"
+          :items="assignees"
+          :label="t('owner')"
+          @update:modelValue="changeAssignee"
+          item-title="displayName"
+          item-value="userId"
+          class="mt-10"
+        />
+      </div>
       <v-spacer></v-spacer>
       <div class="d-flex justify-space-around mr-1">
         <v-tooltip location="top">
@@ -200,8 +211,8 @@ const estimatedPointVals = reactive([
   0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48
 ])
 
-const assignees = reactive([])
-const assignee = ref(null)
+let assignees = ref([])
+let assignee = ref(null)
 
 const refTimeSheet = ref(null)
 const startdayOfWeek = ref(moment().startOf('week'))
@@ -243,7 +254,14 @@ function getSubItemsOfItem(rootItem, subItemIds, allTaskItems) {
 }
 
 async function loadUsers() {
-  assignees = await getAllUser();
+  const response = await getAllUser();
+    
+  if (response !== null && response !== undefined)
+  {
+    assignees.value = response;
+    
+    assignee.value = app.zsUserId != null ? app.zsUserId : assignees[0];
+  }
 }
 
 async function search() {
@@ -259,9 +277,10 @@ async function search() {
           statusId : 0,
           startDateFrom: selectDateRange.value === 'thisweek' ? null: new Date(moment(startdayOfWeek.value).add(0, 'days')),
           startDateTo: selectDateRange.value === 'thisweek' ? null : new Date(moment(startdayOfWeek.value).add(6, 'days')),
-          completedOn : []
+          completedOn : [],
+          assignees: [assignee.value]
         },
-        closedTaskCondition = { sprintTypeIds, statusId : 1, completedOn : selectDateRange.value === 'thisweek' ? [ 'thisweek' ] : [ 'thisweek', 'lastweek' ] };
+        closedTaskCondition = { sprintTypeIds, statusId : 1, completedOn : selectDateRange.value === 'thisweek' ? [ 'thisweek' ] : [ 'thisweek', 'lastweek' ], assignees: [assignee.value] };
     await app.load(async () => {
       const [ resOpenTaskItems, resClosedTaskItems ]= await Promise.all([
         itemApi.find(openTaskCondition), // sprinttype = 2 : Active Sprint, status = 0 : open
@@ -271,6 +290,7 @@ async function search() {
       const allTaskItems = resOpenTaskItems.concat(resClosedTaskItems);
 
       const logworkSearchCondition = {
+        OwnerIds: [assignee.value],
         StartDate: new Date(moment(startdayOfWeek.value).add(1, 'days')),
         EndDate: new Date(moment(startdayOfWeek.value).add(7, 'days')),
         ownerIds: [localStorage.getItem('zsUserId')]
@@ -389,6 +409,10 @@ async function changeWeek() {
   await search();
 }
 
+async function changeAssignee() {
+  await search();
+}
+
 async function refreshCompleteOn() {
   await changeWeek();
 }
@@ -497,7 +521,7 @@ function saveOldLogTime(logTime) {
 
 // bind data
 onBeforeMount(async () => {
-  await getAllUser()
+  await loadUsers()
   getWeekDateData()
   await search()
 })
