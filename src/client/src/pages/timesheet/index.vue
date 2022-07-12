@@ -140,7 +140,7 @@
                 <v-text-field
                     type="number"
                     v-model="log.logTime"
-                    :disabled="logWork.isDisabled"
+                    :disabled="logWork.isDisabled || assignee != app.zsUserId"
                     :class="`input-${logWork.dayOfWeek}`"
                     hide-details
                     dense
