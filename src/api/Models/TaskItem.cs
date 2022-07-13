@@ -14,6 +14,9 @@ namespace api.Models
         [JsonProperty(PropertyName = "isParent")]
         public bool IsParent { get; set; }
 
+        [JsonProperty(PropertyName = "parentItem")]
+        public String ParentItemId { get; set; }
+
         [JsonProperty(PropertyName = "endDate")]
         public string EndDate { get; set; }
 

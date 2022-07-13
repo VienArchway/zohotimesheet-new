@@ -95,20 +95,6 @@ namespace api.Infrastructure.Clients
 
                         var status = resultprojStatuses.FirstOrDefault(item => item.StatusId.Equals(resultItem.StatusId));
                         resultItem.StatusName = status != null ? status.Name : null;
-
-                        if (resultItem.IsParent)
-                        {
-                            var urlSubItems = $"team/{teamId}/projects/{resultItem.ProjId}/sprints/{resultItem.SprintId}/item/{resultItem.Id}/subitem/?action=level";
-                            var resSubItems = await client.GetAsync(urlSubItems).ConfigureAwait(false);
-
-                            if (resSubItems.StatusCode == HttpStatusCode.OK)
-                            {
-                                var resContentSubItems = await resSubItems.Content.ReadAsStringAsync().ConfigureAwait(false);
-                                var srcJObjSubItems = JsonConvert.DeserializeObject<JObject>(resContentSubItems);
-                                var subIds = srcJObjSubItems.GetValue("itemIds").ToObject<List<string>>();
-                                resultItem.SubItemIds = subIds;
-                            }
-                        }
                     }
 
                     result.AddRange(resultItems);
