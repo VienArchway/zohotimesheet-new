@@ -24,8 +24,8 @@ namespace api.Application
 
             var user = new User
             {
-                FirstName = settingForName.Result?.FirstName?.Replace(" ",""),
-                ZSUserId = settingForZsUserId.Result?.ZsUserId
+                FirstName = settingForName.Result.FirstName.Replace(" ",""),
+                ZSUserId = settingForZsUserId.Result.ZsUserId
             };
 
             return user;

@@ -5,6 +5,6 @@ namespace api.Application.Interfaces
 {
   public interface ISlackService
     {
-        void SendMessage(string headerTitle, string color, string emoji, string username, List<SlackField> messages);
+        void SendMessage(String headerTitle, String color, String emoji, String username, List<SlackField> messages);
     }
 }

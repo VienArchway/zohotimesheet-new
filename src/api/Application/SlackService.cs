@@ -14,7 +14,7 @@ namespace api.Application
             this.client = client;
         }
 
-        public void SendMessage(string headerTitle, string color, string emoji, string username, List<SlackField> messages)
+        public void SendMessage(String headerTitle, String color, String emoji, String username, List<SlackField> messages)
         {
             client.SendMessage(headerTitle, color, emoji, username, messages);
         }

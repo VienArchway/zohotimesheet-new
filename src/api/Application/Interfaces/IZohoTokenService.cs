@@ -4,11 +4,9 @@ namespace api.Application.Interfaces
 {
     public interface IZohoTokenService
     {
-        Task<Token> GetAccessTokenAsync(string code);
+        Task<Token> GetAccessTokenAsync(String code);
 
-        Task<Token> GetAccessTokenFromRefreshTokenAsync(string firstName, string zsUserId);
-
-        Task<Token> GetAdminAccessTokenAsync();
+        Task<Token> GetAccessTokenFromRefreshTokenAsync(String firstName, String zsUserId);
 
         Task RevokeRefreshTokenAsync();
     }

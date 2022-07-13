@@ -21,13 +21,13 @@ namespace api.Application
 
         private readonly IBackgroundTaskQueue queueTaskService;
 
-        private readonly string logWorkFilePath;
+        private readonly String logWorkFilePath;
 
-        private readonly string logWorkFilePathBackUp;
+        private readonly String logWorkFilePathBackUp;
 
-        private readonly string powerBIGroupId;
+        private readonly String powerBIGroupId;
 
-        private readonly string dataSetId;
+        private readonly String dataSetId;
 
         private readonly PowerBIClient powerBIClient;
 
@@ -46,10 +46,10 @@ namespace api.Application
             this.serviceScopeFactory = serviceScopeFactory;
             this.queueTaskService = queueTaskService;
             this.powerBIClient = powerBIClient;
-            this.logWorkFilePath = configuration.GetValue<string>("Adls:LogWorkFilePath");
-            this.logWorkFilePathBackUp = configuration.GetValue<string>("Adls:LogWorkFilePathBackUp");
-            this.powerBIGroupId = configuration.GetValue<string>("PowerBI:PowerBIGroupId");
-            this.dataSetId = configuration.GetValue<string>("PowerBI:DataSetId");
+            this.logWorkFilePath = configuration.GetValue<String>("Adls:LogWorkFilePath");
+            this.logWorkFilePathBackUp = configuration.GetValue<String>("Adls:LogWorkFilePathBackUp");
+            this.powerBIGroupId = configuration.GetValue<String>("PowerBI:PowerBIGroupId");
+            this.dataSetId = configuration.GetValue<String>("PowerBI:DataSetId");
         }
 
         public async Task<IEnumerable<LogWork>> GetFromAdlsAsync()
@@ -61,10 +61,10 @@ namespace api.Application
             }
 
             var content = await adlsClient.DownloadAsync(logWorkFilePath).ConfigureAwait(false);
-            return !string.IsNullOrEmpty(content) ? JsonConvert.DeserializeObject<LogWorkFileContent>(content).Logs : Enumerable.Empty<LogWork>();
+            return !String.IsNullOrEmpty(content) ? JsonConvert.DeserializeObject<LogWorkFileContent>(content).Logs : Enumerable.Empty<LogWork>();
         }
 
-        public async Task DeleteFromAdlsAsync(string[] AdlsIds)
+        public async Task DeleteFromAdlsAsync(String[] AdlsIds)
         {
             var isExist = adlsClient.CheckExist(logWorkFilePath);
 
@@ -87,7 +87,7 @@ namespace api.Application
             await RefreshPowerBIDataAsync().ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<LogWork>> TransferAdlsAsync(LogWorkSearchParameter parameter, string userTransfer = null)
+        public async Task<IEnumerable<LogWork>> TransferAdlsAsync(LogWorkSearchParameter parameter, String userTransfer = null)
         {
             var data = await logWorkService.SearchAsync(parameter).ConfigureAwait(false);
             var isExist = adlsClient.CheckExist(logWorkFilePath);
@@ -152,11 +152,11 @@ namespace api.Application
             return data;
         }
 
-        public async Task TransferAdlsAsync(string logId, string ownerId, DateTime logDate)
+        public async Task TransferAdlsAsync(String logId, String ownerId, DateTime logDate)
         {
             var param = new LogWorkSearchParameter()
             {
-                    OwnerIds = new List<string>() { ownerId },
+                    OwnerIds = new List<String>() { ownerId },
                     StartDate = logDate,
                     EndDate = logDate
             };

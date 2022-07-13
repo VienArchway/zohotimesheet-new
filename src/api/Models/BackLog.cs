@@ -5,6 +5,6 @@ namespace api.Models
     public class BackLog
     {
         [JsonProperty(PropertyName = "backlogId")]
-        public string BacklogId { get; set; }
+        public String BacklogId { get; set; }
     }
 }

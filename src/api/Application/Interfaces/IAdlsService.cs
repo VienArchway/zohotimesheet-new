@@ -6,11 +6,11 @@ namespace api.Application.Interfaces
     {
         Task<IEnumerable<LogWork>> GetFromAdlsAsync();
         
-        Task DeleteFromAdlsAsync(string[] AdlsIds);
+        Task DeleteFromAdlsAsync(String[] AdlsIds);
 
-        Task<IEnumerable<LogWork>> TransferAdlsAsync(LogWorkSearchParameter parameter, string userTransfer = null);
+        Task<IEnumerable<LogWork>> TransferAdlsAsync(LogWorkSearchParameter parameter, String userTransfer = null);
 
-        Task TransferAdlsAsync(string logId, string ownerId, DateTime logDate);
+        Task TransferAdlsAsync(String logId, String ownerId, DateTime logDate);
 
         Task RestoreFromAdlsAsync();
 

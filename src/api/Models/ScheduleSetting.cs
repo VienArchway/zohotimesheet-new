@@ -4,14 +4,14 @@ namespace api.Models
 {
     public class ScheduleSetting
     {
-        public string Status { get; set; }
+        public String Status { get; set; }
 
-        public string Time { get; set; }
+        public String Time { get; set; }
 
-        public string TimeZoneOffSet { get; set; }
+        public String TimeZoneOffSet { get; set; }
 
-        public string Type { get; set; }
+        public String Type { get; set; }
 
-        public string LastRunDate { get; set; }
+        public String LastRunDate { get; set; }
     }
 }

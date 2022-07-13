@@ -4,5 +4,5 @@ namespace api.Services.Security;
 
 public class ZohoAuthenticationSchema : AuthenticationSchemeOptions
 {
-    public const string DefaultSchemeName = "zoho";
+    public const String DefaultSchemeName = "zoho";
 }

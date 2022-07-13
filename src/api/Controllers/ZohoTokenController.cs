@@ -21,7 +21,7 @@ public class ZohoTokenController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(Token), 200)]
-    public async Task<IActionResult> GetAccessToken([FromQuery] string code)
+    public async Task<IActionResult> GetAccessToken([FromQuery] String code)
     {
         var result = await service.GetAccessTokenAsync(code).ConfigureAwait(false);
         
@@ -31,14 +31,14 @@ public class ZohoTokenController : ControllerBase
             // HttpOnly = true,
             SameSite = SameSiteMode.Unspecified
         };
-        Response.Cookies.Append("accessToken", result.AccessToken ?? string.Empty, cookieOptions);
+        Response.Cookies.Append("accessToken", result.AccessToken ?? String.Empty, cookieOptions);
         
         return Ok(result);
     }
     
     [HttpGet("refresh-access-token")]
     [ProducesResponseType(typeof(Token), 200)]
-    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync([FromQuery] string firstName, [FromQuery] string zsUserId)
+    public async Task<IActionResult> GetAccessTokenFromRefreshTokenAsync([FromQuery] String firstName, [FromQuery] String zsUserId)
     {
         var result = await service.GetAccessTokenFromRefreshTokenAsync(firstName, zsUserId).ConfigureAwait(false);
         var cookieOptions = new CookieOptions
@@ -47,17 +47,8 @@ public class ZohoTokenController : ControllerBase
             // HttpOnly = true,
             SameSite = SameSiteMode.Unspecified
         };
-        Response.Cookies.Append("accessToken", result.AccessToken ?? string.Empty, cookieOptions);
+        Response.Cookies.Append("accessToken", result.AccessToken ?? String.Empty, cookieOptions);
 
-        return Ok(result);
-    }
-
-    [HttpGet("get-admin-access-token")]
-    [ProducesResponseType(typeof(Token), 200)]
-    public async Task<IActionResult> GetAdminAccessTokenAsync()
-    {
-        var result = await service.GetAdminAccessTokenAsync().ConfigureAwait(false);
-        
         return Ok(result);
     }
 

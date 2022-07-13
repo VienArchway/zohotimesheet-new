@@ -19,24 +19,24 @@ namespace api.Infrastructure.Clients
 #pragma warning disable SA1401 // Fields must be private
         protected readonly HttpClient client;
 
-        protected readonly string teamId;
+        protected readonly String teamId;
 
         protected readonly IServiceProvider svcProvider;
 
         protected readonly IConfiguration configuration;
 
-        protected string path;
+        protected String path;
 #pragma warning restore SA1401 // Fields must be private
 
         protected ZohoServiceClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider)
         {
-            this.teamId = configuration.GetValue<string>("Zoho:TeamId");
+            this.teamId = configuration.GetValue<String>("Zoho:TeamId");
             this.client = client;
             this.svcProvider = svcProvider;
             this.configuration = configuration;
         }
 
-        protected IEnumerable<T> ConvertJsonResponseToClass<T>(JToken? properties, JToken? TaskItems)
+        protected IEnumerable<T> ConvertJsonResponseToClass<T>(JToken properties, JToken TaskItems)
         {
             var result = new List<T>();
 
@@ -81,7 +81,7 @@ namespace api.Infrastructure.Clients
                 {
                     var newJObjFormat = new JObject();
                     newJObjFormat.Add("id", TaskItem.Name);
-                    newJObjFormat.Add("displayName", TaskItem.Value.ToObject<string>());
+                    newJObjFormat.Add("displayName", TaskItem.Value.ToObject<String>());
 
                     var resultTaskItem = newJObjFormat.ToObject<User>();
                     result.Add(resultTaskItem);
@@ -96,7 +96,7 @@ namespace api.Infrastructure.Clients
         {
             var type = parameter.GetType();
             var properties = type.GetProperties().Where(prop => prop.GetCustomAttribute(typeof(JsonPropertyAttribute)) != null);
-            var urlParameter = new List<KeyValuePair<string, string>>();
+            var urlParameter = new List<KeyValuePair<String, String>>();
 
             foreach (var property in properties)
             {
@@ -104,13 +104,13 @@ namespace api.Infrastructure.Clients
                 var jsonAttr = property.GetCustomAttribute<JsonPropertyAttribute>();
                 if (value != null)
                 {
-                    var stringValue = value.ToString();
+                    var StringValue = value.ToString();
                     if (property.PropertyType.Equals(typeof(DateTime?)) ||
                         property.PropertyType.Equals(typeof(DateTime))) {
                         var date = (DateTime) value;
-                        stringValue = date.ToString("yyyy-MM-dd'T'HH:mm:ssZ");
+                        StringValue = date.ToString("yyyy-MM-dd'T'HH:mm:ssZ");
                     }
-                    var keyValue = new KeyValuePair<string, string>(jsonAttr.PropertyName, stringValue);
+                    var keyValue = new KeyValuePair<String, String>(jsonAttr.PropertyName, StringValue);
                     urlParameter.Add(keyValue);
                 }
             }

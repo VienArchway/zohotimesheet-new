@@ -24,7 +24,7 @@ namespace api.Application
                 parameter.Assignees);
         }
 
-        public Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(string projectId, TaskItemSearchParameter parameter)
+        public Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(String projectId, TaskItemSearchParameter parameter)
         {
             return client.SearchByProjectIdAsync(
                 projectId,

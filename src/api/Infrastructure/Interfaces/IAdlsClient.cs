@@ -7,18 +7,18 @@ namespace api.Infrastructure.Interfaces
 {
     public interface IAdlsClient
     {
-        bool CheckExist(string destFilePath);
+        bool CheckExist(String destFilePath);
 
-        Task CreateFileAsync(string destFilePath);
+        Task CreateFileAsync(String destFilePath);
 
-        Task UploadAsync(string content, string destFilePath);
+        Task UploadAsync(String content, String destFilePath);
 
-        void Upload(string content, string destFilePath);
+        void Upload(String content, String destFilePath);
 
-        Task<string> DownloadAsync(string destFilePath);
+        Task<String> DownloadAsync(String destFilePath);
 
-        string Download(string destFilePath);
+        String Download(String destFilePath);
 
-        Task<PathProperties> GetPropertiesAsync(string destFilePath);
+        Task<PathProperties> GetPropertiesAsync(String destFilePath);
     }
 }

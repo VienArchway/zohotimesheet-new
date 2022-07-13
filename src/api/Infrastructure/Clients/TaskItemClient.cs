@@ -18,9 +18,9 @@ namespace api.Infrastructure.Clients
             DateTime? startDateFrom,
             DateTime? startDateTo,
             IEnumerable<int> sprintTypeIds,
-            IEnumerable<string> completedOn,
+            IEnumerable<String> completedOn,
             int statusId,
-            IEnumerable<string> assignees)
+            IEnumerable<String> assignees)
         {
             var result = new List<TaskItem>();
             var index = 1;
@@ -37,11 +37,11 @@ namespace api.Infrastructure.Clients
                     view = 0;
                 }
 
-                if (startDateFrom != null && startDateTo != null)
+                if (startDateFrom.HasValue && startDateTo.HasValue)
                 {
-                    filter.Add("startdate_fromdate", startDateFrom.Value.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
-                    filter.Add("startdate_todate", startDateTo.Value.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
-                    filter.Add("startdate", JArray.FromObject(new string[] { "custom", "withoutdue" }));
+                    filter.Add("startdate_fromdate", startDateFrom?.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
+                    filter.Add("startdate_todate", startDateTo?.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
+                    filter.Add("startdate", JArray.FromObject(new String[] { "custom", "withoutdue" }));
                 }
 
                 if (sprintTypeIds != null && sprintTypeIds.Any())
@@ -57,7 +57,7 @@ namespace api.Infrastructure.Clients
                 var url = $"team/{teamId}/globalview/?action=itemdetails&view={view}&viewoption={statusId}&index={index}&range={range}&needsubitem=true";
 
                 var filterEncode = HttpUtility.UrlEncode(JsonConvert.SerializeObject(filter));
-                if (!string.IsNullOrEmpty(filterEncode))
+                if (!String.IsNullOrEmpty(filterEncode))
                 {
                     url += $"&filter={filterEncode}";
                 }
@@ -109,7 +109,7 @@ namespace api.Infrastructure.Clients
             return result;
         }
 
-        public async Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(string projectId, IEnumerable<string> itemIds, IEnumerable<string> itemNos)
+        public async Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(String projectId, IEnumerable<String> itemIds, IEnumerable<String> itemNos)
         {
             var result = new List<TaskItem>();
             var filter = new JObject();
@@ -156,7 +156,7 @@ namespace api.Infrastructure.Clients
                     {
                         var resContentSubItems = await resSubItems.Content.ReadAsStringAsync().ConfigureAwait(false);
                         var srcJObjSubItems = JsonConvert.DeserializeObject<JObject>(resContentSubItems);
-                        var subIds = srcJObjSubItems.GetValue("itemIds").ToObject<List<string>>();
+                        var subIds = srcJObjSubItems.GetValue("itemIds").ToObject<List<String>>();
                         resultItem.SubItemIds = subIds;
                     }
                 }
@@ -178,7 +178,7 @@ namespace api.Infrastructure.Clients
 
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-            var status = srcJObj.GetValue("status")?.ToObject<string>();
+            var status = srcJObj.GetValue("status").ToObject<String>();
 
             if (status == null || !status.Equals("success"))
             {
@@ -222,14 +222,14 @@ namespace api.Infrastructure.Clients
             await SendItem(url, formContent).ConfigureAwait(false);
         }
 
-        private async Task<JObject> SendItem(string url, FormUrlEncodedContent formContent)
+        private async Task<JObject> SendItem(String url, FormUrlEncodedContent formContent)
         {
-            client.DefaultRequestHeaders.Add("x-za-reqsize", new string[] { "large" });
+            client.DefaultRequestHeaders.Add("x-za-reqsize", new String[] { "large" });
             var response = await client.PostAsync(url, formContent).ConfigureAwait(false);
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-            var status = srcJObj.GetValue("status")?.ToObject<string>();
+            var status = srcJObj.GetValue("status")?.ToObject<String>();
 
             if (status == null || !status.Equals("success"))
             {

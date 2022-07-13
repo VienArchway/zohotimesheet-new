@@ -6,15 +6,15 @@ namespace api.Models
     public class WebHook
     {
         [JsonProperty(PropertyName = "id")]
-        public string WebHookId { get; set; }
+        public String WebHookId { get; set; }
 
         [JsonProperty(PropertyName = "webhookName")]
-        public string WebHookName { get; set; }
+        public String WebHookName { get; set; }
 
         [JsonProperty(PropertyName = "webhookStatus")]
         public int WebHookStatus { get; set; }
 
         [JsonProperty(PropertyName = "webhookUrl")]
-        public string WebHookUrl { get; set; }
+        public String WebHookUrl { get; set; }
     }
 }

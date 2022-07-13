@@ -17,8 +17,8 @@ namespace api.Infrastructure.Clients
         public WebHookClient(HttpClient client, IConfiguration configuration, IServiceProvider svcProvider, IZohoTokenClient zohoTokenClient)
             : base(client, configuration, svcProvider)
         {
-            var accessToken = zohoTokenClient.GetAdminAccessTokenAsync();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken.Result.AccessToken);
+            var accessToken = zohoTokenClient.GetAdminAccessTokenAsync().Result;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken.AccessToken);
         }
 
         public async Task<IEnumerable<WebHook>> GetAllAsync()
@@ -52,12 +52,12 @@ namespace api.Infrastructure.Clients
             var url = $"team/{teamId}/webhooks/{parameter.WebHookId}/";
             var formContent = SetAndEncodeParameter(parameter);
 
-            client.DefaultRequestHeaders.Add("x-za-reqsize", new string[] { "large" });
+            client.DefaultRequestHeaders.Add("x-za-reqsize", new String[] { "large" });
             var response = await client.PostAsync(url, formContent).ConfigureAwait(false);
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-            var status = srcJObj.GetValue("status")?.ToObject<string>();
+            var status = srcJObj.GetValue("status")?.ToObject<String>();
 
             if (status == null || !status.Equals("success"))
             {

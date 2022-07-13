@@ -28,9 +28,9 @@ namespace api.Infrastructure.Clients
         public async Task<IEnumerable<LogWork>> SearchAsync(
             DateTime? startDate,
             DateTime? endDate,
-            IEnumerable<string> projectIds,
-            IEnumerable<string> sprintTypes,
-            IEnumerable<string> ownerIds,
+            IEnumerable<String> projectIds,
+            IEnumerable<String> sprintTypes,
+            IEnumerable<String> ownerIds,
             int delayTimeoutBySeconds = 0)
         {
             var index = 1;
@@ -38,6 +38,11 @@ namespace api.Infrastructure.Clients
 
             var hasData = true;
             var totalResult = new List<LogWork>();
+
+            if(client.DefaultRequestHeaders.Authorization.Parameter == null) {
+                var accessToken = await zohoTokenClient.GetAdminAccessTokenAsync().ConfigureAwait(false);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken.AccessToken);
+            }
 
             while (hasData)
             {
@@ -68,14 +73,14 @@ namespace api.Infrastructure.Clients
 
                     if (startDate.HasValue && endDate.HasValue)
                     {
-                        if (endDate == null)
+                        if (!endDate.HasValue)
                         {
                             endDate = DateTime.Now.Date;
                         }
 
-                        filter.Add("logdate", JArray.FromObject(new string[] { "custom" }));
-                        filter.Add("logdate_fromdate", startDate.Value.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
-                        filter.Add("logdate_todate", endDate.Value.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
+                        filter.Add("logdate", JArray.FromObject(new String[] { "custom" }));
+                        filter.Add("logdate_fromdate", startDate?.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
+                        filter.Add("logdate_todate", endDate?.ToString("yyyy-MM-dd'T'HH:mm:ssZ"));
                     }
 
                     var filterEncode = HttpUtility.UrlEncode(JsonConvert.SerializeObject(filter));
@@ -83,13 +88,9 @@ namespace api.Infrastructure.Clients
                     var url = $"team/{teamId}/timesheet/?action=orglogs&viewtype=0&index={index}&range={range}&logtype=0";
 
 
-                    if (!string.IsNullOrEmpty(filterEncode))
+                    if (!String.IsNullOrEmpty(filterEncode))
                     {
                         url += $"&filter={filterEncode}";
-                    }
-                    if(client.DefaultRequestHeaders.Authorization.Parameter == null) {
-                        var accessToken = await zohoTokenClient.GetAdminAccessTokenAsync().ConfigureAwait(false);
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken.AccessToken);
                     }
 
                     var response = await client.GetAsync(url).ConfigureAwait(false);
@@ -139,14 +140,14 @@ namespace api.Infrastructure.Clients
             await SendLogWork(url, formContent).ConfigureAwait(false);
         }
 
-        private async Task<JObject> SendLogWork(string url, FormUrlEncodedContent formContent)
+        private async Task<JObject> SendLogWork(String url, FormUrlEncodedContent formContent)
         {
-            client.DefaultRequestHeaders.Add("x-za-reqsize", new string[] { "large" });
+            client.DefaultRequestHeaders.Add("x-za-reqsize", new String[] { "large" });
             var response = await client.PostAsync(url, formContent).ConfigureAwait(false);
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-            var status = srcJObj.GetValue("status")?.ToObject<string>();
+            var status = srcJObj.GetValue("status")?.ToObject<String>();
 
             if (status == null || !status.Equals("success"))
             {
@@ -166,7 +167,7 @@ namespace api.Infrastructure.Clients
 
             foreach (var logwork in resultItems)
             {
-                logwork.LogDate = !string.IsNullOrEmpty(logwork.LogDate) ? logwork.LogDate.Split(" ")[0] : null;
+                logwork.LogDate = !String.IsNullOrEmpty(logwork.LogDate) ? logwork.LogDate.Split(" ")[0] : null;
                 logwork.LogTime = logwork.LogTime == null ? 0 : (logwork.LogTime / 3600000);
                 logwork.OwnerName = users.FirstOrDefault(x => x.UserId.Equals(logwork.Owner)).DisplayName;
 
@@ -189,7 +190,7 @@ namespace api.Infrastructure.Clients
 
             foreach (var logwork in resultItems)
             {
-                logwork.LogDate = !string.IsNullOrEmpty(logwork.LogDate) ? logwork.LogDate.Split(" ")[0] : null;
+                logwork.LogDate = !String.IsNullOrEmpty(logwork.LogDate) ? logwork.LogDate.Split(" ")[0] : null;
                 logwork.LogTime = logwork.LogTime == null ? 0 : (logwork.LogTime / 3600000);
                 logwork.OwnerName = users.FirstOrDefault(x => x.UserId.Equals(logwork.Owner)).DisplayName;
             }

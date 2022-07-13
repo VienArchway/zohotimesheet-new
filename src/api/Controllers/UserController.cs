@@ -18,7 +18,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("info")]
-    [ProducesResponseType(typeof(string), 200)]
+    [ProducesResponseType(typeof(String), 200)]
     public async Task<IActionResult> GetCurrentUser()
     {
         var result = await service.GetCurrentUser().ConfigureAwait(false);
@@ -26,7 +26,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("all")]
-    [ProducesResponseType(typeof(string), 200)]
+    [ProducesResponseType(typeof(String), 200)]
     public async Task<IActionResult> GetAllAsync()
     {
         var result = await service.GetAllAsync().ConfigureAwait(false);

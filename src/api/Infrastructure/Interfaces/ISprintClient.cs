@@ -6,6 +6,6 @@ namespace api.Infrastructure.Interfaces
 {
     public interface ISprintClient
     {
-        Task<IEnumerable<Sprint>> SearchAsync(string projectId, int? sprintTypeId);
+        Task<IEnumerable<Sprint>> SearchAsync(String projectId, int? sprintTypeId);
     }
 }

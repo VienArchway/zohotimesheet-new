@@ -31,7 +31,7 @@ public class LogWorkController : ControllerBase
     {
         parameter.Action = "additemlog";
         var result = await service.CreateAsync(parameter).ConfigureAwait(false);
-        return new CreatedResult(string.Empty, result);
+        return new CreatedResult(String.Empty, result);
     }
 
     [HttpPut]

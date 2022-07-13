@@ -44,7 +44,7 @@ namespace api.Infrastructure.Clients
             return result;
         }
 
-        public async Task<IEnumerable<ProjectPriority>> GetProjectPriorityAsync(string id)
+        public async Task<IEnumerable<ProjectPriority>> GetProjectPriorityAsync(String id)
         {
             var result = new List<ProjectPriority>();
 
@@ -61,7 +61,7 @@ namespace api.Infrastructure.Clients
             return result;
         }
 
-        public async Task<IEnumerable<ProjectItemType>> GetProjectItemTypeAsync(string id)
+        public async Task<IEnumerable<ProjectItemType>> GetProjectItemTypeAsync(String id)
         {
             var result = new List<ProjectItemType>();
 

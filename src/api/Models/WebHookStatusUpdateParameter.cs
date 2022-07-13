@@ -6,10 +6,10 @@ namespace api.Models
 {
     public class WebHookStatusUpdateParameter
     {
-        public string WebHookId { get; set; }
+        public String WebHookId { get; set; }
         
         [JsonProperty(PropertyName = "action")]
-        public string Action { get; set; }
+        public String Action { get; set; }
 
         [JsonProperty(PropertyName = "hookstatus")]
         public int HookStatus { get; set; }

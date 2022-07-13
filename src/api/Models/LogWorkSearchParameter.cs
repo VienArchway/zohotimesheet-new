@@ -6,14 +6,14 @@ namespace api.Models
 
         public DateTime? EndDate { get; set; }
 
-        public IEnumerable<Project>? Projects { get; set; }
+        public IEnumerable<Project> Projects { get; set; }
 
-        public IEnumerable<string>? OwnerIds { get; set; }
+        public IEnumerable<String> OwnerIds { get; set; }
 
         public int? SprintTypeId { get; set; }
 
-        public IEnumerable<string>? ProjectIds { get; set; }
+        public IEnumerable<String> ProjectIds { get; set; }
 
-        public IEnumerable<string>? SprintTypes { get; set; }
+        public IEnumerable<String> SprintTypes { get; set; }
     }
 }

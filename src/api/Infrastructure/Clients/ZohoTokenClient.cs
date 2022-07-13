@@ -25,9 +25,9 @@ namespace api.Infrastructure.Clients
             client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
         }
 
-        public async Task<Token> GetAccessTokenAsync(string code)
+        public async Task<Token> GetAccessTokenAsync(String code)
         {
-            var parameter = new List<KeyValuePair<string, string>>
+            var parameter = new List<KeyValuePair<String, String>>
             {
                 new("code", code),
                 new("client_id", configuration["Zoho:ClientId"]),
@@ -51,12 +51,12 @@ namespace api.Infrastructure.Clients
             return token ?? throw new InvalidOperationException();
         }
 
-        public async Task<Token> GetAccessTokenFromRefreshTokenAsync(string? firstName, string? zsUserId)
+        public async Task<Token> GetAccessTokenFromRefreshTokenAsync(String firstName, String zsUserId)
         {
             var refreshToken = await FetchSecretRefreshToken(null, firstName, zsUserId).ConfigureAwait(false);
             if (refreshToken == null) throw new OperationCanceledException();
             
-            var parameter = new List<KeyValuePair<string, string>>
+            var parameter = new List<KeyValuePair<String, String>>
             {
                 new("refresh_token", refreshToken),
                 new("client_id", configuration["Zoho:ClientId"]),
@@ -81,7 +81,7 @@ namespace api.Infrastructure.Clients
             var refreshToken = await FetchSecretRefreshToken();
             if (refreshToken == null) throw new OperationCanceledException();
             
-            var parameter = new List<KeyValuePair<string, string>>
+            var parameter = new List<KeyValuePair<String, String>>
             {
                 new("token", refreshToken)
             };
@@ -90,7 +90,7 @@ namespace api.Infrastructure.Clients
  
             var resContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var srcJObj = JsonConvert.DeserializeObject<JObject>(resContent);
-            var status = srcJObj?.GetValue("status")?.ToObject<string>();
+            var status = srcJObj?.GetValue("status")?.ToObject<String>();
 
             if (status is not "success")
             {
@@ -100,12 +100,12 @@ namespace api.Infrastructure.Clients
 
         public async Task<Token> GetAdminAccessTokenAsync()
         {
-            var tokenHost = configuration.GetValue<string>("Zoho:TokenHost");
-            var clientId = configuration.GetValue<string>("Zoho:ClientId");
-            var clientSecret = configuration.GetValue<string>("Zoho:ClientSecret");
-            var refreshToken = configuration.GetValue<string>("Zoho:RefreshToken");
+            var tokenHost = configuration.GetValue<String>("Zoho:TokenHost");
+            var clientId = configuration.GetValue<String>("Zoho:ClientId");
+            var clientSecret = configuration.GetValue<String>("Zoho:ClientSecret");
+            var refreshToken = configuration.GetValue<String>("Zoho:RefreshToken");
 
-            var parameter = new List<KeyValuePair<string, string>>
+            var parameter = new List<KeyValuePair<String, String>>
             {
                 new("refresh_token", refreshToken),
                 new("client_id", clientId),
@@ -122,7 +122,7 @@ namespace api.Infrastructure.Clients
             return token ?? throw new InvalidOperationException();
         }
         
-        private async Task<string> FetchSecretRefreshToken(Token? token = null, string? firstName = null, string? zsUserId = null)
+        private async Task<String> FetchSecretRefreshToken(Token token = null, String firstName = null, String zsUserId = null)
         {
             if (token is not null)
             {
@@ -138,7 +138,7 @@ namespace api.Infrastructure.Clients
             var secretClient = new SecretClient(
                 new Uri("https://zohotoken.vault.azure.net/"),
                 new DefaultAzureCredential());
-            Response<KeyVaultSecret>? refreshToken = null;
+            Response<KeyVaultSecret> refreshToken = null;
 
             try
             {
@@ -165,7 +165,7 @@ namespace api.Infrastructure.Clients
             finally
             {
                 var newRefreshToken = token?.RefreshToken?.Equals(refreshToken?.Value.Value);
-                if (!string.IsNullOrEmpty(token?.RefreshToken) && newRefreshToken is false)
+                if (!String.IsNullOrEmpty(token?.RefreshToken) && newRefreshToken is false)
                 {
                     var currentSecretAsync = await secretClient
                         .GetSecretAsync(

@@ -3,8 +3,8 @@ using System.Net.Http.Headers;
 namespace api.Services.HttpClient;
 
 public static class HttpClientConfig {
-    public static void ConfigureService(WebApplicationBuilder? builder) {
-        var zohoSprintApiHost = builder.Configuration.GetValue<string>("Zoho:ApiHost");
+    public static void ConfigureService(WebApplicationBuilder builder) {
+        var zohoSprintApiHost = builder.Configuration.GetValue<String>("Zoho:ApiHost");
 
         builder.Services.AddHttpClient("", (services, httpClient) =>
         {

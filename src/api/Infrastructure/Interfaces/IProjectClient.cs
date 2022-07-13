@@ -8,8 +8,8 @@ namespace api.Infrastructure.Interfaces
     {
         Task<IEnumerable<Project>> SearchAsync();
 
-        Task<IEnumerable<ProjectPriority>> GetProjectPriorityAsync(string id);
+        Task<IEnumerable<ProjectPriority>> GetProjectPriorityAsync(String id);
 
-        Task<IEnumerable<ProjectItemType>> GetProjectItemTypeAsync(string id);
+        Task<IEnumerable<ProjectItemType>> GetProjectItemTypeAsync(String id);
     }
 }

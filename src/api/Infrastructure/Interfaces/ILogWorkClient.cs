@@ -9,9 +9,9 @@ namespace api.Infrastructure.Interfaces
         Task<IEnumerable<LogWork>> SearchAsync(
             DateTime? startDate,
             DateTime? endDate,
-            IEnumerable<string> projectIds,
-            IEnumerable<string> sprintTypes,
-            IEnumerable<string> ownerIds,
+            IEnumerable<String> projectIds,
+            IEnumerable<String> sprintTypes,
+            IEnumerable<String> ownerIds,
             int delayTimeoutBySeconds = 0);
 
         Task<LogWork> CreateAsync(LogWorkSaveParameter parameter);

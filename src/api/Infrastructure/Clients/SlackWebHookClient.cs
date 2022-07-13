@@ -7,17 +7,17 @@ namespace api.Infrastructure.Clients
 {
     public class SlackWebHookClient : ISlackWebHookClient
     {
-        private readonly string channel;
+        private readonly String channel;
 
         private readonly SlackClient client;
 
         public SlackWebHookClient(IConfiguration configuration)
         {
-           this.channel = configuration.GetValue<string>("Slack:Channel");
-           this.client = new SlackClient(configuration.GetValue<string>("Slack:WebHookUri"));
+           this.channel = configuration.GetValue<String>("Slack:Channel");
+           this.client = new SlackClient(configuration.GetValue<String>("Slack:WebHookUri"));
         }
 
-        public void SendMessage(string headerTitle, string color, string emoji, string username, List<SlackField> messages)
+        public void SendMessage(String headerTitle, String color, String emoji, String username, List<SlackField> messages)
         {
             var slackMessage = new SlackMessage
             {

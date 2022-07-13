@@ -19,7 +19,7 @@ namespace api.Infrastructure.Clients
         {
         }
 
-        public async Task<BackLog> SearchAsync(string projectId)
+        public async Task<BackLog> SearchAsync(String projectId)
         {
             var response = await client.GetAsync($"team/{teamId}/projects/{projectId}/?action=getbacklog").ConfigureAwait(false);
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

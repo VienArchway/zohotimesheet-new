@@ -8,37 +8,37 @@ namespace api.Infrastructure.Clients
 {
     public class AdlsClient : IAdlsClient
     {
-        private readonly string storageName;
+        private readonly String storageName;
 
-        private readonly string key;
+        private readonly String key;
 
-        private readonly string connectionString;
+        private readonly String connectionString;
 
         private readonly DataLakeServiceClient dataLakeServiceClient;
 
         public AdlsClient(IConfiguration configuration)
         {
-            this.storageName = configuration.GetValue<string>("Adls:StorageName");
-            this.key = configuration.GetValue<string>("Adls:Key");
-            this.connectionString = configuration.GetValue<string>("Adls:ConnectionString");
+            this.storageName = configuration.GetValue<String>("Adls:StorageName");
+            this.key = configuration.GetValue<String>("Adls:Key");
+            this.connectionString = configuration.GetValue<String>("Adls:ConnectionString");
             var sharedKeyCredential = new StorageSharedKeyCredential(storageName, this.key);
             dataLakeServiceClient = new DataLakeServiceClient(this.connectionString);
         }
 
-        public bool CheckExist(string destFilePath)
+        public bool CheckExist(String destFilePath)
         {
             var fileSystemClient = dataLakeServiceClient.GetFileSystemClient("zohotimesheet");
             var fileClient = fileSystemClient.GetFileClient(destFilePath);
             return fileClient.Exists();
         }
 
-        public async Task CreateFileAsync(string destFilePath)
+        public async Task CreateFileAsync(String destFilePath)
         {
             var fileSystemClient = dataLakeServiceClient.GetFileSystemClient("zohotimesheet");
             await fileSystemClient.CreateFileAsync(destFilePath);
         }
 
-        public async Task UploadAsync(string content, string destFilePath)
+        public async Task UploadAsync(String content, String destFilePath)
         {
             var fileSystemClient = dataLakeServiceClient.GetFileSystemClient("zohotimesheet");
             var fileClient = fileSystemClient.GetFileClient(destFilePath);
@@ -48,7 +48,7 @@ namespace api.Infrastructure.Clients
             }       
         }
 
-        public void Upload(string content, string destFilePath)
+        public void Upload(String content, String destFilePath)
         {
             var fileSystemClient = dataLakeServiceClient.GetFileSystemClient("zohotimesheet");
             var fileClient = fileSystemClient.GetFileClient(destFilePath);
@@ -58,10 +58,10 @@ namespace api.Infrastructure.Clients
             }       
         }
 
-        public async Task<string> DownloadAsync(string destFilePath)
+        public async Task<String> DownloadAsync(String destFilePath)
         {
             var fileSystemClient = dataLakeServiceClient.GetFileSystemClient("zohotimesheet");
-            var directoryClient = fileSystemClient.GetDirectoryClient(string.Empty);
+            var directoryClient = fileSystemClient.GetDirectoryClient(String.Empty);
             var fileClient = directoryClient.GetFileClient(destFilePath);
 
             var downloadResponse = await fileClient.ReadAsync();
@@ -72,10 +72,10 @@ namespace api.Infrastructure.Clients
             }
         }
 
-        public string Download(string destFilePath)
+        public String Download(String destFilePath)
         {
             var fileSystemClient = dataLakeServiceClient.GetFileSystemClient("zohotimesheet");
-            var directoryClient = fileSystemClient.GetDirectoryClient(string.Empty);
+            var directoryClient = fileSystemClient.GetDirectoryClient(String.Empty);
             var fileClient = directoryClient.GetFileClient(destFilePath);
 
             var downloadResponse = fileClient.Read();
@@ -86,10 +86,10 @@ namespace api.Infrastructure.Clients
             }
         }
 
-        public async Task<PathProperties> GetPropertiesAsync(string destFilePath)
+        public async Task<PathProperties> GetPropertiesAsync(String destFilePath)
         {
             var fileSystemClient = dataLakeServiceClient.GetFileSystemClient("zohotimesheet");
-            var directoryClient = fileSystemClient.GetDirectoryClient(string.Empty);
+            var directoryClient = fileSystemClient.GetDirectoryClient(String.Empty);
             var fileClient = directoryClient.GetFileClient(destFilePath);
 
             var response = await fileClient.GetPropertiesAsync().ConfigureAwait(false);

@@ -1,3 +1,3 @@
 namespace api.Models;
 
-public record TeamClient(object Portals, string? Status);
+public record TeamClient(object Portals, String Status);

@@ -6,7 +6,7 @@ namespace api.Application.Interfaces
     {
         Task<IEnumerable<TaskItem>> SearchAsync(TaskItemSearchParameter parameter);
 
-        Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(string projectId, TaskItemSearchParameter parameter);
+        Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(String projectId, TaskItemSearchParameter parameter);
 
         Task UpdateStatusAsync(UpdateItemStatusParameter parameter);
 

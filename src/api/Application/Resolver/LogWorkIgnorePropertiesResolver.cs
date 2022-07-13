@@ -8,9 +8,9 @@ namespace api.Application.Resolver
 {
     public class LogWorkIgnorePropertiesResolver : DefaultContractResolver
     {
-        private readonly IEnumerable<string> ignoreProps;
+        private readonly IEnumerable<String> ignoreProps;
 
-        public LogWorkIgnorePropertiesResolver(IEnumerable<string> ignoreProps)
+        public LogWorkIgnorePropertiesResolver(IEnumerable<String> ignoreProps)
         {
             this.ignoreProps = ignoreProps;
         }

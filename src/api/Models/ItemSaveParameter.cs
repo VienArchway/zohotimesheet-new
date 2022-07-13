@@ -6,14 +6,14 @@ namespace api.Models
 {
     public class ItemSaveParameter
     {
-        public string ItemId { get; set; }
+        public String ItemId { get; set; }
 
-        public string ProjId { get; set; }
+        public String ProjId { get; set; }
 
-        public string SprintId { get; set; }
+        public String SprintId { get; set; }
 
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        public String Name { get; set; }
 
         [JsonProperty(PropertyName = "projItemTypeid", NullValueHandling=NullValueHandling.Ignore)]
         public long? ProjItemTypeId { get; set; }
@@ -22,16 +22,16 @@ namespace api.Models
         public long? ProjPriorityId { get; set; }
 
         [JsonProperty(PropertyName = "users", NullValueHandling=NullValueHandling.Ignore)]
-        public string[] Users  { get; set; }
+        public String[] Users  { get; set; }
 
         [JsonProperty(PropertyName = "description", NullValueHandling=NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public String Description { get; set; }
 
         [JsonProperty(PropertyName = "point", NullValueHandling=NullValueHandling.Ignore)]
         public int? Point { get; set; }
 
         [JsonProperty(PropertyName = "duration", NullValueHandling=NullValueHandling.Ignore)]
-        public string duration { get; set; }
+        public String duration { get; set; }
 
         [JsonProperty(PropertyName = "startdate", NullValueHandling=NullValueHandling.Ignore)]
         public DateTime? StartDate { get; set; }

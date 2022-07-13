@@ -6,34 +6,34 @@ namespace api.Models
     public class LogWork
     {
         [JsonProperty(PropertyName = "id")]
-        public string LogTimeId { get; set; }
+        public String LogTimeId { get; set; }
 
         [JsonProperty(PropertyName = "sprintId")]
-        public string SprintId { get; set; }
+        public String SprintId { get; set; }
 
         [JsonProperty(PropertyName = "itemNo")]
-        public string ItemNo { get; set; }
+        public String ItemNo { get; set; }
 
         [JsonProperty(PropertyName = "itemName")]
-        public string ItemName { get; set; }
+        public String ItemName { get; set; }
 
         [JsonProperty(PropertyName = "tLogId")]
-        public string TLogId { get; set; }
+        public String TLogId { get; set; }
 
         [JsonProperty(PropertyName = "Owner")]
-        public string Owner { get; set; }
+        public String Owner { get; set; }
 
         [JsonProperty(PropertyName = "OwnerName")]
-        public string OwnerName { get; set; }
+        public String OwnerName { get; set; }
 
         [JsonProperty(PropertyName = "logDate")]
-        public string LogDate { get; set; }
+        public String LogDate { get; set; }
 
         [JsonProperty(PropertyName = "logTime")]
         public float? LogTime { get; set; }
 
         [JsonProperty(PropertyName = "itemId")]
-        public string ItemId { get; set; }
+        public String ItemId { get; set; }
 
         [JsonProperty(PropertyName = "billableType")]
         public int BillableType { get; set; }
@@ -42,26 +42,26 @@ namespace api.Models
         public int ApproveType { get; set; }
 
         [JsonProperty(PropertyName = "tClockId")]
-        public string TClockId { get; set; }
+        public String TClockId { get; set; }
 
         [JsonProperty(PropertyName = "addedBy")]
-        public string AddedBy { get; set; }
+        public String AddedBy { get; set; }
 
         [JsonProperty(PropertyName = "logNotes")]
-        public string LogNotes { get; set; }
+        public String LogNotes { get; set; }
 
         [JsonProperty(PropertyName = "approvedBy")]
-        public string ApprovedBy { get; set; }
+        public String ApprovedBy { get; set; }
 
         [JsonProperty(PropertyName = "projItemTypeId")]
-        public string ProjItemTypeId { get; set; }
+        public String ProjItemTypeId { get; set; }
 
-        public string ProjName { get; set; }
+        public String ProjName { get; set; }
 
         [JsonProperty(PropertyName = "projNo")]
-        public string ProjNo { get; set; }
+        public String ProjNo { get; set; }
 
         [JsonProperty(PropertyName = "projId")]
-        public string ProjId { get; set; }
+        public String ProjId { get; set; }
     }
 }

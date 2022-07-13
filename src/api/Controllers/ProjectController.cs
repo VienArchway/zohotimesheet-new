@@ -27,14 +27,14 @@ public class ProjectController : ControllerBase
 
     [HttpGet("priority/{projectId}")]
     [ProducesResponseType(typeof(IEnumerable<ProjectPriority>), 200)]
-    public async Task<IActionResult> GetProjectPriorityAsync(string projectId)
+    public async Task<IActionResult> GetProjectPriorityAsync(String projectId)
     {
         var result = await service.GetProjectPriorityAsync(projectId).ConfigureAwait(false);
         return Ok(result);
     }
     [HttpGet("item-type/{projectId}")]
     [ProducesResponseType(typeof(IEnumerable<ProjectItemType>), 200)]
-    public async Task<IActionResult> GetProjectItemTypeAsync(string projectId)
+    public async Task<IActionResult> GetProjectItemTypeAsync(String projectId)
     {
         var result = await service.GetProjectItemTypeAsync(projectId).ConfigureAwait(false);
         return Ok(result);

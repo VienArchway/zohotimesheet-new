@@ -319,7 +319,6 @@ async function loadUsers() {
   if (response !== null && response !== undefined)
   {
     assignees.value = response;
-    
     assignee.value = app.zsUserId != null ? app.zsUserId : assignees[0];
   }
 }
@@ -365,9 +364,11 @@ async function search() {
 
       if (selectDateRange.value !== "thisweek") {
         const extraTaskData = _.filter(logWorkData, (logWorkitem) => {
-          return !_.find(allTaskItems, (task) => {
-            return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0;
+          var existItem = _.find(allTaskItems, (task) => {
+            return task.id === logWorkitem.itemId;
           });
+
+          return !existItem;
         });
 
         extraTaskData.forEach((taskitem) => {
@@ -580,8 +581,6 @@ onBeforeMount(async () => {
   getWeekDateData()
   await search()
 })
-
-
 </script>
 
 <style scoped>

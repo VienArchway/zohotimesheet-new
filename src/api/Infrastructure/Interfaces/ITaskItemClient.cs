@@ -10,14 +10,14 @@ namespace api.Infrastructure.Interfaces
             DateTime? startDateFrom,
             DateTime? startDateTo,
             IEnumerable<int> sprintTypeIds,
-            IEnumerable<string> completedOn,
+            IEnumerable<String> completedOn,
             int statusId,
-            IEnumerable<string> assignees);
+            IEnumerable<String> assignees);
 
         Task<IEnumerable<TaskItem>> SearchByProjectIdAsync(
-            string projectId, 
-            IEnumerable<string> TaskItemIds, 
-            IEnumerable<string> TaskItemNos);
+            String projectId, 
+            IEnumerable<String> TaskItemIds, 
+            IEnumerable<String> TaskItemNos);
 
         Task UpdateStatusAsync(UpdateItemStatusParameter parameter);
 

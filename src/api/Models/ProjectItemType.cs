@@ -7,21 +7,21 @@ namespace api.Models
     public class ProjectItemType
     {
         [JsonProperty(PropertyName = "id")]
-        public string ProjId { get; set; }
+        public String ProjId { get; set; }
 
         [JsonProperty(PropertyName = "projItemTypeId", NullValueHandling=NullValueHandling.Ignore)]
-        public string ProjItemTypeId { get; set; }
+        public String ProjItemTypeId { get; set; }
 
         [JsonProperty(PropertyName = "ItemTypeImage", NullValueHandling=NullValueHandling.Ignore)]
-        public string ItemTypeImage { get; set; }
+        public String ItemTypeImage { get; set; }
 
         [JsonProperty(PropertyName = "baseType", NullValueHandling=NullValueHandling.Ignore)]
         public int BaseType { get; set; }
 
         [JsonProperty(PropertyName = "ItemTypeId", NullValueHandling=NullValueHandling.Ignore)]
-        public string ItemTypeId { get; set; }
+        public String ItemTypeId { get; set; }
 
         [JsonProperty(PropertyName = "ItemTypeName", NullValueHandling=NullValueHandling.Ignore)]
-        public string ItemTypeName { get; set; }
+        public String ItemTypeName { get; set; }
     }
 }

@@ -6,10 +6,10 @@ namespace api.Models
 {
     public class DeleteItemParameter
     {
-        public string ItemId { get; set; }
+        public String ItemId { get; set; }
 
-        public string ProjId { get; set; }
+        public String ProjId { get; set; }
 
-        public string SprintId { get; set; }
+        public String SprintId { get; set; }
     }
 }

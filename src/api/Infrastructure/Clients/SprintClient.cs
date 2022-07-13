@@ -19,7 +19,7 @@ namespace api.Infrastructure.Clients
         {
         }
 
-        public async Task<IEnumerable<Sprint>> SearchAsync(string projectId, int? sprintTypeId)
+        public async Task<IEnumerable<Sprint>> SearchAsync(String projectId, int? sprintTypeId)
         {
             var result = new List<Sprint>();
             var sprintType = sprintTypeId != null && sprintTypeId != 0 ? $"%5B{sprintTypeId}%5D" : "%5B2,3,4%5D";

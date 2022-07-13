@@ -13,7 +13,7 @@ namespace api.Application
 
         private readonly IConfiguration configuration;
 
-        private readonly string scheduleSettingFile;
+        private readonly String scheduleSettingFile;
 
         private Timer timer;
 
@@ -24,7 +24,7 @@ namespace api.Application
             this.logger = logger;
             this.services = services;
             this.configuration = configuration;
-            this.scheduleSettingFile = configuration.GetValue<string>("Adls:ScheduleSettingFile");
+            this.scheduleSettingFile = configuration.GetValue<String>("Adls:ScheduleSettingFile");
         }
 
         public virtual async Task<ScheduleSetting> StartAsync(ScheduleSetting condition)
@@ -43,7 +43,7 @@ namespace api.Application
                 schedule = await GetStatusAsync().ConfigureAwait(false);
             }
 
-            var offsetTime = string.IsNullOrEmpty(schedule.TimeZoneOffSet) ? "-540" : schedule.TimeZoneOffSet; //japan locale zone time +9:00
+            var offsetTime = String.IsNullOrEmpty(schedule.TimeZoneOffSet) ? "-540" : schedule.TimeZoneOffSet; //japan locale zone time +9:00
             var offsetTimeValue = double.Parse(offsetTime);
             if (DateTimeOffset.Now.Offset.TotalMinutes * -1 == offsetTimeValue)
             {
@@ -54,7 +54,7 @@ namespace api.Application
                 offsetTimeValue = offsetTimeValue - (DateTimeOffset.Now.Offset.TotalMinutes * -1);
             }
 
-            if (!string.IsNullOrEmpty(schedule.Time) && !string.IsNullOrEmpty(schedule.Type))
+            if (!String.IsNullOrEmpty(schedule.Time) && !String.IsNullOrEmpty(schedule.Type))
             {
                 logger.LogInformation("Zoho Background Service is starting.");
 
@@ -119,7 +119,7 @@ namespace api.Application
         {
             logger.LogInformation("Zoho Background Service is stopping.");
 
-            timer?.Change(Timeout.Infinite, 0);
+            timer.Change(Timeout.Infinite, 0);
 
             return Task.CompletedTask;
         }
@@ -143,9 +143,9 @@ namespace api.Application
                     status = new ScheduleSetting()
                     {
                         Status = "stopped",
-                        Time = configuration.GetValue<string>("Schedule:Time"),
-                        Type = configuration.GetValue<string>("Schedule:Type"),
-                        TimeZoneOffSet = configuration.GetValue<string>("Schedule:TimeZoneOffSet")
+                        Time = configuration.GetValue<String>("Schedule:Time"),
+                        Type = configuration.GetValue<String>("Schedule:Type"),
+                        TimeZoneOffSet = configuration.GetValue<String>("Schedule:TimeZoneOffSet")
                     };
                 }
 
@@ -182,7 +182,7 @@ namespace api.Application
             }
         }
 
-        private async Task<ScheduleSetting> UploadStatusToAdslAsync(string status)
+        private async Task<ScheduleSetting> UploadStatusToAdslAsync(String status)
         {
             using (var scope = services.CreateScope())
             {

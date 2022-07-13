@@ -13,13 +13,13 @@ namespace api.Infrastructure.Clients
 
         public record TeamSetting
         {
-            public string? FirstName { get; set; }
-            public string? ZsUserId { get; set; }
+            public String FirstName { get; set; }
+            public String ZsUserId { get; set; }
         }
 
-        public async Task<TeamSetting?> GetTeamSettingAsync(string? action = null, string? accessToken = null)
+        public async Task<TeamSetting> GetTeamSettingAsync(String action = null, String accessToken = null)
         {
-            if (!string.IsNullOrEmpty(accessToken)) {
+            if (!String.IsNullOrEmpty(accessToken)) {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken);
             }
             
@@ -30,7 +30,7 @@ namespace api.Infrastructure.Clients
                 if (response.Content != null)
                 {
                     var contentStream = await response.Content.ReadAsStreamAsync();
-                    return await JsonSerializer.DeserializeAsync<TeamSetting?>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return await JsonSerializer.DeserializeAsync<TeamSetting>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 }
             }
             finally
@@ -41,7 +41,7 @@ namespace api.Infrastructure.Clients
             return null;
         }
 
-        public async Task<string?> FetchTeamsAsync()
+        public async Task<String> FetchTeamsAsync()
         {
             using var response = await client.GetAsync($"teams/", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
             return !response.IsSuccessStatusCode ? null : "success";

@@ -5,12 +5,12 @@ namespace api.Models
     public class SlackPayLoad
     {
         [JsonProperty("channel")]
-        public string Channel { get; set; }
+        public String Channel { get; set; }
 
         [JsonProperty("username")]
-        public string Username { get; set; }
+        public String Username { get; set; }
 
         [JsonProperty("text")]
-        public string Text { get; set; }
+        public String Text { get; set; }
     }
 }

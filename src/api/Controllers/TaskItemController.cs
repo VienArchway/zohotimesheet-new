@@ -27,7 +27,7 @@ public class TaskItemController : ControllerBase
 
         [HttpPost("search-by-projectId/{projectId}")]
         [ProducesResponseType(typeof(IEnumerable<TaskItem>), 200)]
-        public async Task<IActionResult> SearchByProjectIdAsync(string projectId, [FromBody] TaskItemSearchParameter parameter)
+        public async Task<IActionResult> SearchByProjectIdAsync(String projectId, [FromBody] TaskItemSearchParameter parameter)
         {
             var result = await service.SearchByProjectIdAsync(projectId, parameter).ConfigureAwait(false);
             return Ok(result);
@@ -44,14 +44,14 @@ public class TaskItemController : ControllerBase
         public async Task<IActionResult> CreateAsync([FromBody] ItemSaveParameter parameter)
         {
             var result = await service.CreateAsync(parameter).ConfigureAwait(false);
-            return new CreatedResult(string.Empty, result);
+            return new CreatedResult(String.Empty, result);
         }
 
         [HttpPost("create-sub-item")]
         public async Task<IActionResult> CreateSubItemAsync([FromBody] ItemSaveParameter parameter)
         {
             var result = await service.CreateSubItemAsync(parameter).ConfigureAwait(false);
-            return new CreatedResult(string.Empty, result);
+            return new CreatedResult(String.Empty, result);
         }
 
         [HttpPost("update")]

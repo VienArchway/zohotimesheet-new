@@ -6,17 +6,17 @@ namespace api.Models
 {
     public class UpdateItemStatusParameter
     {
-        public string TaskItemId { get; set; }
+        public String TaskItemId { get; set; }
 
-        public string ProjId { get; set; }
+        public String ProjId { get; set; }
 
-        public string SprintId { get; set; }
+        public String SprintId { get; set; }
 
         [JsonProperty(PropertyName = "statusid", NullValueHandling=NullValueHandling.Ignore)]
-        public string StatusId { get; set; }
+        public String StatusId { get; set; }
 
         [JsonProperty(PropertyName = "action", NullValueHandling=NullValueHandling.Ignore)]
-        public string Action
+        public String Action
         {
             get
             {

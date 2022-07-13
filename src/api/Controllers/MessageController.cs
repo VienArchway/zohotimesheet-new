@@ -8,7 +8,7 @@ namespace api.Controllers;
 [ApiController]
 public class MessageController : ControllerBase
 {
-    public IActionResult Get(string? msg)
+    public IActionResult Get(String msg)
     {
         return Ok(msg != null ? $"Hello {msg}" : "Hello default message");
     }
