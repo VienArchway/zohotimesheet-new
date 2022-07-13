@@ -9,7 +9,7 @@ import AppHeader from '@/components/templates/AppHeader.vue'
 <template>
   <AppLogin>
       <AppHeader />
-      <v-main style="height: 100vh; overflow: hidden;">
+      <v-main style="height: 100vh; overflow: auto;">
         <AppContainer>
           <Loading />
           <router-view />
