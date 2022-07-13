@@ -1,0 +1,40 @@
+$primary   : #1976D2
+$secondary : #26A69A
+$accent    : #9C27B0
+
+$dark      : #1D1D1D
+
+$positive  : #21BA45
+$negative  : #C10015
+$info      : #31CCEC
+$warning   : #F2C037
+
+$hoverBackground: #fff7f730
+
+$screen-small: 300px
+$screen-medium: 900px
+
+//global style
+.btn-hover:hover
+  color: white
+  background-color: $hoverBackground
+  border-radius: 4px
+  
+.q-table
+  height: auto
+  
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th /* bg color is important for th; just specify one */
+    background-color: #fff
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  /* this will be the loading indicator */
+  thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+  thead tr:first-child th
+    top: 0
+  

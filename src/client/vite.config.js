@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 import vuetify from '@vuetify/vite-plugin'
 import VueI18n from '@intlify/vite-plugin-vue-i18n'
 import Pages from 'vite-plugin-pages'
@@ -15,7 +16,9 @@ export default ({ mode }) => {
       minify: false
     },
     plugins: [
-      vue(),
+      vue({
+        template: { transformAssetUrls }
+      }),
       vuetify({
         autoImport: true, // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
       }),
@@ -32,6 +35,9 @@ export default ({ mode }) => {
       Layouts({
         defaultLayout: 'default'
       }),
+      quasar({
+        sassVariables: 'src/quasar-variables.sass'
+      })
     ],
     define: { 'process.env': {} },
     envPrefix: 'FE_',

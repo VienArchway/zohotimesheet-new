@@ -4,12 +4,18 @@ import pinia from '@/lib/store.js'
 import router from '@/lib/router.js'
 import i18n from '@/lib/i18n.js'
 import vuetify from '@/plugins/vuetify/vuetify'
+import { Quasar } from 'quasar'
+import '@quasar/extras/material-icons/material-icons.css'
+import 'quasar/src/css/index.sass'
 import useAuthStore from '@/store/auth.js'
 import { worker } from '@/mocks/browser.js'
 import _ from "lodash"
 
 const app = createApp(App)
 app
+    .use(Quasar, {
+        plugins: {}
+    })
     .use(pinia)
     .use(i18n)
     .use(router)
