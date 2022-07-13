@@ -27,6 +27,17 @@
           </span>
         </v-tooltip>
       </div>
+      <div>
+        <v-select
+          v-model="assignee"
+          :items="assignees"
+          :label="t('owner')"
+          @update:modelValue="refresh"
+          item-title="displayName"
+          item-value="userId"
+          class="mt-10"
+        />
+      </div>
       <v-spacer></v-spacer>
       <div class="d-flex justify-space-around mr-1">
         <v-tooltip location="top">
@@ -183,16 +194,15 @@
                 class="logWork-logs d-flex"
               >
                 <v-text-field
-                  type="number"
-                  v-model="log.logTime"
-                  :disabled="logWork.isDisabled"
-                  :class="`input-${logWork.dayOfWeek}`"
-                  hide-details
-                  dense
-                  outlined
-                  @focus="saveOldLogTime(log.logTime)"
-                  @blur="save($event, task, logWork, log)"
-                >
+                    type="number"
+                    v-model="log.logTime"
+                    :disabled="logWork.isDisabled || assignee != app.zsUserId"
+                    :class="`input-${logWork.dayOfWeek}`"
+                    hide-details
+                    dense
+                    outlined
+                    @focus='saveOldLogTime(log.logTime)'
+                    @blur='save($event, task, logWork, log)'>
                 </v-text-field>
                 <v-progress-circular indeterminate class="ml-2 d-none" />
               </div>
@@ -226,9 +236,10 @@ import { ref, reactive, computed, onBeforeMount } from "vue";
 import appStore from "@/store/app";
 import logworkApi from "@/api/resources/logwork";
 import itemApi from "@/api/resources/item";
+import { getAllUser} from '@/api/resources/user'
 
-const { t } = useI18n();
-const app = appStore();
+const { t } = useI18n()
+const app = appStore()
 
 const dateRanges = reactive([
   { text: t("thisweek"), value: "thisweek" },
@@ -251,11 +262,15 @@ const selecteddayOfWeek = ref([
   t("fri"),
 ]);
 const estimatedPointVals = reactive([
-  0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48,
-]);
-const refTimeSheet = ref(null);
-const startdayOfWeek = ref(moment().startOf("week"));
-const zohoSprintLink = "https://sprints.zoho.com/team/archwaybeats";
+  0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48
+])
+
+let assignees = ref([])
+let assignee = ref(null)
+
+const refTimeSheet = ref(null)
+const startdayOfWeek = ref(moment().startOf('week'))
+const zohoSprintLink = 'https://sprints.zoho.com/team/archwaybeats'
 
 // a computed selecteddayOfWeek
 const totalDateColumn = computed(() => {
@@ -298,6 +313,17 @@ function arrangeItem(allTaskItems, item, isIndent) {
   }
 }
 
+async function loadUsers() {
+  const response = await getAllUser();
+    
+  if (response !== null && response !== undefined)
+  {
+    assignees.value = response;
+    
+    assignee.value = app.zsUserId != null ? app.zsUserId : assignees[0];
+  }
+}
+
 async function search() {
   values.data = [];
   values.sortTaskItems = [];
@@ -310,6 +336,7 @@ async function search() {
         statusId: 0,
         startDateFrom: selectDateRange.value === "thisweek" ? null : new Date(daysOfWeek.value[0].date._d),
         startDateTo: selectDateRange.value === "thisweek" ? null : new Date(daysOfWeek.value[6].date._d),
+        assignees: [assignee.value]
       },
       closedTaskCondition = {
         sprintTypeIds,
@@ -318,11 +345,12 @@ async function search() {
           selectDateRange.value === "thisweek"
             ? ["thisweek"]
             : ["thisweek", "lastweek"],
+        assignees: [assignee.value]
       },
       logworkSearchCondition = {
         StartDate: new Date(daysOfWeek.value[0].date._d),
         EndDate: new Date(daysOfWeek.value[6].date._d),
-        ownerIds: [localStorage.getItem("zsUserId")],
+        ownerIds: [assignee.value],
       };
 
     await app.load(async () => {
@@ -341,6 +369,7 @@ async function search() {
             return task.id === logWorkitem.itemId && logWorkitem.logTime !== 0;
           });
         });
+
         extraTaskData.forEach((taskitem) => {
           allTaskItems.push({
             id: taskitem.itemId,
@@ -351,7 +380,6 @@ async function search() {
           });
         });
       }
-
 
       const sortTaskItemsbyId = _.orderBy(allTaskItems, ["isParent", "id"], ["desc", "asc"]);
       let subItemids = [];
@@ -438,6 +466,7 @@ async function refresh() {
   getWeekDateData();
   await search();
 }
+
 async function save($event, task, logWork, log) {
   const target = $event.target,
     vInput = target.closest(".v-input"),
@@ -547,9 +576,12 @@ function saveOldLogTime(logTime) {
 
 // bind data
 onBeforeMount(async () => {
-  getWeekDateData();
-  await search();
-});
+  await loadUsers()
+  getWeekDateData()
+  await search()
+})
+
+
 </script>
 
 <style scoped>

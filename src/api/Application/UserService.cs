@@ -8,10 +8,12 @@ namespace api.Application
     {
 
         private readonly ITeamClient teamClient;
+        private readonly IUserClient client;
 
-        public UserService(ITeamClient teamClient)
+        public UserService(ITeamClient teamClient, IUserClient client)
         {
             this.teamClient = teamClient;
+            this.client = client;
         }
 
         public async Task<User> GetCurrentUser()
@@ -27,6 +29,11 @@ namespace api.Application
             };
 
             return user;
+        }
+
+        public async Task<IEnumerable<User>> GetAllAsync()
+        {
+            return await client.GetAllAsync();
         }
     }
 }
