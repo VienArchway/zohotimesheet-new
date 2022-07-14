@@ -230,10 +230,10 @@ function search() {
 function pageChanged() {
     if(page.current == page.length)
     {
-        data.displayItems =_.slice(data.filterItems, page.current * page.size - 1, data.filterItems.length);
+        data.displayItems =_.slice(data.filterItems, (page.current -1) * page.size, data.filterItems.length);
     }
     else {
-        data.displayItems = page.current < page.length ? _.slice(data.filterItems, page.current * page.size -1, (page.current + 1 )* page.size) : data.filterItems;
+        data.displayItems = page.current < page.length ? _.slice(data.filterItems, (page.current -1) * page.size, page.current * page.size) : data.filterItems;
     }
 }
 // bind data
