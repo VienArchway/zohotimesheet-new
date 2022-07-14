@@ -39,6 +39,7 @@ namespace api.Infrastructure.Clients
             var hasData = true;
             var totalResult = new List<LogWork>();
 
+            // Set admin token to run schedule transfer by background task
             if(client.DefaultRequestHeaders.Authorization.Parameter == null) {
                 var accessToken = await zohoTokenClient.GetAdminAccessTokenAsync().ConfigureAwait(false);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", accessToken.AccessToken);

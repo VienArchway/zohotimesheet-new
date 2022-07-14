@@ -72,6 +72,10 @@
             </v-list>
           </v-card>
         </v-menu>
+        <v-btn
+          icon="mdi-plus"
+          @click="toggleItemDrawer"
+        />
       </div>
     </v-toolbar>
     <v-table fixed-header fixed-footer height="calc(100vh - 170px)">
@@ -225,6 +229,8 @@
         </tr>
       </tfoot>
     </v-table>
+
+    <ItemDrawer v-model="itemDrawerModel" />
   </div>
 </template>
 
@@ -237,6 +243,8 @@ import appStore from "@/store/app";
 import logworkApi from "@/api/resources/logwork";
 import itemApi from "@/api/resources/item";
 import { getAllUser} from '@/api/resources/user'
+
+import ItemDrawer from '@/components/organisms/ItemDrawer.vue'
 
 const { t } = useI18n()
 const app = appStore()
@@ -271,11 +279,16 @@ let assignee = ref(null)
 const refTimeSheet = ref(null)
 const startdayOfWeek = ref(moment().startOf('week'))
 const zohoSprintLink = 'https://sprints.zoho.com/team/archwaybeats'
+const itemDrawerModel = ref(false)
 
 // a computed selecteddayOfWeek
 const totalDateColumn = computed(() => {
   return selecteddayOfWeek.value.length;
 });
+
+function toggleItemDrawer() {
+  itemDrawerModel.value = !itemDrawerModel.value
+}
 
 // handle a methods
 function getWeekDateData() {
@@ -395,7 +408,7 @@ async function search() {
         arrangeItem(allTaskItems, item);
       });
 
-      const projectsData = _(values.sortTaskItems)
+      const timesheetData = _(values.sortTaskItems)
         .groupBy("projName")
         .map((items, projName) => {
           let defaultItem = _.find(items, (item) => {
@@ -414,7 +427,7 @@ async function search() {
         })
         .value();
 
-      projectsData.forEach((proj) => {
+      timesheetData.forEach((proj) => {
         proj.tasks.forEach((task) => {
           task.logWorks = [];
           daysOfWeek.value.forEach((date) => {
@@ -451,7 +464,7 @@ async function search() {
         });
       });
 
-      values.data = _.orderBy(projectsData, ["name"], ["asc"]);
+      values.data = _.orderBy(timesheetData, ["name"], ["asc"]);
     });
   } catch (error) {
     console.log(error);

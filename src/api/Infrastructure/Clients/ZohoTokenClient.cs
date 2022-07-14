@@ -51,7 +51,7 @@ namespace api.Infrastructure.Clients
             return token ?? throw new InvalidOperationException();
         }
 
-        public async Task<Token> GetAccessTokenFromRefreshTokenAsync(String firstName, String zsUserId)
+        public async Task<Token> GetAccessTokenByRefreshTokenAsync(String firstName, String zsUserId)
         {
             var refreshToken = await FetchSecretRefreshToken(null, firstName, zsUserId).ConfigureAwait(false);
             if (refreshToken == null) throw new OperationCanceledException();
