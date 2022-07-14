@@ -11,5 +11,7 @@ namespace api.Infrastructure.Interfaces
         Task<IEnumerable<ProjectPriority>> GetProjectPriorityAsync(String id);
 
         Task<IEnumerable<ProjectItemType>> GetProjectItemTypeAsync(String id);
+
+        Task<Project> GetProjectDetailAsync(String no);
     }
 }

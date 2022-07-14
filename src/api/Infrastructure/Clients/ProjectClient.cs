@@ -32,10 +32,10 @@ namespace api.Infrastructure.Clients
 
                 var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
                 var properties = srcJObj?.GetValue("project_prop");
-                var TaskItems = srcJObj?.GetValue("projectJObj");
-                var resultTaskItems = ConvertJsonResponseToClass<Project>(properties, TaskItems);
+                var projectItems = srcJObj?.GetValue("projectJObj");
+                var resultItems = ConvertJsonResponseToClass<Project>(properties, projectItems);
 
-                result.AddRange(resultTaskItems);
+                result.AddRange(resultItems);
 
                 hasNext = srcJObj.GetValue("next").ToObject<bool>();
                 index += range;
@@ -74,6 +74,31 @@ namespace api.Infrastructure.Clients
             var resultItems = ConvertJsonResponseToClass<ProjectItemType>(properties, items);
 
             result.AddRange(resultItems);
+
+            return result;
+        }
+
+        public async Task<Project> GetProjectDetailAsync(String no)
+        {
+            var result = new Project();
+
+            var response = await client.GetAsync($"team/{teamId}/projects/no-{no}/?action=tabheader").ConfigureAwait(false);
+            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
+
+            var projProperties = srcJObj?.GetValue("project_prop");
+            var projectItems = srcJObj?.GetValue("projectJObj");
+            var projects = ConvertJsonResponseToClass<Project>(projProperties, projectItems);
+            result = projects.First();
+
+            var projItemTypeProps = srcJObj?.SelectToken("projItemTypeObj.projItemType_prop");
+            var projItemTypeItems = srcJObj?.SelectToken("projItemTypeObj.projItemTypeJObj");
+            result.ProjItemTypes = ConvertJsonResponseToClass<ProjectItemType>(projItemTypeProps, projItemTypeItems);
+
+            var projPriorityProps = srcJObj.SelectToken("projPriorityObj.projPriority_prop");
+            var projPriorityItems = srcJObj?.SelectToken("projPriorityObj.projPriorityJObj");
+            result.ProjPriorities = ConvertJsonResponseToClass<ProjectPriority>(projPriorityProps, projPriorityItems);
 
             return result;
         }

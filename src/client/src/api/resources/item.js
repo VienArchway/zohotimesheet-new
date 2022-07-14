@@ -12,5 +12,8 @@ export default {
     },
     async updateStatus(requestInput) {
         await fetchApi('POST', API_PATH_NAME + '/update-status', null, requestInput)
+    },
+    async deleteItem(requestInput) {
+        await fetchApi('POST', API_PATH_NAME + '/delete', null, requestInput)
     }
 }
