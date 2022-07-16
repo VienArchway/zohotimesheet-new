@@ -27,5 +27,10 @@ namespace api.Application
         {
             return client.GetProjectItemTypeAsync(id);
         }
+
+        public Task<Project> GetProjectDetailAsync(String no)
+        {
+            return client.GetProjectDetailAsync(no);
+        }
     }
 }

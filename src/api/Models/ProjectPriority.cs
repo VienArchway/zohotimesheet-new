@@ -10,11 +10,5 @@ namespace api.Models
 
         [JsonProperty(PropertyName = "priorityName")]
         public String PriorityName { get; set; }
-
-        [JsonProperty(PropertyName = "isDefault")]
-        public String IsDefault { get; set; }
-
-        [JsonProperty(PropertyName = "colorCode")]
-        public String ColorCode { get; set; }
     }
 }

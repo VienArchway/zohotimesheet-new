@@ -39,4 +39,12 @@ public class ProjectController : ControllerBase
         var result = await service.GetProjectItemTypeAsync(projectId).ConfigureAwait(false);
         return Ok(result);
     }
+
+    [HttpGet("{no}")]
+    [ProducesResponseType(typeof(Project), 200)]
+    public async Task<IActionResult> GetProjectDetailAsync(String no)
+    {
+        var result = await service.GetProjectDetailAsync(no).ConfigureAwait(false);
+        return Ok(result);
+    }
 }

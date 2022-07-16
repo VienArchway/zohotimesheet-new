@@ -18,5 +18,9 @@ namespace api.Models
         public String CreatedBy { get; set; }
 
         public IEnumerable<Sprint> Sprints { get; set; }
+
+        public IEnumerable<ProjectItemType> ProjItemTypes {get; set;}
+
+        public IEnumerable<ProjectPriority> ProjPriorities {get; set;}
     }
 }
