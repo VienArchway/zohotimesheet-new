@@ -91,7 +91,7 @@ namespace api.Infrastructure.Clients
                     foreach (var resultItem in resultItems)
                     {
                         resultItem.Users = users;
-                        resultItem.ProjItemName = resultProjItemTypes.FirstOrDefault(item => item.ProjItemTypeId.Equals(resultItem.ProjItemTypeId)).ItemTypeName;
+                        resultItem.ProjItemTypeName = resultProjItemTypes.FirstOrDefault(item => item.ItemTypeId.Equals(resultItem.ProjItemTypeId)).ItemTypeName;
 
                         var status = resultprojStatuses.FirstOrDefault(item => item.StatusId.Equals(resultItem.StatusId));
                         resultItem.StatusName = status != null ? status.Name : null;

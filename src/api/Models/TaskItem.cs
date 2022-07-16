@@ -78,7 +78,7 @@ namespace api.Models
         [JsonProperty(PropertyName = "projItemTypeId")]
         public String ProjItemTypeId { get; set; }
 
-        public String ProjItemName { get; set; }
+        public String ProjItemTypeName { get; set; }
 
         [JsonProperty(PropertyName = "projectId")]
         public String ProjectId { get; set; }

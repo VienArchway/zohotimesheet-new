@@ -109,6 +109,9 @@ namespace api.Infrastructure.Clients
                         property.PropertyType.Equals(typeof(DateTime))) {
                         var date = (DateTime) value;
                         StringValue = date.ToString("yyyy-MM-dd'T'HH:mm:ssZ");
+                    } else if (property.PropertyType.IsArray) {
+                        object[] arrValue = (object[]) value;
+                        StringValue = "[" + String.Join(",", arrValue) + "]";
                     }
                     var keyValue = new KeyValuePair<String, String>(jsonAttr.PropertyName, StringValue);
                     urlParameter.Add(keyValue);

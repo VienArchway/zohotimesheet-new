@@ -15,7 +15,7 @@ namespace api.Models
         [JsonProperty(PropertyName = "name")]
         public String Name { get; set; }
 
-        [JsonProperty(PropertyName = "projItemTypeid", NullValueHandling=NullValueHandling.Ignore)]
+        [JsonProperty(PropertyName = "projitemtypeid", NullValueHandling=NullValueHandling.Ignore)]
         public long? ProjItemTypeId { get; set; }
 
         [JsonProperty(PropertyName = "projpriorityid", NullValueHandling=NullValueHandling.Ignore)]

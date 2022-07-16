@@ -117,19 +117,19 @@
           >
             <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
               <v-icon
-                v-if="task.projItemName === 'Task'"
+                v-if="task.projItemTypeName === 'Task'"
                 color="blue"
                 small
                 icon="mdi-file"
               ></v-icon>
               <v-icon
-                v-else-if="task.projItemName === 'Bug'"
+                v-else-if="task.projItemTypeName === 'Bug'"
                 color="pink"
                 small
                 icon="mdi-bug"
               ></v-icon>
               <v-icon
-                v-else-if="task.projItemName === 'Story'"
+                v-else-if="task.projItemTypeName === 'Story'"
                 color="green"
                 small
                 icon="mdi-flag"
@@ -230,7 +230,7 @@
       </tfoot>
     </v-table>
 
-    <ItemDrawer v-model="itemDrawerModel" />
+    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" @afterCreate="afterCreateItem"/>
   </div>
 </template>
 
@@ -419,7 +419,7 @@ async function search() {
           }
 
           return {
-            id: defaultItem.id,
+            projId: defaultItem.projId,
             name: projName,
             tasks: items,
             projNo: defaultItem.projNo,
@@ -586,6 +586,41 @@ function saveOldLogTime(logTime) {
     return;
   }
   values.oldLogTime = logTime;
+}
+
+function afterCreateItem(item) {
+  const selectedProject = values.data.find(p => p.projId === item.projId);
+  if (selectedProject) {
+    var newItem = {
+      id: item.projId,
+      itemNo: item.itemNo,
+      itemName: item.itemName,
+      projName: item.projName,
+      projNo: item.projNo,
+      projItemTypeName: item.projItemTypeName,
+      statusName: "To do",
+      indent: 0,
+      logWorks: []
+    }
+
+    daysOfWeek.value.forEach((date) => {
+      newItem.logWorks.push({
+        dayOfWeekIndex: date.index,
+        dayOfWeek: date.dayOfWeek,
+        date: date.longDate,
+        logs: [{
+          itemName: item.itemName,
+          itemNo: item.itemNo,
+          logDate: date.longDate,
+          projItemTypeId: item.projItemTypeId,
+          logTime: null,
+        }],
+        isDisabled: moment(date.longDate).isAfter(moment()),
+      })
+    })
+
+    selectedProject.tasks.push(newItem)
+  }
 }
 
 // bind data

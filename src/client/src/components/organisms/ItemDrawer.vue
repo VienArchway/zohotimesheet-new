@@ -4,7 +4,7 @@
       <v-card-title> Create Item </v-card-title>
       <v-card-subtitle>
         <v-select
-          v-model="selectedProjectId"
+          v-model="data.projId"
           :items="projectMasterData"
           label="Select Project"
           variant="outlined"
@@ -19,19 +19,48 @@
         <v-list>
           <v-list-item-group>
             <v-list-item>
-              <v-text-field label="Item Name" density="comfortable" />
-            </v-list-item>
-            <v-list-item>
-              <v-select
-                :items="projectMasterData"
-                label="Epic"
-                item-title="projName"
-                item-value="projId"
+              <v-text-field
+                v-model="data.name"
+                label="Item Name"
                 density="comfortable"
               />
             </v-list-item>
             <v-list-item>
+              <!-- <v-combobox
+                v-model="data.users"
+                :items="assignees"
+                chips
+                clearable
+                label="Assign Users"
+                multiple
+                solo
+              >
+                <template v-slot:selection="{ attrs, item, select, selected }">
+                  <v-chip
+                    v-bind="attrs"
+                    :input-value="selected"
+                    closable
+                    @click="select"
+                    @click:close="remove(item)"
+                  >
+                    <strong>{{ item.displayName }}</strong>&nbsp;
+                  </v-chip>
+                </template>
+              </v-combobox> -->
               <v-select
+                v-model="data.users"
+                :items="assignees"
+                label="Assign Users"
+                item-title="displayName"
+                item-value="userId"
+                density="comfortable"
+                chips
+                multiple
+              />
+            </v-list-item>
+            <v-list-item>
+              <v-select
+                v-model="data.projItemTypeId"
                 :items="selectedProject.itemTypes"
                 label="Item Type"
                 item-title="itemTypeName"
@@ -41,6 +70,7 @@
             </v-list-item>
             <v-list-item>
               <v-select
+                v-model="data.projPriorityId"
                 :items="selectedProject.prorities"
                 label="Priority"
                 item-title="priorityName"
@@ -49,10 +79,18 @@
               />
             </v-list-item>
             <v-list-item>
-              <v-text-field label="Start Date" density="comfortable" />
+              <v-text-field
+                v-model="data.startDate"
+                label="Start Date"
+                density="comfortable"
+              />
             </v-list-item>
             <v-list-item>
-              <v-text-field label="End Date" density="comfortable" />
+              <v-text-field
+                v-model="data.endDate"
+                label="End Date"
+                density="comfortable"
+              />
             </v-list-item>
             <v-list-item>
               <v-select
@@ -66,19 +104,43 @@
           </v-list-item-group>
         </v-list>
       </v-form>
+      <v-card-actions style="justify-content: flex-end;">
+        <v-btn color="success" flat @click="create">
+          Create
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-navigation-drawer>
 </template>
 
 <script setup>
 import { computed, reactive, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import projectApi from "@/api/resources/project";
+import sprintApi from "@/api/resources/sprint";
+import itemApi from "@/api/resources/item";
+import appStore from "@/store/app";
 
-const props = defineProps(["modelValue"]);
-const emit = defineEmits(["update:modelValue"]);
+const { t } = useI18n()
+const app = appStore()
+
+const props = defineProps({
+  modelValue: Boolean,
+  assignees: Array
+});
+const emit = defineEmits(["update:modelValue", "afterCreate"]);
 
 const projectMasterData = ref([]);
-const selectedProjectId = ref(null);
+const data = ref({
+  projId: null,
+  sprintId: null,
+  name: null,
+  projItemTypeId: null,
+  projPriorityId: null,
+  users: [],
+  startDate: null,
+  endDate: null
+});
 const selectedProject = ref({});
 
 const value = computed({
@@ -102,17 +164,36 @@ watch(value, async (newVal) => {
 });
 
 const getProjectDetailMasterData = async () => {
-    selectedProject.value = projectMasterData.value.find(p => p.projId == selectedProjectId.value);
+    selectedProject.value = projectMasterData.value.find(p => p.projId == data.value.projId);
 
     if (selectedProject.value && selectedProject.value.prorities.length === 0) {
-        const [ resPriotiries, resItemTypes ] = await Promise.all([
+        const [ resPriotiries, resItemTypes, resSprints ] = await Promise.all([
             projectApi.getProjectPriorityAsync(selectedProject.value.projId),
             projectApi.getProjectItemTypeAsync(selectedProject.value.projId),
+            sprintApi.search(selectedProject.value.projId)
         ]);
 
         selectedProject.value.prorities = resPriotiries;
         selectedProject.value.itemTypes = resItemTypes;
-        debugger
+        
+        const activeSprint = resSprints.find(s => s.sprintType === 2);
+        if (activeSprint) {
+          data.value.sprintId = activeSprint.sprintId
+        }
     }
 };
+
+const create = async () => {
+  await app.load(async () => {
+    const res = await itemApi.create(data.value)
+
+    res.projId = data.value.projId
+    res.projItemTypeName = selectedProject.value.itemTypes.find(t => t.itemTypeId === data.value.projItemTypeId).itemTypeName;
+    emit("afterCreate", res);
+  })
+}
+
+const remove = (item) => {
+  assignees.splice(assignees.indexOf(item), 1)
+}
 </script>
