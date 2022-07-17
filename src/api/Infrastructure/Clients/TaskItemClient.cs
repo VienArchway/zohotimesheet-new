@@ -192,7 +192,7 @@ namespace api.Infrastructure.Clients
             var formContent = SetAndEncodeParameter(parameter);
 
             var response = await SendItem(url, formContent).ConfigureAwait(false);
-            var result = GetItemFromResponse(response);
+            var result = GetItemFromResponse(response, parameter);
             return result.FirstOrDefault();
         }
 
@@ -203,6 +203,7 @@ namespace api.Infrastructure.Clients
 
             var response = await SendItem(url, formContent).ConfigureAwait(false);
             var result = GetItemFromResponse(response);
+
             return result.FirstOrDefault();
         }
 
@@ -239,7 +240,7 @@ namespace api.Infrastructure.Clients
             return srcJObj;
         }
 
-        private IEnumerable<TaskItem> GetItemFromResponse(JObject srcJObj, Project proj = null)
+        private IEnumerable<TaskItem> GetItemFromResponse(JObject srcJObj, ItemSaveParameter parameter = null)
         {
             var itemProperties = srcJObj.GetValue("item_prop");
             var items = srcJObj.GetValue("itemJObj");
@@ -247,6 +248,7 @@ namespace api.Infrastructure.Clients
             var users = ConvertUserDisplay(userItems);
 
             var resultItems = ConvertJsonResponseToClass<TaskItem>(itemProperties, items);
+
             return resultItems;
         }
     }

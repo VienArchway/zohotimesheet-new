@@ -589,38 +589,50 @@ function saveOldLogTime(logTime) {
 }
 
 function afterCreateItem(item) {
-  const selectedProject = values.data.find(p => p.projId === item.projId);
-  if (selectedProject) {
-    var newItem = {
-      id: item.projId,
-      itemNo: item.itemNo,
-      itemName: item.itemName,
-      projName: item.projName,
+  let selectedProject = values.data.find(p => p.projId === item.projId);
+
+  if (!selectedProject) {
+    const newProject = {
+      projId: item.projId,
+      name: item.projName,
+      tasks: [],
       projNo: item.projNo,
-      projItemTypeName: item.projItemTypeName,
-      statusName: "To do",
-      indent: 0,
-      logWorks: []
-    }
+    };
 
-    daysOfWeek.value.forEach((date) => {
-      newItem.logWorks.push({
-        dayOfWeekIndex: date.index,
-        dayOfWeek: date.dayOfWeek,
-        date: date.longDate,
-        logs: [{
-          itemName: item.itemName,
-          itemNo: item.itemNo,
-          logDate: date.longDate,
-          projItemTypeId: item.projItemTypeId,
-          logTime: null,
-        }],
-        isDisabled: moment(date.longDate).isAfter(moment()),
-      })
-    })
+    selectedProject = newProject;
 
-    selectedProject.tasks.push(newItem)
+    values.data.push(selectedProject);
   }
+
+  var newItem = {
+    id: item.projId,
+    itemNo: item.itemNo,
+    itemName: item.itemName,
+    projName: item.projName,
+    projNo: item.projNo,
+    projItemTypeName: item.projItemTypeName,
+    statusName: "To do",
+    indent: 0,
+    logWorks: []
+  }
+
+  daysOfWeek.value.forEach((date) => {
+    newItem.logWorks.push({
+      dayOfWeekIndex: date.index,
+      dayOfWeek: date.dayOfWeek,
+      date: date.longDate,
+      logs: [{
+        itemName: item.itemName,
+        itemNo: item.itemNo,
+        logDate: date.longDate,
+        projItemTypeId: item.projItemTypeId,
+        logTime: null,
+      }],
+      isDisabled: moment(date.longDate).isAfter(moment()),
+    })
+  })
+
+  selectedProject.tasks.push(newItem)
 }
 
 // bind data

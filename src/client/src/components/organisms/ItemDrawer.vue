@@ -187,8 +187,12 @@ const create = async () => {
   await app.load(async () => {
     const res = await itemApi.create(data.value)
 
+    debugger
     res.projId = data.value.projId
+    res.projName = selectedProject.value.projName
+    res.projNo = selectedProject.value.projNo
     res.projItemTypeName = selectedProject.value.itemTypes.find(t => t.itemTypeId === data.value.projItemTypeId).itemTypeName;
+    res.sprintId = data.value.sprintId
     emit("afterCreate", res);
   })
 }
