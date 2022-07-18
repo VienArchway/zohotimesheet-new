@@ -217,16 +217,25 @@ namespace api.Infrastructure.Clients
 
         public async Task DeleteAsync(DeleteItemParameter parameter)
         {
-            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/{parameter.ItemId}/";
-            var formContent = SetAndEncodeParameter(parameter);
+            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/{parameter.ItemId}/?";
 
-            await SendItem(url, formContent).ConfigureAwait(false);
+            client.DefaultRequestHeaders.Add("x-za-reqsize", new String[] { "large" });
+            var response = await client.DeleteAsync(url).ConfigureAwait(false);
+            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
+            var status = srcJObj.GetValue("status")?.ToObject<String>();
+
+            if (status == null || !status.Equals("success"))
+            {
+                throw new InvalidOperationException(responseContent);
+            }
         }
 
         private async Task<JObject> SendItem(String url, FormUrlEncodedContent formContent)
         {
             client.DefaultRequestHeaders.Add("x-za-reqsize", new String[] { "large" });
-            var response = await client.DeleteAsync(url).ConfigureAwait(false);
+            var response = await client.PostAsync(url, formContent).ConfigureAwait(false);
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);

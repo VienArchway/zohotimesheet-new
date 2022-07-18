@@ -169,10 +169,10 @@ watch(value, async (newVal) => {
 });
 
 const customStartDateFormatter = computed(() => {
-  return searchConditions.startDate ? moment(data.value.startDate).format("LL") : "";
+  return data.value.startDate ? moment(data.value.startDate).format("LL") : "";
 })
 const customEndDateFormatter = computed(() => {
-  return searchConditions.endDate ? moment(data.value.endDate).format("LL") : "";
+  return data.value.endDate ? moment(data.value.endDate).format("LL") : "";
 })
 
 const getProjectDetailMasterData = async () => {

@@ -107,8 +107,16 @@
               <a
                 :href="`${zohoSprintLink}#board/P${proj.projNo}`"
                 target="_blank"
-                >{{ proj.name }}</a
               >
+                {{ proj.name }}
+              </a>
+              <v-btn
+                icon="mdi-plus"
+                size="x-small"
+                color="success"
+                flat
+                @click="toggleItemDrawer(proj)"
+              />
             </td>
           </tr>
           <tr
@@ -117,19 +125,19 @@
           >
             <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
               <v-icon
-                v-if="task.projItemName === 'Task'"
+                v-if="task.projItemTypeName === 'Task'"
                 color="blue"
                 small
                 icon="mdi-file"
               ></v-icon>
               <v-icon
-                v-else-if="task.projItemName === 'Bug'"
+                v-else-if="task.projItemTypeName === 'Bug'"
                 color="pink"
                 small
                 icon="mdi-bug"
               ></v-icon>
               <v-icon
-                v-else-if="task.projItemName === 'Story'"
+                v-else-if="task.projItemTypeName === 'Story'"
                 color="green"
                 small
                 icon="mdi-flag"
@@ -236,7 +244,7 @@
       </tfoot>
     </v-table>
 
-    <ItemDrawer v-model="itemDrawerModel" />
+    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" :projectId="selectedProject?.projId" @afterCreate="afterCreateItem"/>
     <v-dialog v-model="showConfirmDialog" max-width="600px">
         <v-card>
             <v-card-title>
@@ -320,8 +328,9 @@ const estimatedPointVals = reactive([
   0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48
 ])
 
-let assignees = ref([])
-let assignee = ref(null)
+const assignees = ref([])
+const assignee = ref(null)
+const selectedProject = ref(null)
 
 const refTimeSheet = ref(null)
 const startdayOfWeek = ref(moment().startOf('week'))
@@ -333,7 +342,8 @@ const totalDateColumn = computed(() => {
   return selecteddayOfWeek.value.length;
 });
 
-function toggleItemDrawer() {
+function toggleItemDrawer(project) {
+  selectedProject.value = project
   itemDrawerModel.value = !itemDrawerModel.value
 }
 
@@ -466,7 +476,7 @@ async function search() {
           }
 
           return {
-            id: defaultItem.id,
+            projId: defaultItem.projId,
             name: projName,
             tasks: items,
             projNo: defaultItem.projNo,
@@ -633,6 +643,53 @@ function saveOldLogTime(logTime) {
     return;
   }
   values.oldLogTime = logTime;
+}
+
+function afterCreateItem(item) {
+  let selectedProject = values.data.find(p => p.projId === item.projId);
+
+  if (!selectedProject) {
+    const newProject = {
+      projId: item.projId,
+      name: item.projName,
+      tasks: [],
+      projNo: item.projNo,
+    };
+
+    selectedProject = newProject;
+
+    values.data.push(selectedProject);
+  }
+
+  var newItem = {
+    id: item.projId,
+    itemNo: item.itemNo,
+    itemName: item.itemName,
+    projName: item.projName,
+    projNo: item.projNo,
+    projItemTypeName: item.projItemTypeName,
+    statusName: "To do",
+    indent: 0,
+    logWorks: []
+  }
+
+  daysOfWeek.value.forEach((date) => {
+    newItem.logWorks.push({
+      dayOfWeekIndex: date.index,
+      dayOfWeek: date.dayOfWeek,
+      date: date.longDate,
+      logs: [{
+        itemName: item.itemName,
+        itemNo: item.itemNo,
+        logDate: date.longDate,
+        projItemTypeId: item.projItemTypeId,
+        logTime: null,
+      }],
+      isDisabled: moment(date.longDate).isAfter(moment()),
+    })
+  })
+
+  selectedProject.tasks.push(newItem)
 }
 
 let showConfirmDialog = ref(false)
