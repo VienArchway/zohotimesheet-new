@@ -117,19 +117,19 @@
           >
             <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
               <v-icon
-                v-if="task.projItemTypeName === 'Task'"
+                v-if="task.projItemName === 'Task'"
                 color="blue"
                 small
                 icon="mdi-file"
               ></v-icon>
               <v-icon
-                v-else-if="task.projItemTypeName === 'Bug'"
+                v-else-if="task.projItemName === 'Bug'"
                 color="pink"
                 small
                 icon="mdi-bug"
               ></v-icon>
               <v-icon
-                v-else-if="task.projItemTypeName === 'Story'"
+                v-else-if="task.projItemName === 'Story'"
                 color="green"
                 small
                 icon="mdi-flag"
@@ -141,6 +141,12 @@
               >
                 {{ task.itemName }}
               </a>
+              <v-icon
+                color="red"
+                small
+                icon="mdi-trash-can-outline"
+                @click="removeItem(task)"
+              ></v-icon>
             </td>
             <td>
               <v-chip
@@ -230,7 +236,48 @@
       </tfoot>
     </v-table>
 
-    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" @afterCreate="afterCreateItem"/>
+    <ItemDrawer v-model="itemDrawerModel" />
+    <v-dialog v-model="showConfirmDialog" max-width="600px">
+        <v-card>
+            <v-card-title>
+                <span class="headline">{{ t('confirmDialog') }}</span>
+            </v-card-title>
+            <v-card-text>
+                <v-form
+                    ref="form"
+                    v-model="valid"
+                >
+                    <v-row>
+                        <v-col cols="12">
+                            <span>{{ t("confirmRemoveItemMessage")}}</span>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <span color="warning">{{ t("* Data once deleted cannot be recovered.")}}</span>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-checkbox
+                              v-model="confirmedDelete"
+                              label="I understand that the data cannot be recovered."
+                              :value="true"
+                              class="my-n4"
+                              dark
+                              hide-details
+                            />
+                        </v-col>
+                    </v-row>
+                </v-form>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="showConfirmDialog = false">{{ t("close")}}</v-btn>
+                <v-btn :disabled="confirmedDelete == false" color="warning" @click="executeRemoveItem">{{ t("delete")}}</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -344,11 +391,11 @@ async function search() {
     const sprintTypeIds =
         selectDateRange.value === "thisweek" ? ["2"] : ["2", "3"],
       openTaskCondition = {
-        // sprintTypeIds,
-        // statusId: 0,
-        // startDateFrom: selectDateRange.value === "thisweek" ? null : new Date(daysOfWeek.value[0].date._d),
-        // startDateTo: selectDateRange.value === "thisweek" ? null : new Date(daysOfWeek.value[6].date._d),
-        // assignees: [assignee.value]
+        sprintTypeIds,
+        statusId: 0,
+        startDateFrom: selectDateRange.value === "thisweek" ? null : new Date(daysOfWeek.value[0].date._d),
+        startDateTo: selectDateRange.value === "thisweek" ? null : new Date(daysOfWeek.value[6].date._d),
+        assignees: [assignee.value]
       },
       closedTaskCondition = {
         sprintTypeIds,
@@ -419,7 +466,7 @@ async function search() {
           }
 
           return {
-            projId: defaultItem.projId,
+            id: defaultItem.id,
             name: projName,
             tasks: items,
             projNo: defaultItem.projNo,
@@ -588,53 +635,28 @@ function saveOldLogTime(logTime) {
   values.oldLogTime = logTime;
 }
 
-function afterCreateItem(item) {
-  let selectedProject = values.data.find(p => p.projId === item.projId);
-
-  if (!selectedProject) {
-    const newProject = {
-      projId: item.projId,
-      name: item.projName,
-      tasks: [],
-      projNo: item.projNo,
-    };
-
-    selectedProject = newProject;
-
-    values.data.push(selectedProject);
-  }
-
-  var newItem = {
-    id: item.projId,
-    itemNo: item.itemNo,
-    itemName: item.itemName,
-    projName: item.projName,
-    projNo: item.projNo,
-    projItemTypeName: item.projItemTypeName,
-    statusName: "To do",
-    indent: 0,
-    logWorks: []
-  }
-
-  daysOfWeek.value.forEach((date) => {
-    newItem.logWorks.push({
-      dayOfWeekIndex: date.index,
-      dayOfWeek: date.dayOfWeek,
-      date: date.longDate,
-      logs: [{
-        itemName: item.itemName,
-        itemNo: item.itemNo,
-        logDate: date.longDate,
-        projItemTypeId: item.projItemTypeId,
-        logTime: null,
-      }],
-      isDisabled: moment(date.longDate).isAfter(moment()),
-    })
-  })
-
-  selectedProject.tasks.push(newItem)
+let showConfirmDialog = ref(false)
+let deleteItem = ref(null)
+function removeItem(item) {
+  deleteItem.value = item
+  showConfirmDialog.value = true
 }
 
+let confirmedDelete = ref(false)
+async function executeRemoveItem() {
+  await app.load(async () => {
+    const param = {
+      itemId: deleteItem.value.id,
+      projId: deleteItem.value.projId,
+      sprintId: deleteItem.value.sprintId
+    }
+    await itemApi.deleteItem(param);
+  });
+  app.success(t("deletesuccess"), 5000);
+  showConfirmDialog.value = false
+  confirmedDelete.value = false
+  await search()
+}
 // bind data
 onBeforeMount(async () => {
   await loadUsers()

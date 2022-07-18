@@ -226,7 +226,7 @@ namespace api.Infrastructure.Clients
         private async Task<JObject> SendItem(String url, FormUrlEncodedContent formContent)
         {
             client.DefaultRequestHeaders.Add("x-za-reqsize", new String[] { "large" });
-            var response = await client.PostAsync(url, formContent).ConfigureAwait(false);
+            var response = await client.DeleteAsync(url).ConfigureAwait(false);
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
