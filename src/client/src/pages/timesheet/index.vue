@@ -344,11 +344,11 @@ async function search() {
     const sprintTypeIds =
         selectDateRange.value === "thisweek" ? ["2"] : ["2", "3"],
       openTaskCondition = {
-        sprintTypeIds,
-        statusId: 0,
-        startDateFrom: selectDateRange.value === "thisweek" ? null : new Date(daysOfWeek.value[0].date._d),
-        startDateTo: selectDateRange.value === "thisweek" ? null : new Date(daysOfWeek.value[6].date._d),
-        assignees: [assignee.value]
+        // sprintTypeIds,
+        // statusId: 0,
+        // startDateFrom: selectDateRange.value === "thisweek" ? null : new Date(daysOfWeek.value[0].date._d),
+        // startDateTo: selectDateRange.value === "thisweek" ? null : new Date(daysOfWeek.value[6].date._d),
+        // assignees: [assignee.value]
       },
       closedTaskCondition = {
         sprintTypeIds,

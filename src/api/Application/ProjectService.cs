@@ -18,16 +18,6 @@ namespace api.Application
             return client.SearchAsync();
         }
 
-        public Task<IEnumerable<ProjectPriority>> GetProjectPriorityAsync(String id)
-        {
-            return client.GetProjectPriorityAsync(id);
-        }
-
-        public Task<IEnumerable<ProjectItemType>> GetProjectItemTypeAsync(String id)
-        {
-            return client.GetProjectItemTypeAsync(id);
-        }
-
         public Task<Project> GetProjectDetailAsync(String no)
         {
             return client.GetProjectDetailAsync(no);
