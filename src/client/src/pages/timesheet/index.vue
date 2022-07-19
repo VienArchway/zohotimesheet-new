@@ -107,8 +107,16 @@
               <a
                 :href="`${zohoSprintLink}#board/P${proj.projNo}`"
                 target="_blank"
-                >{{ proj.name }}</a
               >
+                {{ proj.name }}
+              </a>
+              <v-btn
+                icon="mdi-plus"
+                size="x-small"
+                color="success"
+                flat
+                @click="toggleItemDrawer(proj)"
+              />
             </td>
           </tr>
           <tr
@@ -230,7 +238,7 @@
       </tfoot>
     </v-table>
 
-    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" @afterCreate="afterCreateItem"/>
+    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" :projectId="selectedProject?.projId" @afterCreate="afterCreateItem"/>
   </div>
 </template>
 
@@ -273,8 +281,9 @@ const estimatedPointVals = reactive([
   0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48
 ])
 
-let assignees = ref([])
-let assignee = ref(null)
+const assignees = ref([])
+const assignee = ref(null)
+const selectedProject = ref(null)
 
 const refTimeSheet = ref(null)
 const startdayOfWeek = ref(moment().startOf('week'))
@@ -286,7 +295,8 @@ const totalDateColumn = computed(() => {
   return selecteddayOfWeek.value.length;
 });
 
-function toggleItemDrawer() {
+function toggleItemDrawer(project) {
+  selectedProject.value = project
   itemDrawerModel.value = !itemDrawerModel.value
 }
 

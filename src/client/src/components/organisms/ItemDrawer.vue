@@ -126,7 +126,8 @@ const app = appStore()
 
 const props = defineProps({
   modelValue: Boolean,
-  assignees: Array
+  assignees: Array,
+  projectId: String
 });
 const emit = defineEmits(["update:modelValue", "afterCreate"]);
 
@@ -161,6 +162,10 @@ watch(value, async (newVal) => {
     });
     projectMasterData.value = resProject;
   }
+
+  if (newVal) {
+    data.value.projId = props.projectId
+  }
 });
 
 const getProjectDetailMasterData = async () => {
@@ -187,7 +192,6 @@ const create = async () => {
   await app.load(async () => {
     const res = await itemApi.create(data.value)
 
-    debugger
     res.projId = data.value.projId
     res.projName = selectedProject.value.projName
     res.projNo = selectedProject.value.projNo
