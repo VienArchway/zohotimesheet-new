@@ -160,13 +160,13 @@ watch(value, async (newVal) => {
     projectMasterData.value = resProject;
   }
 
-  debugger
   if (newVal) {
     data.value.projId = props.project?.projId
   }
 
   if (newVal && props.item) {
     data.value.projId = props.item?.projId
+    data.value.itemId = props.item?.id
   }
 });
 
@@ -187,7 +187,10 @@ const getProjectDetailMasterData = async () => {
         ]);
 
         selectedProject.value.priorities = resProjDetail.projPriorities;
-        selectedProject.value.itemTypes = resProjDetail.projItemTypes;
+        resProjDetail.projItemTypes.forEach(type => {
+          if(type.itemTypeName === "Task" || type.itemTypeName === "Bug")
+            selectedProject.value.itemTypes.push(type)
+        })
         
         selectedProject.value.estPoints = [ 0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48 ];
 
@@ -204,7 +207,7 @@ const getProjectDetailMasterData = async () => {
 
 const create = async () => {
   await app.load(async () => {
-    const res = await itemApi.create(data.value)
+    const res = data.value.itemId === null ? await itemApi.create(data.value) : await itemApi.createSubItem(data.value)
 
     res.projId = data.value.projId
     res.projName = selectedProject.value.projName

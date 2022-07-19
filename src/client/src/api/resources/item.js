@@ -16,6 +16,12 @@ export default {
             return await res.json()
         }
     },
+    async createSubItem(requestInput) {
+        const res = await fetchApi('POST', API_PATH_NAME + '/create-sub-item', null, requestInput)
+        if (res) {
+            return await res.json()
+        }
+    },
     async updateStatus(requestInput) {
         await fetchApi('POST', API_PATH_NAME + '/update-status', null, requestInput)
     },

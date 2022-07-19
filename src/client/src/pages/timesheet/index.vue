@@ -147,7 +147,7 @@
                     {{ task.itemName }}
                   </a>
                 </div>
-                <Command @delete="removeItem(task)" @create="createItem(null, task)"/>
+                <Command @delete="removeItem(task)" @create="createItem(proj, task)"/>
               </div>
             </td>
             <td>
