@@ -74,7 +74,7 @@
         </v-menu>
         <v-btn
           icon="mdi-plus"
-          @click="toggleItemDrawer"
+          @click="createItem"
         />
       </div>
     </v-toolbar>
@@ -102,7 +102,7 @@
           v-for="(proj, index) in values.data"
           :key="`project-${index}`"
         >
-          <tr>
+          <tr class="project-title">
             <td :rowspan="proj.tasks.length ? proj.tasks.length + 1 : 1">
               <a
                 :href="`${zohoSprintLink}#board/P${proj.projNo}`"
@@ -110,13 +110,7 @@
               >
                 {{ proj.name }}
               </a>
-              <v-btn
-                icon="mdi-plus"
-                size="x-small"
-                color="success"
-                flat
-                @click="toggleItemDrawer(proj)"
-              />
+              <Command :can-delete="false" :can-update="false" @create="createItem(proj)"/>
             </td>
           </tr>
           <tr
@@ -153,7 +147,7 @@
                     {{ task.itemName }}
                   </a>
                 </div>
-                <Command @delete="removeItem(task)"/>
+                <Command @delete="removeItem(task)" @create="createItem(null, task)"/>
               </div>
             </td>
             <td>
@@ -244,7 +238,7 @@
       </tfoot>
     </v-table>
 
-    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" :projectId="selectedProject?.projId" @afterCreate="afterCreateItem"/>
+    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" :project="selectedProject" :item="selectedItem" @afterCreate="afterCreateItem"/>
     <v-dialog v-model="showConfirmDialog" max-width="600px">
         <v-card>
             <v-card-title>
@@ -332,7 +326,7 @@ const estimatedPointVals = reactive([
 const assignees = ref([])
 const assignee = ref(null)
 const selectedProject = ref(null)
-
+const selectedItem = ref(null)
 const refTimeSheet = ref(null)
 const startdayOfWeek = ref(moment().startOf('week'))
 const zohoSprintLink = 'https://sprints.zoho.com/team/archwaybeats'
@@ -343,8 +337,9 @@ const totalDateColumn = computed(() => {
   return selecteddayOfWeek.value.length;
 });
 
-function toggleItemDrawer(project) {
+function createItem(project, item) {
   selectedProject.value = project
+  selectedItem.value = item
   itemDrawerModel.value = !itemDrawerModel.value
 }
 
@@ -449,6 +444,7 @@ async function search() {
             itemName: taskitem.itemName,
             projName: taskitem.projName,
             projNo: taskitem.projNo,
+            projId: taskitem.projId
           });
         });
       }
@@ -754,6 +750,10 @@ onBeforeMount(async () => {
 
 .commands {
   display: none;
+}
+
+.project-title:hover .commands {
+  display: inline-flex;
 }
 
 .item-title:hover .commands {

@@ -1,107 +1,98 @@
 <template>
   <v-navigation-drawer v-model="value" width="500" location="right" temporary>
-    <v-card class="mx-auto" height="100%">
+    <v-card class="mx-auto" flat>
       <v-card-title> Create Item </v-card-title>
-      <v-card-subtitle>
-        <v-select
-          v-model="data.projId"
-          :items="projectMasterData"
-          label="Select Project"
-          variant="outlined"
-          item-title="projName"
-          item-value="projId"
-          density="comfortable"
-          @update:modelValue="getProjectDetailMasterData"
-        />
+      <v-card-subtitle class="d-block">
+        <v-form>
+          <v-select
+            v-model="data.projId"
+            :items="projectMasterData"
+            label="Select Project"
+            variant="outlined"
+            item-title="projName"
+            item-value="projId"
+            density="comfortable"
+            @update:modelValue="getProjectDetailMasterData"
+          />
+          <v-text-field
+            :modelValue="props.item?.itemName"
+            v-show="item"
+            label="Parent Item Name"
+            density="comfortable"
+            readonly
+          />
+        </v-form>
       </v-card-subtitle>
       <v-divider></v-divider>
-      <v-form>
-        <v-list>
-          <v-list-item-group>
-            <v-list-item>
-              <v-text-field
-                v-model="data.name"
-                label="Item Name"
-                density="comfortable"
-              />
-            </v-list-item>
-            <v-list-item>
-              <!-- <v-combobox
-                v-model="data.users"
-                :items="assignees"
-                chips
-                clearable
-                label="Assign Users"
-                multiple
-                solo
-              >
-                <template v-slot:selection="{ attrs, item, select, selected }">
-                  <v-chip
-                    v-bind="attrs"
-                    :input-value="selected"
-                    closable
-                    @click="select"
-                    @click:close="remove(item)"
-                  >
-                    <strong>{{ item.displayName }}</strong>&nbsp;
-                  </v-chip>
-                </template>
-              </v-combobox> -->
-              <v-select
-                v-model="data.users"
-                :items="assignees"
-                label="Assign Users"
-                item-title="displayName"
-                item-value="userId"
-                density="comfortable"
-                chips
-                multiple
-              />
-            </v-list-item>
-            <v-list-item>
-              <v-select
-                v-model="data.projItemTypeId"
-                :items="selectedProject.itemTypes"
-                label="Item Type"
-                item-title="itemTypeName"
-                item-value="itemTypeId"
-                density="comfortable"
-              />
-            </v-list-item>
-            <v-list-item>
-              <v-select
-                v-model="data.projPriorityId"
-                :items="selectedProject.priorities"
-                label="Priority"
-                item-title="priorityName"
-                item-value="priorityId"
-                density="comfortable"
-              />
-            </v-list-item>
-            <v-list-item>
-              <v-text-field
-                v-model="data.startDate"
-                label="Start Date"
-                density="comfortable"
-              />
-            </v-list-item>
-            <v-list-item>
-              <v-text-field
-                v-model="data.endDate"
-                label="End Date"
-                density="comfortable"
-              />
-            </v-list-item>
-            <v-list-item>
-              <v-select
-                v-model="data.estPoints"
-                :items="selectedProject.estPoints"
-                label="Estimation Points"
-                density="comfortable"
-              />
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
+      <v-form class="pa-4 pt-6">
+        <v-text-field
+          v-model="data.name"
+          label="Item Name"
+          density="comfortable"
+        />
+        <!-- <v-combobox
+          v-model="data.users"
+          :items="assignees"
+          chips
+          clearable
+          label="Assign Users"
+          multiple
+          solo
+        >
+          <template v-slot:selection="{ attrs, item, select, selected }">
+            <v-chip
+              v-bind="attrs"
+              :input-value="selected"
+              closable
+              @click="select"
+              @click:close="remove(item)"
+            >
+              <strong>{{ item.displayName }}</strong>&nbsp;
+            </v-chip>
+          </template>
+        </v-combobox> -->
+        <v-select
+          v-model="data.users"
+          :items="assignees"
+          label="Assign Users"
+          item-title="displayName"
+          item-value="userId"
+          density="comfortable"
+          chips
+          multiple
+        />
+        <v-select
+          v-model="data.projItemTypeId"
+          :items="selectedProject.itemTypes"
+          label="Item Type"
+          item-title="itemTypeName"
+          item-value="itemTypeId"
+          density="comfortable"
+        />
+        <v-select
+          v-model="data.projPriorityId"
+          :items="selectedProject.priorities"
+          label="Priority"
+          item-title="priorityName"
+          item-value="priorityId"
+          density="comfortable"
+        />
+        <v-text-field
+          v-model="data.startDate"
+          label="Start Date"
+          density="comfortable"
+        />
+        <v-text-field
+          v-model="data.endDate"
+          label="End Date"
+          density="comfortable"
+        />
+        <v-select
+          v-model="data.estPoints"
+          :items="selectedProject.estPoints"
+          label="Estimation Points"
+          density="comfortable"
+        />
       </v-form>
       <v-card-actions style="justify-content: flex-end;">
         <v-btn color="success" flat @click="create">
@@ -127,7 +118,8 @@ const app = appStore()
 const props = defineProps({
   modelValue: Boolean,
   assignees: Array,
-  projectId: String
+  project: Object,
+  item: Object,
 });
 const emit = defineEmits(["update:modelValue", "afterCreate"]);
 
@@ -168,8 +160,13 @@ watch(value, async (newVal) => {
     projectMasterData.value = resProject;
   }
 
+  debugger
   if (newVal) {
-    data.value.projId = props.projectId
+    data.value.projId = props.project?.projId
+  }
+
+  if (newVal && props.item) {
+    data.value.projId = props.item?.projId
   }
 });
 
