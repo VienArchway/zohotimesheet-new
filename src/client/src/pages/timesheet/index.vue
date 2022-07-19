@@ -150,6 +150,7 @@
                 {{ task.itemName }}
               </a>
               <v-icon
+                v-if="assignee === app.zsUserId"
                 color="red"
                 small
                 icon="mdi-trash-can-outline"
