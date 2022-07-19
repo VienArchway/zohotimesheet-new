@@ -71,7 +71,7 @@
             <v-list-item>
               <v-select
                 v-model="data.projPriorityId"
-                :items="selectedProject.prorities"
+                :items="selectedProject.priorities"
                 label="Priority"
                 item-title="priorityName"
                 item-value="priorityId"
@@ -94,10 +94,9 @@
             </v-list-item>
             <v-list-item>
               <v-select
-                :items="projectMasterData"
+                v-model="data.estPoints"
+                :items="selectedProject.estPoints"
                 label="Estimation Points"
-                item-title="projName"
-                item-value="projId"
                 density="comfortable"
               />
             </v-list-item>
@@ -120,6 +119,7 @@ import projectApi from "@/api/resources/project";
 import sprintApi from "@/api/resources/sprint";
 import itemApi from "@/api/resources/item";
 import appStore from "@/store/app";
+import moment from 'moment'
 
 const { t } = useI18n()
 const app = appStore()
@@ -133,14 +133,18 @@ const emit = defineEmits(["update:modelValue", "afterCreate"]);
 
 const projectMasterData = ref([]);
 const data = ref({
+  itemId: null,
   projId: null,
   sprintId: null,
   name: null,
   projItemTypeId: null,
   projPriorityId: null,
   users: [],
-  startDate: null,
-  endDate: null
+  startDate: new Date().toISOString().substr(0, 10),
+  endDate: new Date().toISOString().substr(0, 10),
+  point: null,
+  description: null,
+  duration: null
 });
 const selectedProject = ref({});
 
@@ -157,8 +161,9 @@ watch(value, async (newVal) => {
   if (newVal && projectMasterData.value.length == 0) {
     const resProject = await projectApi.getAll();
     resProject.forEach(p => {
-        p.prorities = [];
+        p.priorities = [];
         p.itemTypes = [];
+        p.estPoints = [];
     });
     projectMasterData.value = resProject;
   }
@@ -168,19 +173,31 @@ watch(value, async (newVal) => {
   }
 });
 
+const customStartDateFormatter = computed(() => {
+  return data.value.startDate ? moment(data.value.startDate).format("LL") : "";
+})
+const customEndDateFormatter = computed(() => {
+  return data.value.endDate ? moment(data.value.endDate).format("LL") : "";
+})
+
 const getProjectDetailMasterData = async () => {
     selectedProject.value = projectMasterData.value.find(p => p.projId == data.value.projId);
 
-    if (selectedProject.value && selectedProject.value.prorities.length === 0) {
-        const [ resPriotiries, resItemTypes, resSprints ] = await Promise.all([
-            projectApi.getProjectPriorityAsync(selectedProject.value.projId),
-            projectApi.getProjectItemTypeAsync(selectedProject.value.projId),
+    if (selectedProject.value && selectedProject.value.priorities.length === 0) {
+        const [ resProjDetail, resSprints ] = await Promise.all([
+            projectApi.getProjectDetailAsync(selectedProject.value.projNo),
             sprintApi.search(selectedProject.value.projId)
         ]);
 
-        selectedProject.value.prorities = resPriotiries;
-        selectedProject.value.itemTypes = resItemTypes;
+        selectedProject.value.priorities = resProjDetail.projPriorities;
+        selectedProject.value.itemTypes = resProjDetail.projItemTypes;
         
+        selectedProject.value.estPoints = [ 0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48 ];
+
+        data.value.projItemTypeId = selectedProject.value.itemTypes[0].itemTypeId;
+        data.value.projPriorityId = selectedProject.value.priorities[0].priorityId;
+        data.value.estPoints = selectedProject.value.estPoints[0];
+
         const activeSprint = resSprints.find(s => s.sprintType === 2);
         if (activeSprint) {
           data.value.sprintId = activeSprint.sprintId

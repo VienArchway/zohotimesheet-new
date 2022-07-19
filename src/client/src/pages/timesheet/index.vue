@@ -149,6 +149,13 @@
               >
                 {{ task.itemName }}
               </a>
+              <v-icon
+                v-if="assignee === app.zsUserId"
+                color="red"
+                small
+                icon="mdi-trash-can-outline"
+                @click="removeItem(task)"
+              ></v-icon>
             </td>
             <td>
               <v-chip
@@ -239,6 +246,47 @@
     </v-table>
 
     <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" :projectId="selectedProject?.projId" @afterCreate="afterCreateItem"/>
+    <v-dialog v-model="showConfirmDialog" max-width="600px">
+        <v-card>
+            <v-card-title>
+                <span class="headline">{{ t('confirmDialog') }}</span>
+            </v-card-title>
+            <v-card-text>
+                <v-form
+                    ref="form"
+                    v-model="valid"
+                >
+                    <v-row>
+                        <v-col cols="12">
+                            <span>{{ t("confirmRemoveItemMessage")}}</span>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <span color="warning">{{ t("* Data once deleted cannot be recovered.")}}</span>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-checkbox
+                              v-model="confirmedDelete"
+                              label="I understand that the data cannot be recovered."
+                              :value="true"
+                              class="my-n4"
+                              dark
+                              hide-details
+                            />
+                        </v-col>
+                    </v-row>
+                </v-form>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="showConfirmDialog = false">{{ t("close")}}</v-btn>
+                <v-btn :disabled="confirmedDelete == false" color="warning" @click="executeRemoveItem">{{ t("delete")}}</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -645,6 +693,28 @@ function afterCreateItem(item) {
   selectedProject.tasks.push(newItem)
 }
 
+let showConfirmDialog = ref(false)
+let deleteItem = ref(null)
+function removeItem(item) {
+  deleteItem.value = item
+  showConfirmDialog.value = true
+}
+
+let confirmedDelete = ref(false)
+async function executeRemoveItem() {
+  await app.load(async () => {
+    const param = {
+      itemId: deleteItem.value.id,
+      projId: deleteItem.value.projId,
+      sprintId: deleteItem.value.sprintId
+    }
+    await itemApi.deleteItem(param);
+  });
+  app.success(t("deletesuccess"), 5000);
+  showConfirmDialog.value = false
+  confirmedDelete.value = false
+  await search()
+}
 // bind data
 onBeforeMount(async () => {
   await loadUsers()

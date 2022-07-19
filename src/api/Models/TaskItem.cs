@@ -80,9 +80,6 @@ namespace api.Models
 
         public String ProjItemTypeName { get; set; }
 
-        [JsonProperty(PropertyName = "projectId")]
-        public String ProjectId { get; set; }
-
         [JsonProperty(PropertyName = "startDate")]
         public String StartDate { get; set; }
 

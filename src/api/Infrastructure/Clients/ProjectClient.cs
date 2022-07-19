@@ -43,41 +43,7 @@ namespace api.Infrastructure.Clients
 
             return result;
         }
-
-        public async Task<IEnumerable<ProjectPriority>> GetProjectPriorityAsync(String id)
-        {
-            var result = new List<ProjectPriority>();
-
-            var response = await client.GetAsync($"team/{teamId}/projects/{id}/priority/").ConfigureAwait(false);
-            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-            var properties = srcJObj.GetValue("projPriority_prop");
-            var items = srcJObj.GetValue("projPriorityJObj");
-            var resultItems = ConvertJsonResponseToClass<ProjectPriority>(properties, items);
-
-            result.AddRange(resultItems);
-
-            return result;
-        }
-
-        public async Task<IEnumerable<ProjectItemType>> GetProjectItemTypeAsync(String id)
-        {
-            var result = new List<ProjectItemType>();
-
-            var response = await client.GetAsync($"team/{teamId}/projects/{id}/itemtype/?action=alldata").ConfigureAwait(false);
-            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            var srcJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-            var properties = srcJObj.GetValue("projItemType_prop");
-            var items = srcJObj.GetValue("projItemTypeJObj");
-            var resultItems = ConvertJsonResponseToClass<ProjectItemType>(properties, items);
-
-            result.AddRange(resultItems);
-
-            return result;
-        }
-
+        
         public async Task<Project> GetProjectDetailAsync(String no)
         {
             var result = new Project();

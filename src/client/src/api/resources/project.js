@@ -8,14 +8,8 @@ export default {
             return await res.json()
         }
     },
-    async getProjectPriorityAsync(projectId) {
-        const res = await fetchApi('GET', API_PATH_NAME + `/priority/${projectId}`)
-        if (res) {
-            return await res.json()
-        }
-    },
-    async getProjectItemTypeAsync(projectId) {
-        const res = await fetchApi('GET', API_PATH_NAME + `/item-type/${projectId}`)
+    async getProjectDetailAsync(projectNo) {
+        const res = await fetchApi('GET', API_PATH_NAME + `/${projectNo}`)
         if (res) {
             return await res.json()
         }
