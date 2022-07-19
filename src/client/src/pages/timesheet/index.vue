@@ -122,40 +122,39 @@
           <tr
             v-for="(task, taskIndex) in proj.tasks"
             :key="`task-${index}-${taskIndex}`"
+            class="item-title"
           >
             <td :style="`padding-left: ${(task.indent + 1) * 25}px`">
-              <v-icon
-                v-if="task.projItemTypeName === 'Task'"
-                color="blue"
-                small
-                icon="mdi-file"
-              ></v-icon>
-              <v-icon
-                v-else-if="task.projItemTypeName === 'Bug'"
-                color="pink"
-                small
-                icon="mdi-bug"
-              ></v-icon>
-              <v-icon
-                v-else-if="task.projItemTypeName === 'Story'"
-                color="green"
-                small
-                icon="mdi-flag"
-              ></v-icon>
-              <a
-                :href="`${zohoSprintLink}#itemdetails/P${proj.projNo}/I${task.itemNo}`"
-                target="_blank"
-                class="pl-2"
-              >
-                {{ task.itemName }}
-              </a>
-              <v-icon
-                v-if="assignee === app.zsUserId"
-                color="red"
-                small
-                icon="mdi-trash-can-outline"
-                @click="removeItem(task)"
-              ></v-icon>
+              <div class="d-inline-flex">
+                <div>
+                  <v-icon
+                    v-if="task.projItemTypeName === 'Task'"
+                    color="blue"
+                    small
+                    icon="mdi-file"
+                  ></v-icon>
+                  <v-icon
+                    v-else-if="task.projItemTypeName === 'Bug'"
+                    color="pink"
+                    small
+                    icon="mdi-bug"
+                  ></v-icon>
+                  <v-icon
+                    v-else-if="task.projItemTypeName === 'Story'"
+                    color="green"
+                    small
+                    icon="mdi-flag"
+                  ></v-icon>
+                  <a
+                    :href="`${zohoSprintLink}#itemdetails/P${proj.projNo}/I${task.itemNo}`"
+                    target="_blank"
+                    class="pl-2"
+                  >
+                    {{ task.itemName }}
+                  </a>
+                </div>
+                <Command @delete="removeItem(task)"/>
+              </div>
             </td>
             <td>
               <v-chip
@@ -300,6 +299,7 @@ import logworkApi from "@/api/resources/logwork";
 import itemApi from "@/api/resources/item";
 import { getAllUser} from '@/api/resources/user'
 
+import Command from '@/components/atoms/Command.vue'
 import ItemDrawer from '@/components/organisms/ItemDrawer.vue'
 
 const { t } = useI18n()
@@ -750,5 +750,13 @@ onBeforeMount(async () => {
 
 .flex-table > div {
   width: 100%;
+}
+
+.commands {
+  display: none;
+}
+
+.item-title:hover .commands {
+  display: inline-flex;
 }
 </style>
