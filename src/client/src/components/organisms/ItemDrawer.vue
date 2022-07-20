@@ -26,7 +26,9 @@
       <v-divider></v-divider>
       <v-form class="pa-4 pt-6">
         <v-text-field
-          v-model="data.name"
+          v-model="v$.name.$model"
+          :error-messages="nameErrors"
+          :rules="[ nameErrors.length === 0 ]"
           label="Item Name"
           density="comfortable"
         />
@@ -106,6 +108,8 @@
 <script setup>
 import { computed, reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { required } from "@vuelidate/validators";
+import useVuelidate from '@vuelidate/core'
 import projectApi from "@/api/resources/project";
 import sprintApi from "@/api/resources/sprint";
 import itemApi from "@/api/resources/item";
@@ -138,6 +142,11 @@ const data = ref({
   description: null,
   duration: null
 });
+
+const v$ = useVuelidate({
+  name: { required }
+}, data)
+
 const selectedProject = ref({});
 
 const value = computed({
@@ -148,6 +157,13 @@ const value = computed({
     emit("update:modelValue", value);
   },
 });
+
+const nameErrors = computed(() => {
+  const errors = []
+  if (!v$.value.name.$dirty) return errors
+  v$.value.name.required.$invalid && errors.push(v$.value.name.required.$message)
+  return errors
+})
 
 watch(value, async (newVal) => {
   if (newVal && projectMasterData.value.length == 0) {
@@ -206,16 +222,25 @@ const getProjectDetailMasterData = async () => {
 };
 
 const create = async () => {
-  await app.load(async () => {
-    const res = data.value.itemId === null ? await itemApi.create(data.value) : await itemApi.createSubItem(data.value)
+  v$.value.$touch()
+  const isValidateError = await v$.value.$validate()
 
-    res.projId = data.value.projId
-    res.projName = selectedProject.value.projName
-    res.projNo = selectedProject.value.projNo
-    res.projItemTypeName = selectedProject.value.itemTypes.find(t => t.itemTypeId === data.value.projItemTypeId).itemTypeName;
-    res.sprintId = data.value.sprintId
-    emit("afterCreate", res);
-  })
+  if (isValidateError) {
+    await app.load(async () => {
+      const parameter = Object.assign(data.value, {
+        name: v$.value.name.$model
+      })
+
+      const res = data.value.itemId === null ? await itemApi.create(parameter) : await itemApi.createSubItem(parameter)
+
+      res.projId = data.value.projId
+      res.projName = selectedProject.value.projName
+      res.projNo = selectedProject.value.projNo
+      res.projItemTypeName = selectedProject.value.itemTypes.find(t => t.itemTypeId === data.value.projItemTypeId).itemTypeName;
+      res.sprintId = data.value.sprintId
+      emit("afterCreate", res);
+    })
+  }
 }
 
 const remove = (item) => {
