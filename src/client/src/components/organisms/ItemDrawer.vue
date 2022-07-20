@@ -15,8 +15,8 @@
             @update:modelValue="getProjectDetailMasterData"
           />
           <v-text-field
-            :modelValue="props.item?.itemName"
-            v-show="item"
+            :modelValue="props.parentItem?.itemName"
+            v-show="parentItem"
             label="Parent Item Name"
             density="comfortable"
             readonly
@@ -26,7 +26,7 @@
       <v-divider></v-divider>
       <v-form class="pa-4 pt-6">
         <v-text-field
-          v-model="v$.name.$model"
+          v-model="v$.itemName.$model"
           :error-messages="nameErrors"
           :rules="[ nameErrors.length === 0 ]"
           label="Item Name"
@@ -90,15 +90,18 @@
           density="comfortable"
         />
         <v-select
-          v-model="data.estPoints"
-          :items="selectedProject.estPoints"
+          v-model="data.estimatePoint"
+          :items="selectedProject.estimatePoints"
           label="Estimation Points"
           density="comfortable"
         />
       </v-form>
       <v-card-actions style="justify-content: flex-end;">
-        <v-btn color="success" flat @click="create">
+        <v-btn v-show="props.parentItem" color="success" flat @click="create">
           Create
+        </v-btn>
+        <v-btn v-show="props.item"  color="success" flat @click="update">
+          Update
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -123,16 +126,17 @@ const props = defineProps({
   modelValue: Boolean,
   assignees: Array,
   project: Object,
-  item: Object,
+  parentItem: Object,
+  item: Object
 });
 const emit = defineEmits(["update:modelValue", "afterCreate"]);
 
 const projectMasterData = ref([]);
 const data = ref({
-  itemId: null,
+  id: null,
   projId: null,
   sprintId: null,
-  name: null,
+  itemName: null,
   projItemTypeId: null,
   projPriorityId: null,
   users: [],
@@ -140,7 +144,8 @@ const data = ref({
   endDate: new Date().toISOString().substr(0, 10),
   point: null,
   description: null,
-  duration: null
+  duration: null,
+  estimatePoint: null
 });
 
 const v$ = useVuelidate({
@@ -171,7 +176,7 @@ watch(value, async (newVal) => {
     resProject.forEach(p => {
         p.priorities = [];
         p.itemTypes = [];
-        p.estPoints = [];
+        p.estimatePoints = [];
     });
     projectMasterData.value = resProject;
   }
@@ -180,9 +185,44 @@ watch(value, async (newVal) => {
     data.value.projId = props.project?.projId
   }
 
+  if (newVal && props.parentItem) {
+    data.value.projId = props.parentItem?.projId
+    data.value.id = props.parentItem?.id
+  }
+
   if (newVal && props.item) {
-    data.value.projId = props.item?.projId
-    data.value.itemId = props.item?.id
+    data.value = {
+      id: props.item.id,
+      projId: props.item.projId,
+      sprintId: props.item.sprintId,
+      itemName: props.item.itemName,
+      projItemTypeId: props.item.projItemTypeId,
+      projPriorityId: props.item.projPriorityId,
+      users: props.item.ownerId,
+      startDate: new Date(props.item.startDate).toISOString().substr(0, 10),
+      endDate: new Date(props.item.endDate).toISOString().substr(0, 10),
+      description: props.item.description,
+      duration: props.item.duration,
+      estimatePoint: props.item.estimatePoint
+    }
+  }
+
+  if (!newVal) {
+    data.value = {
+      id: null,
+      projId: null,
+      sprintId: null,
+      itemName: null,
+      projItemTypeId: null,
+      projPriorityId: null,
+      users: [],
+      startDate: new Date().toISOString().substr(0, 10),
+      endDate: new Date().toISOString().substr(0, 10),
+      point: null,
+      description: null,
+      duration: null,
+      estimatePoint: null
+    }
   }
 });
 
@@ -208,11 +248,11 @@ const getProjectDetailMasterData = async () => {
             selectedProject.value.itemTypes.push(type)
         })
         
-        selectedProject.value.estPoints = [ 0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48 ];
+        selectedProject.value.estimatePoints = [ 0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48 ];
 
         data.value.projItemTypeId = selectedProject.value.itemTypes[0].itemTypeId;
         data.value.projPriorityId = selectedProject.value.priorities[0].priorityId;
-        data.value.estPoints = selectedProject.value.estPoints[0];
+        data.value.estimatePoints = selectedProject.value.estimatePoints[0];
 
         const activeSprint = resSprints.find(s => s.sprintType === 2);
         if (activeSprint) {
@@ -228,10 +268,10 @@ const create = async () => {
   if (isValidateError) {
     await app.load(async () => {
       const parameter = Object.assign(data.value, {
-        name: v$.value.name.$model
+        name: v$.value.itemName.$model
       })
 
-      const res = data.value.itemId === null ? await itemApi.create(parameter) : await itemApi.createSubItem(parameter)
+      const res = data.value.id === null ? await itemApi.create(data.value) : await itemApi.createSubItem(data.value)
 
       res.projId = data.value.projId
       res.projName = selectedProject.value.projName
@@ -241,6 +281,19 @@ const create = async () => {
       emit("afterCreate", res);
     })
   }
+}
+
+const update = async () => {
+  await app.load(async () => {
+    const res = await itemApi.update(data.value)
+
+    res.projId = data.value.projId
+    res.projName = selectedProject.value.projName
+    res.projNo = selectedProject.value.projNo
+    res.projItemTypeName = selectedProject.value.itemTypes.find(t => t.itemTypeId === data.value.projItemTypeId).itemTypeName;
+    res.sprintId = data.value.sprintId
+    emit("afterUpdate", res);
+  })
 }
 
 const remove = (item) => {

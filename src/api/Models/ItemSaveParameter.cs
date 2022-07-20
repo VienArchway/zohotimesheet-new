@@ -6,14 +6,14 @@ namespace api.Models
 {
     public class ItemSaveParameter
     {
-        public String ItemId { get; set; }
+        public String Id { get; set; }
 
         public String ProjId { get; set; }
 
         public String SprintId { get; set; }
 
         [JsonProperty(PropertyName = "name")]
-        public String Name { get; set; }
+        public String ItemName { get; set; }
 
         [JsonProperty(PropertyName = "projitemtypeid", NullValueHandling=NullValueHandling.Ignore)]
         public long? ProjItemTypeId { get; set; }
@@ -28,7 +28,7 @@ namespace api.Models
         public String Description { get; set; }
 
         [JsonProperty(PropertyName = "point", NullValueHandling=NullValueHandling.Ignore)]
-        public int? Point { get; set; }
+        public int? EstimatePoint { get; set; }
 
         [JsonProperty(PropertyName = "duration", NullValueHandling=NullValueHandling.Ignore)]
         public String duration { get; set; }

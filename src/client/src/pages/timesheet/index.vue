@@ -147,7 +147,7 @@
                     {{ task.itemName }}
                   </a>
                 </div>
-                <Command @delete="removeItem(task)" @create="createItem(proj, task)"/>
+                <Command @delete="removeItem(task)" @create="createItem(proj, task)" @update="updateItem(proj, task)"/>
               </div>
             </td>
             <td>
@@ -238,7 +238,7 @@
       </tfoot>
     </v-table>
 
-    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" :project="selectedProject" :item="selectedItem" @afterCreate="afterCreateItem"/>
+    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" :project="selectedProject" :parent-item="selectedParentItem" :item="selectedItem" @afterCreate="afterCreateItem"/>
     <v-dialog v-model="showConfirmDialog" max-width="600px">
         <v-card>
             <v-card-title>
@@ -326,6 +326,7 @@ const estimatedPointVals = reactive([
 const assignees = ref([])
 const assignee = ref(null)
 const selectedProject = ref(null)
+const selectedParentItem = ref(null)
 const selectedItem = ref(null)
 const refTimeSheet = ref(null)
 const startdayOfWeek = ref(moment().startOf('week'))
@@ -339,7 +340,15 @@ const totalDateColumn = computed(() => {
 
 function createItem(project, item) {
   selectedProject.value = project
+  selectedParentItem.value = item
+  selectedItem.value = null
+  itemDrawerModel.value = !itemDrawerModel.value
+}
+
+function updateItem(project, item) {
+  selectedProject.value = project
   selectedItem.value = item
+  selectedParentItem.value = null
   itemDrawerModel.value = !itemDrawerModel.value
 }
 

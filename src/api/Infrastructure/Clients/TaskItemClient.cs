@@ -198,7 +198,7 @@ namespace api.Infrastructure.Clients
 
         public async Task<TaskItem> CreateSubItemAsync(ItemSaveParameter parameter)
         {
-            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/{parameter.ItemId}/subitem/";
+            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/{parameter.Id}/subitem/";
             var formContent = SetAndEncodeParameter(parameter);
 
             var response = await SendItem(url, formContent).ConfigureAwait(false);
@@ -209,7 +209,7 @@ namespace api.Infrastructure.Clients
 
         public async Task UpdateAsync(ItemSaveParameter parameter)
         {
-            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/{parameter.ItemId}/";
+            var url = $"team/{teamId}/projects/{parameter.ProjId}/sprints/{parameter.SprintId}/item/{parameter.Id}/";
             var formContent = SetAndEncodeParameter(parameter);
 
             await SendItem(url, formContent).ConfigureAwait(false);
