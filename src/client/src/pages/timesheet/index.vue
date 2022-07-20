@@ -238,7 +238,7 @@
       </tfoot>
     </v-table>
 
-    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" :project="selectedProject" :parent-item="selectedParentItem" :item="selectedItem" @afterCreate="afterCreateItem"/>
+    <ItemDrawer v-model="itemDrawerModel" :assignees="assignees" :project="selectedProject" :parent-item="selectedParentItem" :item="selectedItem" @afterSaved="afterSavedItem"/>
     <v-dialog v-model="showConfirmDialog" max-width="600px">
         <v-card>
             <v-card-title>
@@ -651,7 +651,16 @@ function saveOldLogTime(logTime) {
   values.oldLogTime = logTime;
 }
 
-function afterCreateItem(item) {
+function afterSavedItem(item) {
+  if(selectedParentItem.value) {
+    afterCreatedItem(item)
+  } else {
+    afterUpdatedItem(item)
+  }
+  
+  itemDrawerModel.value = !itemDrawerModel.value
+}
+function afterCreatedItem(item) {
   let selectedProject = values.data.find(p => p.projId === item.projId);
 
   if (!selectedProject) {
@@ -696,6 +705,18 @@ function afterCreateItem(item) {
   })
 
   selectedProject.tasks.push(newItem)
+}
+
+function afterUpdatedItem(item) {
+  values.data.find(p => {
+    if(p.projId === item.projId) {
+      p.tasks.find(t => {
+        if(t.id === item.id) {
+          t.itemName = item.itemName
+        }
+      })
+    }
+  })
 }
 
 let showConfirmDialog = ref(false)

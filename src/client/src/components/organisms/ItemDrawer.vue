@@ -97,7 +97,7 @@
         />
       </v-form>
       <v-card-actions style="justify-content: flex-end;">
-        <v-btn v-show="props.parentItem" color="success" flat @click="create">
+        <v-btn v-show="!props.item" color="success" flat @click="create">
           Create
         </v-btn>
         <v-btn v-show="props.item"  color="success" flat @click="update">
@@ -129,7 +129,7 @@ const props = defineProps({
   parentItem: Object,
   item: Object
 });
-const emit = defineEmits(["update:modelValue", "afterCreate"]);
+const emit = defineEmits(["update:modelValue", "afterSaved"]);
 
 const projectMasterData = ref([]);
 const data = ref({
@@ -149,7 +149,7 @@ const data = ref({
 });
 
 const v$ = useVuelidate({
-  name: { required }
+  itemName: { required }
 }, data)
 
 const selectedProject = ref({});
@@ -165,8 +165,8 @@ const value = computed({
 
 const nameErrors = computed(() => {
   const errors = []
-  if (!v$.value.name.$dirty) return errors
-  v$.value.name.required.$invalid && errors.push(v$.value.name.required.$message)
+  if (!v$.value.itemName.$dirty) return errors
+  v$.value.itemName.required.$invalid && errors.push(v$.value.itemName.required.$message)
   return errors
 })
 
@@ -278,21 +278,16 @@ const create = async () => {
       res.projNo = selectedProject.value.projNo
       res.projItemTypeName = selectedProject.value.itemTypes.find(t => t.itemTypeId === data.value.projItemTypeId).itemTypeName;
       res.sprintId = data.value.sprintId
-      emit("afterCreate", res);
+      emit("afterSaved", res);
     })
   }
 }
 
 const update = async () => {
   await app.load(async () => {
-    const res = await itemApi.update(data.value)
+    await itemApi.update(data.value)
 
-    res.projId = data.value.projId
-    res.projName = selectedProject.value.projName
-    res.projNo = selectedProject.value.projNo
-    res.projItemTypeName = selectedProject.value.itemTypes.find(t => t.itemTypeId === data.value.projItemTypeId).itemTypeName;
-    res.sprintId = data.value.sprintId
-    emit("afterUpdate", res);
+    emit("afterSaved", data.value);
   })
 }
 
