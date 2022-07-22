@@ -74,7 +74,7 @@
         </v-menu>
         <v-btn
           icon="mdi-plus"
-          @click="createItem"
+          @click="createItem(null, null)"
         />
       </div>
     </v-toolbar>
@@ -110,7 +110,7 @@
               >
                 {{ proj.name }}
               </a>
-              <Command :can-delete="false" :can-update="false" @create="createItem(proj)"/>
+              <Command :can-delete="false" :can-update="false" @create="createItem(proj, null)"/>
             </td>
           </tr>
           <tr

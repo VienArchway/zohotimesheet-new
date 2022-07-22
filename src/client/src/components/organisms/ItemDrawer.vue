@@ -6,6 +6,7 @@
         <v-form>
           <v-select
             v-model="data.projId"
+            :disabled="props.project !== null || props.parentItem !== null || props.item !== null"
             :items="projectMasterData"
             label="Select Project"
             variant="outlined"
@@ -17,6 +18,7 @@
           <v-text-field
             :modelValue="props.parentItem?.itemName"
             v-show="parentItem"
+            :disabled="props.parentItem !== null"
             label="Parent Item Name"
             density="comfortable"
             readonly
@@ -65,7 +67,7 @@
         />
         <v-select
           v-model="data.projItemTypeId"
-          :items="selectedProject.itemTypes"
+          :items="selectedProject?.itemTypes"
           label="Item Type"
           item-title="itemTypeName"
           item-value="itemTypeId"
@@ -73,7 +75,7 @@
         />
         <v-select
           v-model="data.projPriorityId"
-          :items="selectedProject.priorities"
+          :items="selectedProject?.priorities"
           label="Priority"
           item-title="priorityName"
           item-value="priorityId"
@@ -91,7 +93,7 @@
         />
         <v-select
           v-model="data.estimatePoint"
-          :items="selectedProject.estimatePoints"
+          :items="selectedProject?.estimatePoints"
           label="Estimation Points"
           density="comfortable"
         />
@@ -180,9 +182,9 @@ watch(value, async (newVal) => {
     });
     projectMasterData.value = resProject;
   }
-
   if (newVal) {
     data.value.projId = props.project?.projId
+    await getProjectDetailMasterData()
   }
 
   if (newVal && props.parentItem) {
