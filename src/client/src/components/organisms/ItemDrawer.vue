@@ -8,7 +8,7 @@
             v-model="data.projId"
             :disabled="props.project !== null || props.parentItem !== null || props.item !== null"
             :items="projectMasterData"
-            label="Select Project"
+            :label="t('project')"
             variant="outlined"
             item-title="projName"
             item-value="projId"
@@ -19,7 +19,7 @@
             :modelValue="props.parentItem?.itemName"
             v-show="parentItem"
             :disabled="props.parentItem !== null"
-            label="Parent Item Name"
+            :label="t('parentitemname')"
             density="comfortable"
             readonly
           />
@@ -31,7 +31,12 @@
           v-model="v$.itemName.$model"
           :error-messages="nameErrors"
           :rules="[ nameErrors.length === 0 ]"
-          label="Item Name"
+          :label="t('itemname')"
+          density="comfortable"
+        />
+        <v-text-field
+          v-model="data.description"
+          :label="t('description')"
           density="comfortable"
         />
         <!-- <v-combobox
@@ -58,7 +63,7 @@
         <v-select
           v-model="data.users"
           :items="assignees"
-          label="Assign Users"
+          :label="t('assigneeusers')"
           item-title="displayName"
           item-value="userId"
           density="comfortable"
@@ -68,7 +73,7 @@
         <v-select
           v-model="data.projItemTypeId"
           :items="selectedProject?.itemTypes"
-          label="Item Type"
+          :label="t('itemtype')"
           item-title="itemTypeName"
           item-value="itemTypeId"
           density="comfortable"
@@ -76,34 +81,34 @@
         <v-select
           v-model="data.projPriorityId"
           :items="selectedProject?.priorities"
-          label="Priority"
+          :label="t('priority')"
           item-title="priorityName"
           item-value="priorityId"
           density="comfortable"
         />
         <v-text-field
           v-model="data.startDate"
-          label="Start Date"
+          :label="t('startdate')"
           density="comfortable"
         />
         <v-text-field
           v-model="data.endDate"
-          label="End Date"
+          :label="t('enddate')"
           density="comfortable"
         />
         <v-select
           v-model="data.estimatePoint"
           :items="selectedProject?.estimatePoints"
-          label="Estimation Points"
+          :label="t('estimatepoints')"
           density="comfortable"
         />
       </v-form>
       <v-card-actions style="justify-content: flex-end;">
         <v-btn v-show="!props.item" color="success" flat @click="create">
-          Create
+          {{ t('create')}}
         </v-btn>
         <v-btn v-show="props.item"  color="success" flat @click="update">
-          Update
+          {{ t('create')}}
         </v-btn>
       </v-card-actions>
     </v-card>

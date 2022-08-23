@@ -256,14 +256,14 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <span color="warning">{{ t("* Data once deleted cannot be recovered.")}}</span>
+                            <span color="warning">{{ t("datacannotberecovered")}}</span>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
                             <v-checkbox
                               v-model="confirmedDelete"
-                              label="I understand that the data cannot be recovered."
+                              label="confirmunderstand"
                               :value="true"
                               class="my-n4"
                               dark
@@ -680,6 +680,7 @@ function afterCreatedItem(item) {
     id: item.projId,
     itemNo: item.itemNo,
     itemName: item.itemName,
+    description: item.description,
     projName: item.projName,
     projNo: item.projNo,
     projItemTypeName: item.projItemTypeName,
@@ -713,6 +714,7 @@ function afterUpdatedItem(item) {
       p.tasks.find(t => {
         if(t.id === item.id) {
           t.itemName = item.itemName
+          t.description = item.description
         }
       })
     }

@@ -60,13 +60,29 @@
   "name":"名前",
   "url":"Url",
   "webhook": "Web通知",
+  "parentitemname": "親アイテム名",
+  "addnewitem":"新アイテム作成",
+  "updateitem":"Update Item",
+  "itemname":"アイテム名",
+  "description":"詳細",
+  "asigneeusers":"担当者",
+  "itemtype":"アイテムタイプ",
+  "priority":"優先度",
+  "confirmDialog": "確認ダイアログ",
+  "confirmRemoveItemMessage": "このアイテムを削除しますか？",
+  "datacannotberecovered": "※削除したデータは復元できません。",
+  "confirmunderstand": "削除したデータを復元できないことを理解しています。",
   "messages": {
     "dataloaded": "データが取得しました。"
   },
   "button": {
     "back": "戻る",
     "try-again": "もう一度やり直してください",
-    "refresh": "リフレッシュ"
+    "refresh": "リフレッシュ",
+    "create": "作成",
+    "update": "更新",
+    "delete": "削除",
+    "close": "閉じる"
   },
   "pages": {
     "not-found": "見つかりません"
