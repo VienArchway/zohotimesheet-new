@@ -14,7 +14,7 @@ namespace api.Application
             services.AddScoped<IZohoTokenService, ZohoTokenService>();
             services.AddScoped<IWebHookService, WebHookService>();
             services.AddScoped<ISlackService, SlackService>();
-            // services.AddScoped<IWebHookService, WebHookService>();
+            services.AddScoped<IEpicService, EpicService>();
             services.AddScoped<IAdlsService, AdlsService>();
 
             services.AddHostedService<QueuedHostedService>();

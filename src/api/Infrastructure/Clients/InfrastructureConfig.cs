@@ -22,6 +22,7 @@ namespace api.Infrastructure
             services.AddScoped<IWebHookClient, WebHookClient>();
             services.AddScoped<IAdlsClient, AdlsClient>();
             services.AddScoped<ISlackWebHookClient, SlackWebHookClient>();
+            services.AddScoped<IEpicClient, EpicClient>();
         }
     }
 }

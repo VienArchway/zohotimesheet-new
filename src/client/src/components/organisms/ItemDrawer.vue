@@ -79,6 +79,14 @@
           density="comfortable"
         />
         <v-select
+          v-model="data.epicId"
+          :items="selectedProject?.epicItems"
+          :label="t('epic')"
+          item-title="name"
+          item-value="id"
+          density="comfortable"
+        />
+        <v-select
           v-model="data.projPriorityId"
           :items="selectedProject?.priorities"
           :label="t('priority')"
@@ -121,6 +129,7 @@ import { useI18n } from "vue-i18n";
 import { required } from "@vuelidate/validators";
 import useVuelidate from '@vuelidate/core'
 import projectApi from "@/api/resources/project";
+import epicApi from "@/api/resources/epic";
 import sprintApi from "@/api/resources/sprint";
 import itemApi from "@/api/resources/item";
 import appStore from "@/store/app";
@@ -144,6 +153,7 @@ const data = ref({
   projId: null,
   sprintId: null,
   itemName: null,
+  epicId: null,
   projItemTypeId: null,
   projPriorityId: null,
   users: [],
@@ -181,6 +191,7 @@ watch(value, async (newVal) => {
   if (newVal && projectMasterData.value.length == 0) {
     const resProject = await projectApi.getAll();
     resProject.forEach(p => {
+        p.epicItems = [];
         p.priorities = [];
         p.itemTypes = [];
         p.estimatePoints = [];
@@ -203,6 +214,7 @@ watch(value, async (newVal) => {
       projId: props.item.projId,
       sprintId: props.item.sprintId,
       itemName: props.item.itemName,
+      epicId: props.item.epicId,
       projItemTypeId: props.item.projItemTypeId,
       projPriorityId: props.item.projPriorityId,
       users: props.item.ownerId,
@@ -220,6 +232,7 @@ watch(value, async (newVal) => {
       projId: null,
       sprintId: null,
       itemName: null,
+      epicId: null,
       projItemTypeId: null,
       projPriorityId: null,
       users: [],
@@ -244,10 +257,14 @@ const getProjectDetailMasterData = async () => {
     selectedProject.value = projectMasterData.value.find(p => p.projId == data.value.projId);
 
     if (selectedProject.value && selectedProject.value.priorities.length === 0) {
-        const [ resProjDetail, resSprints ] = await Promise.all([
+        const [ resProjDetail, resSprints, resEpics ] = await Promise.all([
             projectApi.getProjectDetailAsync(selectedProject.value.projNo),
-            sprintApi.search(selectedProject.value.projId)
+            sprintApi.search(selectedProject.value.projId),
+            epicApi.search(selectedProject.value.projId)
         ]);
+        
+        selectedProject.value.epicItems = resEpics;
+        selectedProject.value.epicItems.unshift({ id: "-1", name: "None" });
 
         selectedProject.value.priorities = resProjDetail.projPriorities;
         resProjDetail.projItemTypes.forEach(type => {
@@ -257,6 +274,8 @@ const getProjectDetailMasterData = async () => {
         
         selectedProject.value.estimatePoints = [ 0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48 ];
 
+        // Default value set
+        data.value.epicId = selectedProject.value.epicItems[0].id;
         data.value.projItemTypeId = selectedProject.value.itemTypes[0].itemTypeId;
         data.value.projPriorityId = selectedProject.value.priorities[0].priorityId;
         data.value.estimatePoints = selectedProject.value.estimatePoints[0];
