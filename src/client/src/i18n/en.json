@@ -71,6 +71,7 @@
   "itemname":"Item Name",
   "description":"Description",
   "assigneeusers":"Asignee Users",
+  "epic": "Epic",
   "itemtype":"Item Type",
   "priority":"Priority",
   "confirmDialog": "Confirm Dialog",

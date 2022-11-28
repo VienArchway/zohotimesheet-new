@@ -41,6 +41,8 @@
   "delete": "削除",
   "date": "日付",
   "assignee": "担当者",
+  "assigneeusers": "担当者",
+  "epic": "Epic",
   "completeon": "完了日",
   "reloadData": "タイムシートのデータを再ロードする",
   "thisweekinformation": "今週のアイテムは、アクティブなスプリントのすべての先週と今週に開始されて、完了されないアイテム（Open Work Items）と今週実行されたアイテム（Closed Work Items）が含まれる",
