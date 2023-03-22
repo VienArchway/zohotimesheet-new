@@ -80,8 +80,10 @@
         />
         <v-select
           v-model="data.epicId"
+          v-show="!parentItem"
           :items="selectedProject?.epicItems"
           :label="t('epic')"
+          :disabled="props.parentItem !== null"
           item-title="name"
           item-value="id"
           density="comfortable"
