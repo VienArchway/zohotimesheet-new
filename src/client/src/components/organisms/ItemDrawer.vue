@@ -257,34 +257,42 @@ const getProjectDetailMasterData = async () => {
     selectedProject.value = projectMasterData.value.find(p => p.projId == data.value.projId);
 
     if (selectedProject.value && selectedProject.value.priorities.length === 0) {
-        const [ resProjDetail, resSprints, resEpics ] = await Promise.all([
-            projectApi.getProjectDetailAsync(selectedProject.value.projNo),
-            sprintApi.search(selectedProject.value.projId),
-            epicApi.search(selectedProject.value.projId)
-        ]);
-        
-        selectedProject.value.epicItems = resEpics;
-        selectedProject.value.epicItems.unshift({ id: "-1", name: "None" });
+      const [ resProjDetail, resSprints, resEpics ] = await Promise.all([
+          projectApi.getProjectDetailAsync(selectedProject.value.projNo),
+          sprintApi.search(selectedProject.value.projId),
+          epicApi.search(selectedProject.value.projId)
+      ]);
+      
+      selectedProject.value.epicItems = resEpics;
+      selectedProject.value.epicItems.unshift({ id: "-1", name: "None" });
 
-        selectedProject.value.priorities = resProjDetail.projPriorities;
-        resProjDetail.projItemTypes.forEach(type => {
-          if(type.itemTypeName === "Task" || type.itemTypeName === "Bug")
-            selectedProject.value.itemTypes.push(type)
-        })
-        
-        selectedProject.value.estimatePoints = [ 0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48 ];
+      selectedProject.value.priorities = resProjDetail.projPriorities;
+      
+      selectedProject.value.allItemTypes = resProjDetail.projItemTypes
+      
+      selectedProject.value.estimatePoints = [ 0, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48 ];
 
-        // Default value set
-        data.value.epicId = selectedProject.value.epicItems[0].id;
-        data.value.projItemTypeId = selectedProject.value.itemTypes[0].itemTypeId;
-        data.value.projPriorityId = selectedProject.value.priorities[0].priorityId;
-        data.value.estimatePoints = selectedProject.value.estimatePoints[0];
+      // Default value set
+      data.value.epicId = selectedProject.value.epicItems[0].id;
+      data.value.projPriorityId = selectedProject.value.priorities[0].priorityId;
+      data.value.estimatePoints = selectedProject.value.estimatePoints[0];
 
-        const activeSprint = resSprints.find(s => s.sprintType === 2);
-        if (activeSprint) {
-          data.value.sprintId = activeSprint.sprintId
-        }
+      const activeSprint = resSprints.find(s => s.sprintType === 2);
+      if (activeSprint) {
+        data.value.sprintId = activeSprint.sprintId
+      }
     }
+    selectedProject.value.itemTypes = []
+    if(props.parentItem !== null) {
+      selectedProject.value.allItemTypes.forEach(type => {
+        if(type.itemTypeName === "Task" || type.itemTypeName === "Bug")
+          selectedProject.value.itemTypes.push(type)
+      })
+    } else {
+      selectedProject.value.itemTypes = selectedProject.value.allItemTypes
+    }
+    
+    data.value.projItemTypeId = selectedProject.value.itemTypes[0].itemTypeId;
 };
 
 const create = async () => {
