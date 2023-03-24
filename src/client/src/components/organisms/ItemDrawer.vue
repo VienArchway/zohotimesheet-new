@@ -118,7 +118,7 @@
           {{ t('create')}}
         </v-btn>
         <v-btn v-show="props.item"  color="success" flat @click="update">
-          {{ t('create')}}
+          {{ t('update')}}
         </v-btn>
       </v-card-actions>
     </v-card>
